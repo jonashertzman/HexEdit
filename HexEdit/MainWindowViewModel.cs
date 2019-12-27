@@ -2,6 +2,7 @@
 using System.ComponentModel;
 using System.IO;
 using System.Reflection;
+using System.Windows.Media;
 
 namespace HexEdit
 {
@@ -32,6 +33,18 @@ namespace HexEdit
 		public string FullApplicationName
 		{
 			get { return $"{Title} {Version}  (Build {BuildNumber})"; }
+		}
+
+		public FontFamily Font
+		{
+			get { return AppSettings.Font; }
+			set { AppSettings.Font = value; OnPropertyChanged(nameof(Font)); }
+		}
+
+		public int FontSize
+		{
+			get { return AppSettings.FontSize; }
+			set { AppSettings.FontSize = value; OnPropertyChanged(nameof(FontSize)); }
 		}
 
 		#endregion
