@@ -1,0 +1,50 @@
+﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" xmlns:local="clr-namespace:HexEdit">
+
+
+	<DataTemplate x:Key="SaveIcon">
+		<Viewbox>
+			<Canvas Width="160" Height="160">
+				<Path StrokeThickness="0">
+					<Path.Fill>
+						<LinearGradientBrush EndPoint="0.6,1" StartPoint="0.4,0">
+							<GradientStop Color="#FF97B2FF" Offset="0" />
+							<GradientStop Color="#FF434A71" Offset="1" />
+						</LinearGradientBrush>
+					</Path.Fill>
+					<Path.Data>
+						<PathGeometry>
+							<PathGeometry.Figures>
+								<PathFigure StartPoint="0,0" IsClosed="True">
+									<PathFigure.Segments>
+										<LineSegment Point="140,0" />
+										<LineSegment Point="160,20" />
+										<LineSegment Point="160,160" />
+										<LineSegment Point="0,160" />
+									</PathFigure.Segments>
+								</PathFigure>
+							</PathGeometry.Figures>
+						</PathGeometry>
+					</Path.Data>
+				</Path>
+				<Rectangle Canvas.Left="50" Canvas.Top="0" Width="70" Height="50">
+					<Rectangle.Fill>
+						<LinearGradientBrush EndPoint="1,1" StartPoint="0,0">
+							<GradientStop Color="#FFE2E0FF" Offset="0" />
+							<GradientStop Color="#FFBBBBBB" Offset="1" />
+						</LinearGradientBrush>
+					</Rectangle.Fill>
+				</Rectangle>
+				<Rectangle Canvas.Left="20" Canvas.Top="70" Width="120" Height="80">
+					<Rectangle.Fill>
+						<LinearGradientBrush EndPoint="1,1" StartPoint="0,0">
+							<GradientStop Color="White" Offset="0" />
+							<GradientStop Color="Gainsboro" Offset="1" />
+						</LinearGradientBrush>
+					</Rectangle.Fill>
+				</Rectangle>
+			</Canvas>
+		</Viewbox>
+	</DataTemplate>
+
+
+</ResourceDictionary>

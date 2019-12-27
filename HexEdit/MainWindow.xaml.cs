@@ -69,6 +69,25 @@ namespace HexEdit
 			}
 		}
 
+		#region Commands
+
+		private void CommandSave_Executed(object sender, System.Windows.Input.ExecutedRoutedEventArgs e)
+		{
+
+		}
+
+		private void CommandSave_CanExecute(object sender, System.Windows.Input.CanExecuteRoutedEventArgs e)
+		{
+			e.CanExecute = true;
+		}
+
+		private void CommandExit_Executed(object sender, System.Windows.Input.ExecutedRoutedEventArgs e)
+		{
+			this.Close();
+		}
+
+		#endregion
+
 		#endregion
 
 	}

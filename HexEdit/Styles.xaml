@@ -1,0 +1,36 @@
+﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" xmlns:local="clr-namespace:HexEdit">
+
+	<Style x:Key="ShortcutTooltip" TargetType="TextBlock">
+		<Setter Property="Margin" Value="20,0,0,0" />
+		<Setter Property="Foreground" Value="Gray" />
+	</Style>
+
+	<Style x:Key="CommonButton" TargetType="Button">
+		<Setter Property="Padding" Value="3" />
+		<Setter Property="Margin" Value="5" />
+		<Setter Property="MinWidth" Value="80" />
+		<Setter Property="BorderBrush" Value="{StaticResource {x:Static SystemColors.ControlDarkBrushKey} }" />
+	</Style>
+
+	<Style x:Key="CommonButtonIcon" TargetType="ContentPresenter">
+		<Setter Property="MaxHeight" Value="16" />
+		<Setter Property="MaxWidth" Value="16" />
+		<Setter Property="Margin" Value="2" />
+		<Style.Triggers>
+			<Trigger Property="IsEnabled" Value="False">
+				<Setter Property="Opacity" Value="0.4"></Setter>
+			</Trigger>
+		</Style.Triggers>
+	</Style>
+
+	<Style x:Key="ToolbarButton" TargetType="Button" BasedOn="{StaticResource {x:Static ToolBar.ButtonStyleKey}}">
+		<Setter Property="Margin" Value="2" />
+		<Setter Property="Focusable" Value="False" />
+		<Style.Triggers>
+			<Trigger Property="IsEnabled" Value="False">
+				<Setter Property="Background" Value="Transparent"></Setter>
+			</Trigger>
+		</Style.Triggers>
+	</Style>
+
+</ResourceDictionary>
