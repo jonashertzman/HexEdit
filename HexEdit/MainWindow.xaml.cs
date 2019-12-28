@@ -1,4 +1,7 @@
-﻿using System;
+﻿using Microsoft.Win32;
+using System;
+using System.Collections.ObjectModel;
+using System.IO;
 using System.Windows;
 
 namespace HexEdit
@@ -47,6 +50,20 @@ namespace HexEdit
 			AppSettings.WriteSettingsToDisk();
 		}
 
+		private void OpenFile(string path)
+		{
+			try
+			{
+				ViewModel.FileContent = new ObservableCollection<byte>(File.ReadAllBytes(path));
+
+				ViewModel.CurrentFile = path;
+			}
+			catch (Exception exception)
+			{
+				MessageBox.Show(exception.Message, $"Error Opening File {path}", MessageBoxButton.OK, MessageBoxImage.Error);
+			}
+		}
+
 		#endregion
 
 		#region Events
@@ -65,11 +82,26 @@ namespace HexEdit
 		{
 			if (Environment.GetCommandLineArgs().Length > 1)
 			{
-				// Load file
+				OpenFile(Environment.GetCommandLineArgs()[1]);
 			}
 		}
 
 		#region Commands
+
+		private void CommandNew_Executed(object sender, System.Windows.Input.ExecutedRoutedEventArgs e)
+		{
+
+		}
+
+		private void CommandOpen_Executed(object sender, System.Windows.Input.ExecutedRoutedEventArgs e)
+		{
+			OpenFileDialog openFileDialog = new OpenFileDialog();
+
+			if (openFileDialog.ShowDialog() == true)
+			{
+				OpenFile(openFileDialog.FileName);
+			}
+		}
 
 		private void CommandSave_Executed(object sender, System.Windows.Input.ExecutedRoutedEventArgs e)
 		{

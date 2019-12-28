@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.IO;
 using System.Reflection;
@@ -13,10 +14,15 @@ namespace HexEdit
 
 		public string Title
 		{
+			get { return $"{CurrentFile ?? "New"} - {ApplicationName}"; }
+		}
+
+		public string ApplicationName
+		{
 			get { return "Hex Edit"; }
 		}
 
-		public string Version
+		public string ApplicationVersion
 		{
 			get { return "Alpha 1"; }
 		}
@@ -32,8 +38,9 @@ namespace HexEdit
 
 		public string FullApplicationName
 		{
-			get { return $"{Title} {Version}  (Build {BuildNumber})"; }
+			get { return $"{Title} {ApplicationVersion}  (Build {BuildNumber})"; }
 		}
+
 
 		public FontFamily Font
 		{
@@ -45,6 +52,21 @@ namespace HexEdit
 		{
 			get { return AppSettings.FontSize; }
 			set { AppSettings.FontSize = value; OnPropertyChanged(nameof(FontSize)); }
+		}
+
+
+		string currentFile;
+		public string CurrentFile
+		{
+			get { return currentFile; }
+			set { currentFile = value; OnPropertyChanged(nameof(CurrentFile)); OnPropertyChanged(nameof(Title)); }
+		}
+
+		ObservableCollection<byte> fileContent = new ObservableCollection<byte>();
+		public ObservableCollection<byte> FileContent
+		{
+			get { return fileContent; }
+			set { fileContent = value; OnPropertyChanged(nameof(FileContent)); }
 		}
 
 		#endregion

@@ -5,6 +5,20 @@ namespace HexEdit
 	public static class Commands
 	{
 
+		public static readonly RoutedUICommand New = new RoutedUICommand("New", "New", typeof(Commands),
+			new InputGestureCollection()
+			{
+				new KeyGesture(Key.N, ModifierKeys.Control)
+			}
+		);
+
+		public static readonly RoutedUICommand Open = new RoutedUICommand("Open", "Open", typeof(Commands),
+			new InputGestureCollection()
+			{
+				new KeyGesture(Key.O, ModifierKeys.Control)
+			}
+		);
+
 		public static readonly RoutedUICommand Save = new RoutedUICommand("Save", "Save", typeof(Commands),
 			new InputGestureCollection()
 			{
@@ -20,8 +34,6 @@ namespace HexEdit
 		);
 
 		public static readonly RoutedUICommand About = new RoutedUICommand("About", "About", typeof(Commands));
-
-
 
 		public static readonly RoutedUICommand Options = new RoutedUICommand("Options", "Options", typeof(Commands));
 
@@ -54,7 +66,5 @@ namespace HexEdit
 			}
 		);
 
-
 	}
-
 }

@@ -2,6 +2,8 @@
 
 	<Grid>
 		<Grid.CommandBindings>
+			<CommandBinding Command="local:Commands.New" Executed="CommandNew_Executed" />
+			<CommandBinding Command="local:Commands.Open" Executed="CommandOpen_Executed" />
 			<CommandBinding Command="local:Commands.Save" Executed="CommandSave_Executed" CanExecute="CommandSave_CanExecute" />
 			<CommandBinding Command="local:Commands.Exit" Executed="CommandExit_Executed" />
 
@@ -24,8 +26,8 @@
 				</Grid.ColumnDefinitions>
 				<Menu Grid.Row="0" Background="{StaticResource {x:Static SystemColors.WindowBrushKey}}" VerticalAlignment="Center" Margin="2">
 					<MenuItem Header="File">
-						<MenuItem Header="New" />
-						<MenuItem Header="Open" />
+						<MenuItem Header="New" Command="local:Commands.New" />
+						<MenuItem Header="Open" Command="local:Commands.Open" />
 						<MenuItem Header="Save" Command="local:Commands.Save" />
 						<MenuItem Header="Exit" Command="local:Commands.Exit" />
 					</MenuItem>
@@ -54,6 +56,34 @@
 			</WrapPanel.Background>
 
 			<StackPanel Orientation="Horizontal">
+
+				<Button Style="{StaticResource ToolbarButton}" Command="local:Commands.New">
+					<StackPanel Orientation="Horizontal">
+						<ContentPresenter ContentTemplate="{StaticResource NewIcon}" Style="{StaticResource CommonButtonIcon}" />
+					</StackPanel>
+					<Button.ToolTip>
+						<ToolTip DataContext="{Binding Path=PlacementTarget, RelativeSource={x:Static RelativeSource.Self}}">
+							<StackPanel Orientation="Horizontal">
+								<TextBlock Text="{Binding Path=Command.Text}" />
+								<TextBlock Text="Ctrl+N" Style="{StaticResource ShortcutTooltip}" />
+							</StackPanel>
+						</ToolTip>
+					</Button.ToolTip>
+				</Button>
+
+				<Button Style="{StaticResource ToolbarButton}" Command="local:Commands.Open">
+					<StackPanel Orientation="Horizontal">
+						<ContentPresenter ContentTemplate="{StaticResource OpenIcon}" Style="{StaticResource CommonButtonIcon}" />
+					</StackPanel>
+					<Button.ToolTip>
+						<ToolTip DataContext="{Binding Path=PlacementTarget, RelativeSource={x:Static RelativeSource.Self}}">
+							<StackPanel Orientation="Horizontal">
+								<TextBlock Text="{Binding Path=Command.Text}" />
+								<TextBlock Text="Ctrl+O" Style="{StaticResource ShortcutTooltip}" />
+							</StackPanel>
+						</ToolTip>
+					</Button.ToolTip>
+				</Button>
 
 				<Button Style="{StaticResource ToolbarButton}" Command="local:Commands.Save">
 					<StackPanel Orientation="Horizontal">
