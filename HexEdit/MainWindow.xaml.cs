@@ -86,6 +86,22 @@ namespace HexEdit
 			}
 		}
 
+		private void Grid_PreviewDrop(object sender, DragEventArgs e)
+		{
+			var paths = (string[])e.Data.GetData(DataFormats.FileDrop);
+
+			if (paths?.Length > 0)
+			{
+				OpenFile(paths[0]);
+			}
+		}
+
+		private void Grid_PreviewDragOver(object sender, DragEventArgs e)
+		{
+			e.Effects = DragDropEffects.Move;
+			e.Handled = true;
+		}
+
 		#region Commands
 
 		private void CommandNew_Executed(object sender, System.Windows.Input.ExecutedRoutedEventArgs e)
@@ -117,6 +133,7 @@ namespace HexEdit
 		{
 			this.Close();
 		}
+
 
 		#endregion
 
