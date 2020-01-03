@@ -69,6 +69,13 @@ namespace HexEdit
 			set { fileContent = value; OnPropertyChanged(nameof(FileContent)); }
 		}
 
+		ObservableCollection<Chunk> chunks = new ObservableCollection<Chunk>();
+		public ObservableCollection<Chunk> Chunks
+		{
+			get { return chunks; }
+			set { chunks = value; OnPropertyChanged(nameof(Chunks)); }
+		}
+
 		#endregion
 
 		#region INotifyPropertyChanged
