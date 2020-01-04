@@ -99,7 +99,32 @@
 					</Button.ToolTip>
 				</Button>
 
+				<StackPanel Orientation="Horizontal" Margin="2">
+					<TextBlock Text="Width" VerticalAlignment="Center" Margin="2" />
+					<ComboBox Margin="2,0,4,0" Width="50" VerticalAlignment="Center">
+						<ComboBoxItem Content="4" />
+						<ComboBoxItem Content="8" />
+						<ComboBoxItem Content="16" />
+						<ComboBoxItem Content="32" />
+						<ComboBoxItem Content="64" />
+					</ComboBox>
+				</StackPanel>
+
+
+				<StackPanel Orientation="Horizontal" Margin="2">
+					<TextBlock Text="Preview" VerticalAlignment="Center" Margin="2" />
+					<ComboBox Margin="2,0,4,0" Width="90" VerticalAlignment="Center">
+						<ComboBoxItem Content="ASCII" />
+						<ComboBoxItem Content="Ansi" />
+						<ComboBoxItem Content="UTF 8" />
+						<ComboBoxItem Content="UTF 16 BE" />
+						<ComboBoxItem Content="UTF 16 LE" />
+						<ComboBoxItem Content="UTF 32 BE" />
+						<ComboBoxItem Content="UTF 32 LE" />
+					</ComboBox>
+				</StackPanel>
 			</StackPanel>
+
 
 		</WrapPanel>
 
