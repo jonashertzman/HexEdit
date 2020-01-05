@@ -57,6 +57,8 @@ namespace HexEdit
 				ViewModel.FileContent = new ObservableCollection<byte>(File.ReadAllBytes(path));
 
 				ViewModel.CurrentFile = path;
+
+				ViewModel.Init();
 			}
 			catch (Exception exception)
 			{
