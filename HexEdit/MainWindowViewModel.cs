@@ -62,18 +62,24 @@ namespace HexEdit
 			set { currentFile = value; OnPropertyChanged(nameof(CurrentFile)); OnPropertyChanged(nameof(Title)); }
 		}
 
+		PreviewMode filePreview;
+		public PreviewMode FilePreview
+		{
+			get { return filePreview; }
+			set { filePreview = value; OnPropertyChanged(nameof(FilePreview)); OnPropertyChanged(nameof(SelectedPreview)); }
+		}
+
+		public int SelectedPreview
+		{
+			get { return (int)FilePreview; }
+			set { FilePreview = (PreviewMode)value; }
+		}
+
 		ObservableCollection<byte> fileContent = new ObservableCollection<byte>();
 		public ObservableCollection<byte> FileContent
 		{
 			get { return fileContent; }
 			set { fileContent = value; OnPropertyChanged(nameof(FileContent)); }
-		}
-
-		ObservableCollection<Row> rows = new ObservableCollection<Row>();
-		public ObservableCollection<Row> Rows
-		{
-			get { return rows; }
-			set { rows = value; OnPropertyChanged(nameof(Rows)); }
 		}
 
 		ObservableCollection<Chunk> chunks = new ObservableCollection<Chunk>();
@@ -88,38 +94,6 @@ namespace HexEdit
 		{
 			get { return bytesPerRows; }
 			set { bytesPerRows = value; OnPropertyChanged(nameof(BytesPerRow)); }
-		}
-
-		#endregion
-
-		#region  Methods
-
-		internal void Init()
-		{
-			Rows = new ObservableCollection<Row>();
-
-			int i = 0;
-
-			while (i < fileContent.Count)
-			{
-				Row r = new Row() { Offset = i };
-
-
-				int rowSize = Math.Min(fileContent.Count - i, bytesPerRows);
-
-				for (int j = 0; j < rowSize; j++)
-				{
-					r.Bytes.Add(new ByteItem(fileContent[i + j]));
-				}
-				for (int j = 0; j < bytesPerRows - rowSize; j++)
-				{
-					r.Bytes.Add(null);
-				}
-
-				Rows.Add(r);
-
-				i += rowSize;
-			}
 		}
 
 		#endregion

@@ -10,8 +10,8 @@ namespace HexEdit
 
 		public double PositionLeft { get; set; }
 		public double PositionTop { get; set; }
-		public double Width { get; set; } = 500;
-		public double Height { get; set; } = 400;
+		public double Width { get; set; } = 600;
+		public double Height { get; set; } = 300;
 		public WindowState WindowState { get; set; }
 
 	}

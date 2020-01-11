@@ -21,6 +21,8 @@ namespace HexEdit
 		{
 			InitializeComponent();
 
+			PreviewTypeCombobox.ItemsSource = System.Enum.GetValues(typeof(PreviewMode));
+
 			DataContext = ViewModel;
 		}
 
@@ -54,17 +56,164 @@ namespace HexEdit
 		{
 			try
 			{
-				ViewModel.FileContent = new ObservableCollection<byte>(File.ReadAllBytes(path));
+				byte[] bytes = File.ReadAllBytes(path);
+
+				// Check if the file has a BOM
+				if (bytes[0] == 0xEF && bytes[1] == 0xBB && bytes[2] == 0xBF)
+				{
+					ViewModel.FilePreview = PreviewMode.UTF8;
+				}
+				else if (bytes[0] == 0xFF && bytes[1] == 0xFE)
+				{
+					ViewModel.FilePreview = PreviewMode.UTF16LE;
+				}
+				else if (bytes[0] == 0xFE && bytes[1] == 0xFF)
+				{
+					ViewModel.FilePreview = PreviewMode.UTF16BE;
+				}
+				else if (bytes[0] == 0x00 && bytes[1] == 0x00 && bytes[2] == 0xFE && bytes[3] == 0xFF)
+				{
+					ViewModel.FilePreview = PreviewMode.UTF32LE;
+				}
+
+				// No bom found, check if data passes as a bom-less UTF-8 file
+				else if (ValidUtf8(bytes))
+				{
+					ViewModel.FilePreview = PreviewMode.UTF8;
+				}
+
+				ViewModel.FileContent = new ObservableCollection<byte>(bytes);
 
 				ViewModel.CurrentFile = path;
-
-				ViewModel.Init();
 			}
 			catch (Exception exception)
 			{
 				MessageBox.Show(exception.Message, $"Error Opening File {path}", MessageBoxButton.OK, MessageBoxImage.Error);
 			}
 		}
+
+		private bool ValidUtf8(byte[] bytes)
+		{
+			int i = 0;
+			while (i < bytes.Length)
+			{
+				// 1 byte character
+				if (bytes[i] >= 0x00 && bytes[i] <= 0x7F)
+				{
+					i++;
+					continue;
+				}
+
+				// 2 byte character
+				if (bytes[i] >= 0xC2 && bytes[i] <= 0xDF)
+				{
+					if (bytes[i + 1] >= 0x80 && bytes[i + 1] <= 0xBF)
+					{
+						i += 2;
+						continue;
+					}
+				}
+
+				// 3 byte character
+				if (bytes[i] == 0xE0)
+				{
+					if (bytes[i + 1] >= 0xA0 && bytes[i + 1] <= 0xBF)
+					{
+						if (bytes[i + 2] >= 0x80 && bytes[i + 2] <= 0xBF)
+						{
+							i += 3;
+							continue;
+						}
+					}
+				}
+
+				if (bytes[i] >= 0xE1 && bytes[i] <= 0xEC)
+				{
+					if (bytes[i + 1] >= 0x80 && bytes[i + 1] <= 0xBF)
+					{
+						if (bytes[i + 2] >= 0x80 && bytes[i + 2] <= 0xBF)
+						{
+							i += 3;
+							continue;
+						}
+					}
+				}
+
+				if (bytes[i] == 0xED)
+				{
+					if (bytes[i + 1] >= 0x80 && bytes[i + 1] <= 0x9F)
+					{
+						if (bytes[i + 2] >= 0x80 && bytes[i + 2] <= 0xBF)
+						{
+							i += 3;
+							continue;
+						}
+					}
+				}
+
+				if (bytes[i] >= 0xEE && bytes[i] <= 0xEF)
+				{
+					if (bytes[i + 1] >= 0x80 && bytes[i + 1] <= 0xBF)
+					{
+						if (bytes[i + 2] >= 0x80 && bytes[i + 2] <= 0xBF)
+						{
+							i += 3;
+							continue;
+						}
+					}
+				}
+
+				// 4 byte character
+				if (bytes[i] == 0xF0)
+				{
+					if (bytes[i + 1] >= 0x90 && bytes[i + 1] <= 0xBF)
+					{
+						if (bytes[i + 2] >= 0x80 && bytes[i + 2] <= 0xBF)
+						{
+							if (bytes[i + 3] >= 0x80 && bytes[i + 3] <= 0xBF)
+							{
+								i += 4;
+								continue;
+							}
+						}
+					}
+				}
+
+				if (bytes[i] >= 0xF1 && bytes[i] <= 0xF3)
+				{
+					if (bytes[i + 1] >= 0x80 && bytes[i + 1] <= 0xBF)
+					{
+						if (bytes[i + 2] >= 0x80 && bytes[i + 2] <= 0xBF)
+						{
+							if (bytes[i + 3] >= 0x80 && bytes[i + 3] <= 0xBF)
+							{
+								i += 4;
+								continue;
+							}
+						}
+					}
+				}
+
+				if (bytes[i] == 0xF4)
+				{
+					if (bytes[i + 1] >= 0x80 && bytes[i + 1] <= 0x8F)
+					{
+						if (bytes[i + 2] >= 0x80 && bytes[i + 2] <= 0xBF)
+						{
+							if (bytes[i + 3] >= 0x80 && bytes[i + 3] <= 0xBF)
+							{
+								i += 4;
+								continue;
+							}
+						}
+					}
+				}
+
+				return false;
+			}
+			return true;
+		}
+
 
 		#endregion
 
@@ -102,6 +251,12 @@ namespace HexEdit
 		{
 			e.Effects = DragDropEffects.Move;
 			e.Handled = true;
+		}
+
+		private void Preview_MouseWheel(object sender, System.Windows.Input.MouseWheelEventArgs e)
+		{
+			int lines = SystemParameters.WheelScrollLines * e.Delta / 120;
+			VerticalScrollbar.Value -= lines;
 		}
 
 		#region Commands

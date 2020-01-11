@@ -113,15 +113,7 @@
 
 				<StackPanel Orientation="Horizontal" Margin="2">
 					<TextBlock Text="Preview As" VerticalAlignment="Center" Margin="2" />
-					<ComboBox Margin="2,0,4,0" Width="90" VerticalAlignment="Center">
-						<ComboBoxItem Content="ASCII" />
-						<ComboBoxItem Content="Ansi" />
-						<ComboBoxItem Content="UTF 8" />
-						<ComboBoxItem Content="UTF 16 BE" />
-						<ComboBoxItem Content="UTF 16 LE" />
-						<ComboBoxItem Content="UTF 32 BE" />
-						<ComboBoxItem Content="UTF 32 LE" />
-					</ComboBox>
+					<ComboBox Name="PreviewTypeCombobox" Margin="2,0,4,0" Width="90" VerticalAlignment="Center" SelectedIndex="{Binding SelectedPreview}" />
 				</StackPanel>
 			</StackPanel>
 
@@ -130,39 +122,29 @@
 
 		<Grid Grid.Row="2" Background="{StaticResource {x:Static SystemColors.ControlBrushKey}}">
 			<Grid.ColumnDefinitions>
-				<ColumnDefinition Width="500" />
-				<ColumnDefinition Width="Auto" />
 				<ColumnDefinition />
+				<ColumnDefinition Width="Auto" />
+				<ColumnDefinition Width="200" />
 			</Grid.ColumnDefinitions>
 
 			<Border Grid.Column="0" Background="White" BorderThickness="0,1,1,1" BorderBrush="{StaticResource {x:Static SystemColors.ScrollBarBrushKey}}">
-				<ItemsControl ItemsSource="{Binding Rows}">
-					<ItemsControl.ItemTemplate>
-						<DataTemplate>
-							<Grid Background="LightGray">
-								<Grid.ColumnDefinitions>
-									<ColumnDefinition Width="Auto" />
-									<ColumnDefinition Width="Auto" />
-									<ColumnDefinition />
-								</Grid.ColumnDefinitions>
-								<TextBlock Grid.Column="0" Text="{Binding Offset}" Width="50" Margin="1" VerticalAlignment="Center" TextAlignment="Right" />
-								<ItemsControl Grid.Column="1" ItemsSource="{Binding Bytes}">
-									<ItemsControl.ItemsPanel>
-										<ItemsPanelTemplate>
-											<StackPanel Orientation="Horizontal" />
-										</ItemsPanelTemplate>
-									</ItemsControl.ItemsPanel>
-									<ItemsControl.ItemTemplate>
-										<DataTemplate>
-											<TextBox Text="{Binding HexValue, Mode=OneWay}" Margin="1" Width="30" IsReadOnly="True" />
-										</DataTemplate>
-									</ItemsControl.ItemTemplate>
-								</ItemsControl>
-								<TextBox Grid.Column="2" Text="preview" Margin="1" />
-							</Grid>
-						</DataTemplate>
-					</ItemsControl.ItemTemplate>
-				</ItemsControl>
+				<!--Preview Control-->
+				<Grid Grid.Row="1">
+					<Grid.RowDefinitions>
+						<RowDefinition Height="*" />
+						<RowDefinition Height="auto" />
+					</Grid.RowDefinitions>
+					<Grid.ColumnDefinitions>
+						<ColumnDefinition />
+						<ColumnDefinition Width="Auto" />
+						<ColumnDefinition Width="Auto" />
+					</Grid.ColumnDefinitions>
+
+					<local:PreviewControl Grid.Row="0" FontFamily="{Binding Font}" FontSize="{Binding FontSize}" VerticalOffset="{Binding ElementName=VerticalScrollbar, Path=Value, Mode=TwoWay}" HorizontalOffset="{Binding Value, ElementName=HorizontalScrollbar, Mode=TwoWay}" MouseWheel="Preview_MouseWheel" FocusVisualStyle="{x:Null}" />
+					<ScrollBar Grid.Column="2" Name="VerticalScrollbar" SmallChange="1" LargeChange="{Binding Path=VisibleLines, ElementName=Preview}" ViewportSize="{Binding ElementName=Preview, Path=VisibleLines, Mode=TwoWay}" Maximum="{Binding ElementName=Preview, Path=MaxVerialcalScroll }" />
+					<ScrollBar Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2" x:Name="HorizontalScrollbar" Orientation="Horizontal" Maximum="{Binding ElementName=Preview, Path=MaxHorizontalScroll}" ViewportSize="{Binding ElementName=Preview, Path=TextAreaWidth}" SmallChange="10" LargeChange="{Binding ElementName=Preview, Path=TextAreaWidth}" />
+					<StackPanel Grid.Row="1" Grid.Column="2" Grid.ColumnSpan="1" Background="{StaticResource {x:Static SystemColors.ControlBrushKey}}" />
+				</Grid>
 			</Border>
 
 			<GridSplitter Grid.Column="1" Width="4" HorizontalAlignment="Center" Focusable="False" />
