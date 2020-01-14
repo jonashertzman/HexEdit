@@ -112,8 +112,8 @@
 
 
 				<StackPanel Orientation="Horizontal" Margin="2">
-					<TextBlock Text="Preview As" VerticalAlignment="Center" Margin="2" />
-					<ComboBox Name="PreviewTypeCombobox" Margin="2,0,4,0" Width="90" VerticalAlignment="Center" SelectedIndex="{Binding SelectedPreview}" />
+					<TextBlock Text="Preview Mode" VerticalAlignment="Center" Margin="2" />
+					<ComboBox Name="PreviewModeCombobox" Margin="2,0,4,0" Width="90" VerticalAlignment="Center" SelectedIndex="{Binding SelectedPreview}" />
 				</StackPanel>
 			</StackPanel>
 
@@ -140,7 +140,7 @@
 						<ColumnDefinition Width="Auto" />
 					</Grid.ColumnDefinitions>
 
-					<local:PreviewControl Grid.Row="0" FontFamily="{Binding Font}" FontSize="{Binding FontSize}" VerticalOffset="{Binding ElementName=VerticalScrollbar, Path=Value, Mode=TwoWay}" HorizontalOffset="{Binding Value, ElementName=HorizontalScrollbar, Mode=TwoWay}" MouseWheel="Preview_MouseWheel" FocusVisualStyle="{x:Null}" />
+					<local:PreviewControl Grid.Row="0" Bytes="{Binding FileContent}" FontFamily="{Binding Font}" FontSize="{Binding FontSize}" VerticalOffset="{Binding ElementName=VerticalScrollbar, Path=Value, Mode=TwoWay}" HorizontalOffset="{Binding Value, ElementName=HorizontalScrollbar, Mode=TwoWay}" MouseWheel="Preview_MouseWheel" FocusVisualStyle="{x:Null}" />
 					<ScrollBar Grid.Column="2" Name="VerticalScrollbar" SmallChange="1" LargeChange="{Binding Path=VisibleLines, ElementName=Preview}" ViewportSize="{Binding ElementName=Preview, Path=VisibleLines, Mode=TwoWay}" Maximum="{Binding ElementName=Preview, Path=MaxVerialcalScroll }" />
 					<ScrollBar Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2" x:Name="HorizontalScrollbar" Orientation="Horizontal" Maximum="{Binding ElementName=Preview, Path=MaxHorizontalScroll}" ViewportSize="{Binding ElementName=Preview, Path=TextAreaWidth}" SmallChange="10" LargeChange="{Binding ElementName=Preview, Path=TextAreaWidth}" />
 					<StackPanel Grid.Row="1" Grid.Column="2" Grid.ColumnSpan="1" Background="{StaticResource {x:Static SystemColors.ControlBrushKey}}" />

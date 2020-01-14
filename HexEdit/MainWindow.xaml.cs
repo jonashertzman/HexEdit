@@ -21,7 +21,7 @@ namespace HexEdit
 		{
 			InitializeComponent();
 
-			PreviewTypeCombobox.ItemsSource = System.Enum.GetValues(typeof(PreviewMode));
+			PreviewModeCombobox.ItemsSource = System.Enum.GetValues(typeof(PreviewMode));
 
 			DataContext = ViewModel;
 		}
