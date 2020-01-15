@@ -49,7 +49,7 @@ namespace HexEdit
 
 
 			VisibleLines = (int)(ActualHeight / characterHeight + 1);
-			MaxVerialcalScroll = Bytes.Count / rowLength - VisibleLines + 1;
+			MaxVerialcalScroll = Bytes.Count / rowLength - VisibleLines + 2;
 
 			for (int i = 0; i < VisibleLines; i++)
 			{
