@@ -1,9 +1,12 @@
-﻿using System.Windows;
+﻿using System;
+using System.Windows;
 
 namespace HexEdit
 {
 	public class SettingsData
 	{
+
+		public string Id { get; set; } = Guid.NewGuid().ToString();
 
 		public string Font { get; set; } = DefaultSettings.Font;
 		public int FontSize { get; set; } = DefaultSettings.FontSize;
