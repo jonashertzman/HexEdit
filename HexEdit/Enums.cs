@@ -7,9 +7,9 @@ namespace HexEdit
 	{
 		None,
 		Bom,
-		Utf8,
-		Utf16,
-		Utf32
+		Utf8Character,
+		Utf16Character,
+		Utf32Character
 	}
 
 	public enum PreviewMode

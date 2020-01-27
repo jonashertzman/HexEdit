@@ -60,7 +60,11 @@ namespace HexEdit
 		public static FontFamily Font
 		{
 			get { return font; }
-			set { font = value; Settings.Font = value.ToString(); }
+			set
+			{
+				font = value;
+				Settings.Font = value.ToString();
+			}
 		}
 
 		public static int FontSize

@@ -57,11 +57,14 @@ namespace HexEdit
 			try
 			{
 				byte[] bytes = File.ReadAllBytes(path);
+				ObservableCollection<Chunk> chunks = new ObservableCollection<Chunk>();
 
 				// Check if the file has a BOM
 				if (bytes[0] == 0xEF && bytes[1] == 0xBB && bytes[2] == 0xBF)
 				{
 					ViewModel.FilePreview = PreviewMode.UTF8;
+					chunks.Add(new Chunk(ChunkType.Bom, 0, bytes[0..3]));
+					ValidUtf8(bytes, 3, ref chunks);
 				}
 				else if (bytes[0] == 0xFF && bytes[1] == 0xFE)
 				{
@@ -77,14 +80,14 @@ namespace HexEdit
 				}
 
 				// No bom found, check if data passes as a bom-less UTF-8 file
-				else if (ValidUtf8(bytes))
+				else if (ValidUtf8(bytes, 0, ref chunks))
 				{
 					ViewModel.FilePreview = PreviewMode.UTF8;
 				}
 
-				ViewModel.FileContent = new ObservableCollection<byte>(bytes);
-
 				ViewModel.CurrentFile = path;
+				ViewModel.FileContent = new ObservableCollection<byte>(bytes);
+				ViewModel.Chunks = chunks;
 			}
 			catch (Exception exception)
 			{
@@ -92,35 +95,41 @@ namespace HexEdit
 			}
 		}
 
-		private bool ValidUtf8(byte[] bytes)
+		private bool ValidUtf8(byte[] bytes, int offset, ref ObservableCollection<Chunk> chunks)
 		{
-			int i = 0;
+			int i = offset;
 			while (i < bytes.Length)
 			{
 				// 1 byte character
+				int end = i + 1;
 				if (bytes[i] >= 0x00 && bytes[i] <= 0x7F)
 				{
+					chunks.Add(new Chunk(ChunkType.Utf8Character, i, bytes[i..end]));
 					i++;
 					continue;
 				}
 
 				// 2 byte character
+				end = i + 2;
 				if (bytes[i] >= 0xC2 && bytes[i] <= 0xDF)
 				{
 					if (bytes[i + 1] >= 0x80 && bytes[i + 1] <= 0xBF)
 					{
+						chunks.Add(new Chunk(ChunkType.Utf8Character, i, bytes[i..end]));
 						i += 2;
 						continue;
 					}
 				}
 
 				// 3 byte character
+				end = i + 3;
 				if (bytes[i] == 0xE0)
 				{
 					if (bytes[i + 1] >= 0xA0 && bytes[i + 1] <= 0xBF)
 					{
 						if (bytes[i + 2] >= 0x80 && bytes[i + 2] <= 0xBF)
 						{
+							chunks.Add(new Chunk(ChunkType.Utf8Character, i, bytes[i..end]));
 							i += 3;
 							continue;
 						}
@@ -133,6 +142,7 @@ namespace HexEdit
 					{
 						if (bytes[i + 2] >= 0x80 && bytes[i + 2] <= 0xBF)
 						{
+							chunks.Add(new Chunk(ChunkType.Utf8Character, i, bytes[i..end]));
 							i += 3;
 							continue;
 						}
@@ -145,6 +155,7 @@ namespace HexEdit
 					{
 						if (bytes[i + 2] >= 0x80 && bytes[i + 2] <= 0xBF)
 						{
+							chunks.Add(new Chunk(ChunkType.Utf8Character, i, bytes[i..end]));
 							i += 3;
 							continue;
 						}
@@ -157,6 +168,7 @@ namespace HexEdit
 					{
 						if (bytes[i + 2] >= 0x80 && bytes[i + 2] <= 0xBF)
 						{
+							chunks.Add(new Chunk(ChunkType.Utf8Character, i, bytes[i..end]));
 							i += 3;
 							continue;
 						}
@@ -164,6 +176,7 @@ namespace HexEdit
 				}
 
 				// 4 byte character
+				end = i + 4;
 				if (bytes[i] == 0xF0)
 				{
 					if (bytes[i + 1] >= 0x90 && bytes[i + 1] <= 0xBF)
@@ -172,6 +185,7 @@ namespace HexEdit
 						{
 							if (bytes[i + 3] >= 0x80 && bytes[i + 3] <= 0xBF)
 							{
+								chunks.Add(new Chunk(ChunkType.Utf8Character, i, bytes[i..end]));
 								i += 4;
 								continue;
 							}
@@ -187,6 +201,7 @@ namespace HexEdit
 						{
 							if (bytes[i + 3] >= 0x80 && bytes[i + 3] <= 0xBF)
 							{
+								chunks.Add(new Chunk(ChunkType.Utf8Character, i, bytes[i..end]));
 								i += 4;
 								continue;
 							}
@@ -202,6 +217,7 @@ namespace HexEdit
 						{
 							if (bytes[i + 3] >= 0x80 && bytes[i + 3] <= 0xBF)
 							{
+								chunks.Add(new Chunk(ChunkType.Utf8Character, i, bytes[i..end]));
 								i += 4;
 								continue;
 							}
