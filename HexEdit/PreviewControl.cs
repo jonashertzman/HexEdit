@@ -33,7 +33,7 @@ namespace HexEdit
 			Debug.Print("PreviewControl OnRender");
 
 			// Fill background
-			drawingContext.DrawRectangle(Brushes.LightGray, null, new Rect(0, 0, this.ActualWidth, this.ActualHeight));
+			drawingContext.DrawRectangle(Brushes.White, null, new Rect(0, 0, this.ActualWidth, this.ActualHeight));
 
 			if (Bytes.Count == 0)
 				return;
@@ -45,22 +45,30 @@ namespace HexEdit
 
 			double characterHeight = MeasureString("A").Height;
 			double maxTextwidth = 0;
-			int rowLength = 8;
-
+			int bytesPerRow = 8;
+			int byteWidth = 20;
 
 			VisibleLines = (int)(ActualHeight / characterHeight + 1);
-			MaxVerialcalScroll = Bytes.Count / rowLength - VisibleLines + 2;
+			MaxVerialcalScroll = Bytes.Count / bytesPerRow - VisibleLines + 2;
 
 			for (int i = 0; i < VisibleLines; i++)
 			{
-				int rowOffset = (i + VerticalOffset) * rowLength;
+				int rowByteOffset = (i + VerticalOffset) * bytesPerRow;
 
 				// Line Y offset
 				drawingContext.PushTransform(new TranslateTransform(0, characterHeight * i));
 				{
-					for (int J = 0; J < rowLength && rowOffset + J < Bytes.Count; J++)
+					foreach (Chunk c in Chunks)
 					{
-						drawingContext.DrawText(new FormattedText(Bytes[rowOffset + J].ToString("X2"), CultureInfo.CurrentCulture, FlowDirection.LeftToRight, typeface, FontSize, Brushes.Black, new NumberSubstitution(), TextFormattingMode.Display, dpiScale), new Point(J * 30, 0));
+						if (!(c.End < rowByteOffset || c.Start > rowByteOffset + bytesPerRow - 1))
+						{
+							drawingContext.DrawRectangle(new SolidColorBrush(Colors.LightGray), null, new Rect((c.Start - rowByteOffset) * byteWidth + 4, 0, c.Length * byteWidth - 4, characterHeight));
+						}
+					}
+
+					for (int j = 0; j < bytesPerRow && rowByteOffset + j < Bytes.Count; j++)
+					{
+						drawingContext.DrawText(new FormattedText(Bytes[rowByteOffset + j].ToString("X2"), CultureInfo.CurrentCulture, FlowDirection.LeftToRight, typeface, FontSize, Brushes.Black, new NumberSubstitution(), TextFormattingMode.Display, dpiScale), new Point(j * byteWidth + 5, 0));
 					}
 				}
 				drawingContext.Pop(); // Line Y offset
@@ -68,7 +76,6 @@ namespace HexEdit
 
 			TextAreaWidth = (int)ActualWidth;
 			MaxHorizontalScroll = (int)(maxTextwidth - TextAreaWidth);
-
 		}
 
 		#endregion
@@ -81,6 +88,15 @@ namespace HexEdit
 		{
 			get { return (ObservableCollection<byte>)GetValue(BytesProperty); }
 			set { SetValue(BytesProperty, value); }
+		}
+
+
+		public static readonly DependencyProperty ChunksProperty = DependencyProperty.Register("Chunks", typeof(ObservableCollection<Chunk>), typeof(PreviewControl), new FrameworkPropertyMetadata(new ObservableCollection<Chunk>(), FrameworkPropertyMetadataOptions.AffectsRender));
+
+		public ObservableCollection<Chunk> Chunks
+		{
+			get { return (ObservableCollection<Chunk>)GetValue(ChunksProperty); }
+			set { SetValue(ChunksProperty, value); }
 		}
 
 

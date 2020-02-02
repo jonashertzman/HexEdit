@@ -25,6 +25,15 @@ namespace HexEdit
 
 		#endregion
 
+		#region Overrides
+
+		public override string ToString()
+		{
+			return $"{Start} - {End}    {Type}";
+		}
+
+		#endregion
+
 		#region Properties
 
 		public ChunkType Type { get; internal set; } = ChunkType.None;
@@ -38,6 +47,14 @@ namespace HexEdit
 			get
 			{
 				return bytes.Length;
+			}
+		}
+
+		public int End
+		{
+			get
+			{
+				return Start + Length - 1;
 			}
 		}
 
