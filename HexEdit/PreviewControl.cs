@@ -62,7 +62,11 @@ namespace HexEdit
 					{
 						if (!(c.End < rowByteOffset || c.Start > rowByteOffset + bytesPerRow - 1))
 						{
-							drawingContext.DrawRectangle(new SolidColorBrush(Colors.LightGray), null, new Rect((c.Start - rowByteOffset) * byteWidth + 4, 0, c.Length * byteWidth - 4, characterHeight));
+							drawingContext.PushTransform(new TranslateTransform(-.5, .5));
+							{
+								drawingContext.DrawRectangle(new SolidColorBrush(Colors.LightGray), new Pen(new SolidColorBrush(Colors.Black), 1), new Rect((c.Start - rowByteOffset) * byteWidth + 4, 0, c.Length * byteWidth - 3, characterHeight));
+							}
+							drawingContext.Pop();
 						}
 					}
 
