@@ -38,7 +38,7 @@ namespace HexEdit
 
 		public string FullApplicationName
 		{
-			get { return $"{Title} {ApplicationVersion}  (Build {BuildNumber})"; }
+			get { return $"{ApplicationName} {ApplicationVersion}  (Build {BuildNumber})"; }
 		}
 
 
