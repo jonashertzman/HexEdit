@@ -1,4 +1,5 @@
-﻿using System.ComponentModel;
+﻿using System;
+using System.ComponentModel;
 
 namespace HexEdit
 {
@@ -10,10 +11,9 @@ namespace HexEdit
 
 		public Chunk(ChunkType type, int start, byte[] bytes)
 		{
-			this.Type = type;
-			this.Start = start;
-
-			this.bytes = bytes;
+			Type = type;
+			Start = start;
+			Length = bytes.Length;
 
 			switch (type)
 			{
@@ -42,13 +42,7 @@ namespace HexEdit
 
 		public int UnicodeCharacter { get; internal set; } = -1;
 
-		public int Length
-		{
-			get
-			{
-				return bytes.Length;
-			}
-		}
+		public int Length { get; private set; }
 
 		public int End
 		{
@@ -58,7 +52,22 @@ namespace HexEdit
 			}
 		}
 
-		byte[] bytes = new byte[0];
+		public string PreviewString
+		{
+			get
+			{
+				if (Type == ChunkType.Bom)
+				{
+					return "[BOM]";
+				}
+				else if (Type == ChunkType.Utf8Character)
+				{
+					return char.ConvertFromUtf32(UnicodeCharacter);
+				}
+
+				return "[UNKNOWN]";
+			}
+		}
 
 		#endregion
 

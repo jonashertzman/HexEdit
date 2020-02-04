@@ -54,26 +54,38 @@ namespace HexEdit
 			for (int i = 0; i < VisibleLines; i++)
 			{
 				int rowByteOffset = (i + VerticalOffset) * bytesPerRow;
+				string previewString = "";
 
 				// Line Y offset
 				drawingContext.PushTransform(new TranslateTransform(0, characterHeight * i));
 				{
-					foreach (Chunk c in Chunks)
+					// Byte area clip
+					drawingContext.PushClip(new RectangleGeometry(new Rect(0, 0, byteWidth * bytesPerRow + 5, characterHeight + 1)));
 					{
-						if (!(c.End < rowByteOffset || c.Start > rowByteOffset + bytesPerRow - 1))
+						foreach (Chunk c in Chunks)
 						{
-							drawingContext.PushTransform(new TranslateTransform(-.5, .5));
+							if (!(c.End < rowByteOffset || c.Start > rowByteOffset + bytesPerRow - 1))
 							{
-								drawingContext.DrawRectangle(new SolidColorBrush(Colors.LightGray), new Pen(new SolidColorBrush(Colors.Black), 1), new Rect((c.Start - rowByteOffset) * byteWidth + 4, 0, c.Length * byteWidth - 3, characterHeight));
+								drawingContext.PushTransform(new TranslateTransform(-.5, .5));
+								{
+									drawingContext.DrawRectangle(new SolidColorBrush(Colors.LightGray), new Pen(new SolidColorBrush(Colors.Black), 1), new Rect((c.Start - rowByteOffset) * byteWidth + 4, 0, c.Length * byteWidth - 3, characterHeight));
+								}
+								drawingContext.Pop();
+								if (c.Start >= rowByteOffset)
+								{
+									previewString += c.PreviewString;
+								}
 							}
-							drawingContext.Pop();
 						}
 					}
+					drawingContext.Pop(); // Byte area clip
 
 					for (int j = 0; j < bytesPerRow && rowByteOffset + j < Bytes.Count; j++)
 					{
 						drawingContext.DrawText(new FormattedText(Bytes[rowByteOffset + j].ToString("X2"), CultureInfo.CurrentCulture, FlowDirection.LeftToRight, typeface, FontSize, Brushes.Black, new NumberSubstitution(), TextFormattingMode.Display, dpiScale), new Point(j * byteWidth + 5, 0));
 					}
+
+					drawingContext.DrawText(new FormattedText(previewString, CultureInfo.CurrentCulture, FlowDirection.LeftToRight, typeface, FontSize, Brushes.Black, new NumberSubstitution(), TextFormattingMode.Display, dpiScale), new Point(bytesPerRow * byteWidth + 20, 0));
 				}
 				drawingContext.Pop(); // Line Y offset
 			}
