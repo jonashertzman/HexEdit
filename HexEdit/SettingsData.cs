@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Windows;
+using System.Windows.Media;
 
 namespace HexEdit
 {
@@ -16,6 +17,11 @@ namespace HexEdit
 		public double Width { get; set; } = 600;
 		public double Height { get; set; } = 300;
 		public WindowState WindowState { get; set; }
+
+		public Color TextForeground { get; set; } = DefaultSettings.TextForeground;
+		public Color TextBackground { get; set; } = DefaultSettings.TextBackground;
+
+		public Color SelectionBackground { get; set; } = DefaultSettings.SelectionBackground;
 
 	}
 }

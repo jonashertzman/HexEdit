@@ -96,6 +96,25 @@ namespace HexEdit
 			set { bytesPerRows = value; OnPropertyChanged(nameof(BytesPerRow)); }
 		}
 
+
+		public Brush TextForeground
+		{
+			get { return AppSettings.TextForeground; }
+			set { AppSettings.TextForeground = value as SolidColorBrush; OnPropertyChanged(nameof(TextForeground)); }
+		}
+
+		public Brush TextBackground
+		{
+			get { return AppSettings.TextBackground; }
+			set { AppSettings.TextBackground = value as SolidColorBrush; OnPropertyChanged(nameof(TextBackground)); }
+		}
+
+		public Brush SelectionBackground
+		{
+			get { return AppSettings.SelectionBackground; }
+			set { AppSettings.SelectionBackground = value as SolidColorBrush; OnPropertyChanged(nameof(SelectionBackground)); }
+		}
+
 		#endregion
 
 		#region INotifyPropertyChanged

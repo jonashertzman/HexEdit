@@ -306,6 +306,34 @@ namespace HexEdit
 			this.Close();
 		}
 
+		private void CommnadOptions_Executed(object sender, System.Windows.Input.ExecutedRoutedEventArgs e)
+		{
+			// Store existing settings data in case the changes are canceled.
+			var oldFont = ViewModel.Font;
+			var oldFontSize = ViewModel.FontSize;
+			var oldTextBackground = ViewModel.TextBackground;
+			var oldTextForeground = ViewModel.TextForeground;
+			var oldSelectionBackground = ViewModel.SelectionBackground;
+
+			OptionsWindow optionsWindow = new OptionsWindow() { DataContext = ViewModel, Owner = this };
+			optionsWindow.ShowDialog();
+
+			if (optionsWindow.DialogResult == true)
+			{
+				SaveSettings();
+			}
+			else
+			{
+				// Options window was canceled, revert to old settings.
+				ViewModel.Font = oldFont;
+				ViewModel.FontSize = oldFontSize;
+
+				ViewModel.TextBackground = oldTextBackground;
+				ViewModel.TextForeground = oldTextForeground;
+				ViewModel.SelectionBackground = oldSelectionBackground;
+			}
+		}
+
 		private void CommandAbout_Executed(object sender, System.Windows.Input.ExecutedRoutedEventArgs e)
 		{
 			AboutWindow aboutWindow = new AboutWindow() { Owner = this, DataContext = ViewModel };

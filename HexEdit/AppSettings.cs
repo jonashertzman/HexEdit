@@ -73,6 +73,28 @@ namespace HexEdit
 			set { Settings.FontSize = value; }
 		}
 
+
+		private static SolidColorBrush textForeground;
+		public static SolidColorBrush TextForeground
+		{
+			get { return textForeground; }
+			set { textForeground = value; Settings.TextForeground = value.Color; }
+		}
+
+		private static SolidColorBrush textBackground;
+		public static SolidColorBrush TextBackground
+		{
+			get { return textBackground; }
+			set { textBackground = value; Settings.TextBackground = value.Color; }
+		}
+
+		private static SolidColorBrush selectionBackground;
+		public static SolidColorBrush SelectionBackground
+		{
+			get { return selectionBackground; }
+			set { selectionBackground = value; Settings.SelectionBackground = value.Color; }
+		}
+
 		#endregion
 
 		#region Methods
@@ -129,6 +151,11 @@ namespace HexEdit
 		private static void UpdateCachedSettings()
 		{
 			Font = new FontFamily(Settings.Font);
+
+			TextForeground = new SolidColorBrush(Settings.TextForeground);
+			TextBackground = new SolidColorBrush(Settings.TextBackground);
+
+			SelectionBackground = new SolidColorBrush(Settings.SelectionBackground);
 		}
 
 		#endregion
