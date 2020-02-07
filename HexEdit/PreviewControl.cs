@@ -33,7 +33,7 @@ namespace HexEdit
 			Debug.Print("PreviewControl OnRender");
 
 			// Fill background
-			drawingContext.DrawRectangle(Brushes.White, null, new Rect(0, 0, this.ActualWidth, this.ActualHeight));
+			drawingContext.DrawRectangle(AppSettings.TextBackground, null, new Rect(0, 0, this.ActualWidth, this.ActualHeight));
 
 			if (Bytes.Count == 0)
 				return;
@@ -47,6 +47,8 @@ namespace HexEdit
 			double maxTextwidth = 0;
 			int bytesPerRow = 8;
 			int byteWidth = 20;
+
+			Pen chunkPen = new Pen(AppSettings.TextForeground, 1);
 
 			VisibleLines = (int)(ActualHeight / characterHeight + 1);
 			MaxVerialcalScroll = Bytes.Count / bytesPerRow - VisibleLines + 2;
@@ -68,7 +70,7 @@ namespace HexEdit
 							{
 								drawingContext.PushTransform(new TranslateTransform(-.5, .5));
 								{
-									drawingContext.DrawRectangle(new SolidColorBrush(Colors.LightGray), new Pen(new SolidColorBrush(Colors.Black), 1), new Rect((c.Start - rowByteOffset) * byteWidth + 4, 0, c.Length * byteWidth - 3, characterHeight));
+									drawingContext.DrawRectangle(new SolidColorBrush(Colors.LightGray), chunkPen, new Rect((c.Start - rowByteOffset) * byteWidth + 4, 0, c.Length * byteWidth - 3, characterHeight));
 								}
 								drawingContext.Pop();
 								if (c.Start >= rowByteOffset)
@@ -82,10 +84,10 @@ namespace HexEdit
 
 					for (int j = 0; j < bytesPerRow && rowByteOffset + j < Bytes.Count; j++)
 					{
-						drawingContext.DrawText(new FormattedText(Bytes[rowByteOffset + j].ToString("X2"), CultureInfo.CurrentCulture, FlowDirection.LeftToRight, typeface, FontSize, Brushes.Black, new NumberSubstitution(), TextFormattingMode.Display, dpiScale), new Point(j * byteWidth + 5, 0));
+						drawingContext.DrawText(new FormattedText(Bytes[rowByteOffset + j].ToString("X2"), CultureInfo.CurrentCulture, FlowDirection.LeftToRight, typeface, FontSize, AppSettings.TextForeground, new NumberSubstitution(), TextFormattingMode.Display, dpiScale), new Point(j * byteWidth + 5, 0));
 					}
 
-					drawingContext.DrawText(new FormattedText(previewString, CultureInfo.CurrentCulture, FlowDirection.LeftToRight, typeface, FontSize, Brushes.Black, new NumberSubstitution(), TextFormattingMode.Display, dpiScale), new Point(bytesPerRow * byteWidth + 20, 0));
+					drawingContext.DrawText(new FormattedText(previewString, CultureInfo.CurrentCulture, FlowDirection.LeftToRight, typeface, FontSize, AppSettings.TextForeground, new NumberSubstitution(), TextFormattingMode.Display, dpiScale), new Point(bytesPerRow * byteWidth + 20, 0));
 				}
 				drawingContext.Pop(); // Line Y offset
 			}
@@ -167,6 +169,15 @@ namespace HexEdit
 		{
 			get { return (int)GetValue(HorizontalOffsetProperty); }
 			set { SetValue(HorizontalOffsetProperty, value); }
+		}
+
+
+		public static readonly DependencyProperty UpdateTriggerProperty = DependencyProperty.Register("UpdateTrigger", typeof(int), typeof(PreviewControl), new FrameworkPropertyMetadata(0, FrameworkPropertyMetadataOptions.AffectsRender));
+
+		public int UpdateTrigger
+		{
+			get { return (int)GetValue(UpdateTriggerProperty); }
+			set { SetValue(UpdateTriggerProperty, value); }
 		}
 
 		#endregion

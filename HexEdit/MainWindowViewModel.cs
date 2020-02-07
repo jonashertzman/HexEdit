@@ -100,19 +100,27 @@ namespace HexEdit
 		public Brush TextForeground
 		{
 			get { return AppSettings.TextForeground; }
-			set { AppSettings.TextForeground = value as SolidColorBrush; OnPropertyChanged(nameof(TextForeground)); }
+			set { AppSettings.TextForeground = value as SolidColorBrush; OnPropertyChangedRepaint(nameof(TextForeground)); }
 		}
 
 		public Brush TextBackground
 		{
 			get { return AppSettings.TextBackground; }
-			set { AppSettings.TextBackground = value as SolidColorBrush; OnPropertyChanged(nameof(TextBackground)); }
+			set { AppSettings.TextBackground = value as SolidColorBrush; OnPropertyChangedRepaint(nameof(TextBackground)); }
 		}
 
 		public Brush SelectionBackground
 		{
 			get { return AppSettings.SelectionBackground; }
-			set { AppSettings.SelectionBackground = value as SolidColorBrush; OnPropertyChanged(nameof(SelectionBackground)); }
+			set { AppSettings.SelectionBackground = value as SolidColorBrush; OnPropertyChangedRepaint(nameof(SelectionBackground)); }
+		}
+
+
+		int updateTrigger;
+		public int UpdateTrigger
+		{
+			get { return updateTrigger; }
+			set { updateTrigger = value; OnPropertyChanged(nameof(UpdateTrigger)); }
 		}
 
 		#endregion
@@ -120,6 +128,12 @@ namespace HexEdit
 		#region INotifyPropertyChanged
 
 		public event PropertyChangedEventHandler PropertyChanged;
+
+		public void OnPropertyChangedRepaint(string name)
+		{
+			UpdateTrigger++;
+			PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
+		}
 
 		public void OnPropertyChanged(string name)
 		{
