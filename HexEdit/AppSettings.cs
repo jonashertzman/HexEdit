@@ -73,6 +73,11 @@ namespace HexEdit
 			set { Settings.FontSize = value; }
 		}
 
+		public static int BytesPerRow
+		{
+			get { return Settings.BytesPerRow; }
+			set { Settings.BytesPerRow = value; }
+		}
 
 		private static SolidColorBrush textForeground;
 		public static SolidColorBrush TextForeground

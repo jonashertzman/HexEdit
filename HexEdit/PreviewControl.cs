@@ -45,7 +45,7 @@ namespace HexEdit
 
 			double characterHeight = MeasureString("A").Height;
 			double maxTextwidth = 0;
-			int bytesPerRow = 8;
+			int bytesPerRow = AppSettings.BytesPerRow;
 			int byteWidth = 20;
 
 			Pen chunkPen = new Pen(AppSettings.TextForeground, 1);

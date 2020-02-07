@@ -12,6 +12,8 @@ namespace HexEdit
 		public string Font { get; set; } = DefaultSettings.Font;
 		public int FontSize { get; set; } = DefaultSettings.FontSize;
 
+		public int BytesPerRow { get; set; } = 8;
+
 		public double PositionLeft { get; set; }
 		public double PositionTop { get; set; }
 		public double Width { get; set; } = 600;

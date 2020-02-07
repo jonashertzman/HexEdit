@@ -89,11 +89,17 @@ namespace HexEdit
 			set { chunks = value; OnPropertyChanged(nameof(Chunks)); }
 		}
 
-		int bytesPerRows = 8;
+
 		public int BytesPerRow
 		{
-			get { return bytesPerRows; }
-			set { bytesPerRows = value; OnPropertyChanged(nameof(BytesPerRow)); }
+			get { return AppSettings.BytesPerRow; }
+			set { AppSettings.BytesPerRow = value; OnPropertyChangedRepaint(nameof(BytesPerRow)); OnPropertyChanged(nameof(BytesPerRowValue)); }
+		}
+
+		public string BytesPerRowValue
+		{
+			get { return BytesPerRow.ToString(); }
+			set { BytesPerRow = int.Parse(value); }
 		}
 
 
