@@ -1,5 +1,4 @@
-﻿using System;
-using System.ComponentModel;
+﻿using System.ComponentModel;
 
 namespace HexEdit
 {
@@ -20,6 +19,11 @@ namespace HexEdit
 				case ChunkType.Utf8Character:
 					UnicodeCharacter = DecodeUtf8(bytes);
 					break;
+
+				case ChunkType.Utf16leCharacter:
+					UnicodeCharacter = DecodeUtf16le(bytes);
+					break;
+
 			}
 		}
 
@@ -29,7 +33,7 @@ namespace HexEdit
 
 		public override string ToString()
 		{
-			return $"{Start} - {End}    {Type}";
+			return $"{Start} - {Length}   {Type}";
 		}
 
 		#endregion
@@ -56,22 +60,44 @@ namespace HexEdit
 		{
 			get
 			{
-				if (Type == ChunkType.Bom)
+				switch (Type)
 				{
-					return "[BOM]";
-				}
-				else if (Type == ChunkType.Utf8Character)
-				{
-					return char.ConvertFromUtf32(UnicodeCharacter);
-				}
+					case ChunkType.Bom:
+						return "[BOM]";
 
-				return "[UNKNOWN]";
+					case ChunkType.Utf8Character:
+					case ChunkType.Utf16leCharacter:
+						return char.ConvertFromUtf32(UnicodeCharacter);
+
+					default:
+						return "[UNKNOWN]";
+
+				}
 			}
 		}
 
 		#endregion
 
 		#region Methods
+
+		private int DecodeUtf16le(byte[] bytes)
+		{
+			if (bytes.Length == 2)
+			{
+				return bytes[1] << 8 | bytes[0];
+			}
+			else // 4 byte surrogate pair character
+			{
+				int highSurrogate = bytes[1] << 8 | bytes[0];
+				int lowSurrogate = bytes[3] << 8 | bytes[2];
+
+				highSurrogate -= 0xD800;
+				highSurrogate *= 0x400;
+				lowSurrogate -= 0xDC00;
+
+				return highSurrogate + lowSurrogate + 0x10000;
+			}
+		}
 
 		private int DecodeUtf8(byte[] bytes)
 		{

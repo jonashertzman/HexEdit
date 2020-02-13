@@ -8,20 +8,20 @@ namespace HexEdit
 		None,
 		Bom,
 		Utf8Character,
-		Utf16Character,
+		Utf16leCharacter,
 		Utf32Character
 	}
 
 	public enum PreviewMode
 	{
-		ASCII,
+		Ascii,
 		Ansi,
 		[Description("UTF 8")]
-		UTF8,
-		UTF16BE,
-		UTF16LE,
-		UTF32BE,
-		UTF32LE
+		Utf8,
+		Utf16be,
+		Utf16le,
+		Utf32be,
+		Utf32le
 	}
 
 }

@@ -62,27 +62,29 @@ namespace HexEdit
 				// Check if the file has a BOM
 				if (bytes[0] == 0xEF && bytes[1] == 0xBB && bytes[2] == 0xBF)
 				{
-					ViewModel.FilePreview = PreviewMode.UTF8;
+					ViewModel.FilePreview = PreviewMode.Utf8;
 					chunks.Add(new Chunk(ChunkType.Bom, 0, bytes[0..3]));
-					ValidUtf8(bytes, 3, ref chunks);
+					ParseUtf8(bytes, 3, ref chunks);
 				}
 				else if (bytes[0] == 0xFF && bytes[1] == 0xFE)
 				{
-					ViewModel.FilePreview = PreviewMode.UTF16LE;
+					ViewModel.FilePreview = PreviewMode.Utf16le;
+					chunks.Add(new Chunk(ChunkType.Bom, 0, bytes[0..2]));
+					ParseUtf16le(bytes, 2, ref chunks);
 				}
 				else if (bytes[0] == 0xFE && bytes[1] == 0xFF)
 				{
-					ViewModel.FilePreview = PreviewMode.UTF16BE;
+					ViewModel.FilePreview = PreviewMode.Utf16be;
 				}
 				else if (bytes[0] == 0x00 && bytes[1] == 0x00 && bytes[2] == 0xFE && bytes[3] == 0xFF)
 				{
-					ViewModel.FilePreview = PreviewMode.UTF32LE;
+					ViewModel.FilePreview = PreviewMode.Utf32le;
 				}
 
 				// No bom found, check if data passes as a bom-less UTF-8 file
-				else if (ValidUtf8(bytes, 0, ref chunks))
+				else if (ParseUtf8(bytes, 0, ref chunks))
 				{
-					ViewModel.FilePreview = PreviewMode.UTF8;
+					ViewModel.FilePreview = PreviewMode.Utf8;
 				}
 
 				ViewModel.CurrentFile = path;
@@ -95,9 +97,28 @@ namespace HexEdit
 			}
 		}
 
-		private bool ValidUtf8(byte[] bytes, int offset, ref ObservableCollection<Chunk> chunks)
+		private void ParseUtf16le(byte[] bytes, int offset, ref ObservableCollection<Chunk> chunks)
+		{
+			for (int i = offset; i < bytes.Length; i += 2)
+			{
+				if (char.IsHighSurrogate((char)(bytes[i + 1] << 8 | bytes[i])))
+				{
+					chunks.Add(new Chunk(ChunkType.Utf16leCharacter, i, bytes[i..(i + 4)]));
+					i += 2;
+				}
+				else
+				{
+					chunks.Add(new Chunk(ChunkType.Utf16leCharacter, i, bytes[i..(i + 2)]));
+				}
+			}
+		}
+
+		private bool ParseUtf8(byte[] bytes, int offset, ref ObservableCollection<Chunk> chunks)
 		{
 			int i = offset;
+
+			bool valid = true;
+
 			while (i < bytes.Length)
 			{
 				// 1 byte character
@@ -225,9 +246,9 @@ namespace HexEdit
 					}
 				}
 
-				return false;
+				valid = false;
 			}
-			return true;
+			return valid;
 		}
 
 		#endregion
