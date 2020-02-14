@@ -24,6 +24,10 @@ namespace HexEdit
 					UnicodeCharacter = DecodeUtf16le(bytes);
 					break;
 
+				case ChunkType.Utf16beCharacter:
+					UnicodeCharacter = DecodeUtf16be(bytes);
+					break;
+
 			}
 		}
 
@@ -67,6 +71,7 @@ namespace HexEdit
 
 					case ChunkType.Utf8Character:
 					case ChunkType.Utf16leCharacter:
+					case ChunkType.Utf16beCharacter:
 						return char.ConvertFromUtf32(UnicodeCharacter);
 
 					default:
@@ -90,6 +95,25 @@ namespace HexEdit
 			{
 				int highSurrogate = bytes[1] << 8 | bytes[0];
 				int lowSurrogate = bytes[3] << 8 | bytes[2];
+
+				highSurrogate -= 0xD800;
+				highSurrogate *= 0x400;
+				lowSurrogate -= 0xDC00;
+
+				return highSurrogate + lowSurrogate + 0x10000;
+			}
+		}
+
+		private int DecodeUtf16be(byte[] bytes)
+		{
+			if (bytes.Length == 2)
+			{
+				return bytes[0] << 8 | bytes[1];
+			}
+			else // 4 byte surrogate pair character
+			{
+				int highSurrogate = bytes[0] << 8 | bytes[1];
+				int lowSurrogate = bytes[2] << 8 | bytes[3];
 
 				highSurrogate -= 0xD800;
 				highSurrogate *= 0x400;

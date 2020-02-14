@@ -75,6 +75,8 @@ namespace HexEdit
 				else if (bytes[0] == 0xFE && bytes[1] == 0xFF)
 				{
 					ViewModel.FilePreview = PreviewMode.Utf16be;
+					chunks.Add(new Chunk(ChunkType.Bom, 0, bytes[0..2]));
+					ParseUtf16be(bytes, 2, ref chunks);
 				}
 				else if (bytes[0] == 0x00 && bytes[1] == 0x00 && bytes[2] == 0xFE && bytes[3] == 0xFF)
 				{
@@ -109,6 +111,22 @@ namespace HexEdit
 				else
 				{
 					chunks.Add(new Chunk(ChunkType.Utf16leCharacter, i, bytes[i..(i + 2)]));
+				}
+			}
+		}
+
+		private void ParseUtf16be(byte[] bytes, int offset, ref ObservableCollection<Chunk> chunks)
+		{
+			for (int i = offset; i < bytes.Length; i += 2)
+			{
+				if (char.IsHighSurrogate((char)(bytes[i] << 8 | bytes[i + 1])))
+				{
+					chunks.Add(new Chunk(ChunkType.Utf16beCharacter, i, bytes[i..(i + 4)]));
+					i += 2;
+				}
+				else
+				{
+					chunks.Add(new Chunk(ChunkType.Utf16beCharacter, i, bytes[i..(i + 2)]));
 				}
 			}
 		}
