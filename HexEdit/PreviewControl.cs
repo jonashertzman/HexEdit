@@ -1,4 +1,5 @@
-﻿using System.Collections.ObjectModel;
+﻿using System;
+using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.Globalization;
 using System.Windows;
@@ -14,6 +15,12 @@ namespace HexEdit
 
 		private double dpiScale = 0;
 		private Typeface typeface;
+
+		private double offsetMargin;
+		private double textMargin;
+
+		private double characterHeight;
+		private double characterWidth;
 
 		#endregion
 
@@ -43,15 +50,29 @@ namespace HexEdit
 			Matrix m = PresentationSource.FromVisual(this).CompositionTarget.TransformToDevice;
 			dpiScale = 1 / m.M11;
 
-			double characterHeight = MeasureString("A").Height;
 			double maxTextwidth = 0;
 			int bytesPerRow = AppSettings.BytesPerRow;
 			int byteWidth = 20;
+			int lineCount = Bytes.Count / bytesPerRow + 1;
 
 			Pen chunkPen = new Pen(AppSettings.TextForeground, 1);
 
+			TextUtils.CreateGlyphRun("W", typeface, this.FontSize, dpiScale, out characterWidth);
+			characterHeight = Math.Ceiling(TextUtils.FontHeight(typeface, this.FontSize, dpiScale) / dpiScale) * dpiScale;
+
 			VisibleLines = (int)(ActualHeight / characterHeight + 1);
 			MaxVerialcalScroll = Bytes.Count / bytesPerRow - VisibleLines + 2;
+
+			double rowOffsetWidth = Bytes.Count.ToString("X2").Length * characterWidth;
+
+
+			Pen borderPen = new Pen(SystemColors.ScrollBarBrush, RoundToWholePixels(1));
+			GuidelineSet borderGuide = CreateGuidelineSet(borderPen);
+
+			textMargin = RoundToWholePixels(4);
+			offsetMargin = RoundToWholePixels(rowOffsetWidth) + (2 * textMargin) + borderPen.Thickness;
+
+			drawingContext.DrawRectangle(SystemColors.ControlBrush, null, new Rect(0, 0, offsetMargin, this.ActualHeight));
 
 			for (int i = 0; i < VisibleLines; i++)
 			{
@@ -61,33 +82,46 @@ namespace HexEdit
 				// Line Y offset
 				drawingContext.PushTransform(new TranslateTransform(0, characterHeight * i));
 				{
-					// Byte area clip
-					drawingContext.PushClip(new RectangleGeometry(new Rect(0, 0, byteWidth * bytesPerRow + 5, characterHeight + 1)));
+					// Draw row ofset
+					drawingContext.PushTransform(new TranslateTransform(textMargin, 0));
 					{
-						foreach (Chunk c in Chunks)
+						drawingContext.DrawGlyphRun(SystemColors.ControlDarkBrush, TextUtils.CreateGlyphRun(rowByteOffset.ToString("X2"), typeface, this.FontSize, dpiScale, out _));
+					}
+					drawingContext.Pop();
+
+					drawingContext.PushClip(new RectangleGeometry(new Rect(offsetMargin, 0, byteWidth * bytesPerRow + 5, characterHeight + 1)));
+					{
+						drawingContext.PushTransform(new TranslateTransform(offsetMargin, 0));
 						{
-							if (!(c.End < rowByteOffset || c.Start > rowByteOffset + bytesPerRow - 1))
+							// Draw chunks
+							foreach (Chunk c in Chunks)
 							{
-								drawingContext.PushTransform(new TranslateTransform(-.5, .5));
+								if (!(c.End < rowByteOffset || c.Start > rowByteOffset + bytesPerRow - 1))
 								{
-									drawingContext.DrawRectangle(new SolidColorBrush(Colors.LightGray), chunkPen, new Rect((c.Start - rowByteOffset) * byteWidth + 4, 0, c.Length * byteWidth - 3, characterHeight));
-								}
-								drawingContext.Pop();
-								if (c.Start >= rowByteOffset)
-								{
-									previewString += c.PreviewString;
+									drawingContext.PushTransform(new TranslateTransform(-.5, .5));
+									{
+										drawingContext.DrawRectangle(new SolidColorBrush(Colors.LightGray), chunkPen, new Rect((c.Start - rowByteOffset) * byteWidth + 4, 0, c.Length * byteWidth - 3, characterHeight));
+									}
+									drawingContext.Pop();
+									if (c.Start >= rowByteOffset)
+									{
+										previewString += c.PreviewString;
+									}
 								}
 							}
+
+							// Draw bytes
+							for (int j = 0; j < bytesPerRow && rowByteOffset + j < Bytes.Count; j++)
+							{
+								drawingContext.DrawText(new FormattedText(Bytes[rowByteOffset + j].ToString("X2"), CultureInfo.CurrentCulture, FlowDirection.LeftToRight, typeface, FontSize, AppSettings.TextForeground, new NumberSubstitution(), TextFormattingMode.Display, dpiScale), new Point(j * byteWidth + 5, 0));
+							}
 						}
+						drawingContext.Pop();
 					}
 					drawingContext.Pop(); // Byte area clip
 
-					for (int j = 0; j < bytesPerRow && rowByteOffset + j < Bytes.Count; j++)
-					{
-						drawingContext.DrawText(new FormattedText(Bytes[rowByteOffset + j].ToString("X2"), CultureInfo.CurrentCulture, FlowDirection.LeftToRight, typeface, FontSize, AppSettings.TextForeground, new NumberSubstitution(), TextFormattingMode.Display, dpiScale), new Point(j * byteWidth + 5, 0));
-					}
-
-					drawingContext.DrawText(new FormattedText(previewString, CultureInfo.CurrentCulture, FlowDirection.LeftToRight, typeface, FontSize, AppSettings.TextForeground, new NumberSubstitution(), TextFormattingMode.Display, dpiScale), new Point(bytesPerRow * byteWidth + 20, 0));
+					// Draw preview
+					drawingContext.DrawText(new FormattedText(previewString, CultureInfo.CurrentCulture, FlowDirection.LeftToRight, typeface, FontSize, AppSettings.TextForeground, new NumberSubstitution(), TextFormattingMode.Display, dpiScale), new Point(bytesPerRow * byteWidth + 20 + rowOffsetWidth, 0));
 				}
 				drawingContext.Pop(); // Line Y offset
 			}
@@ -189,6 +223,19 @@ namespace HexEdit
 			var formattedText = new FormattedText(text, CultureInfo.CurrentCulture, FlowDirection.LeftToRight, typeface, FontSize, Brushes.Black, new NumberSubstitution(), TextFormattingMode.Display, dpiScale);
 
 			return new Size(formattedText.Width, formattedText.Height);
+		}
+
+		private double RoundToWholePixels(double x)
+		{
+			return Math.Round(x / dpiScale) * dpiScale;
+		}
+
+		private GuidelineSet CreateGuidelineSet(Pen pen)
+		{
+			GuidelineSet guidelineSet = new GuidelineSet();
+			guidelineSet.GuidelinesX.Add(pen.Thickness / 2);
+			guidelineSet.GuidelinesY.Add(pen.Thickness / 2);
+			return guidelineSet;
 		}
 
 		#endregion

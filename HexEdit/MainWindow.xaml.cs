@@ -265,6 +265,7 @@ namespace HexEdit
 				}
 
 				valid = false;
+				i++;
 			}
 			return valid;
 		}
