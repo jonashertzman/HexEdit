@@ -63,7 +63,8 @@ namespace HexEdit
 			VisibleLines = (int)(ActualHeight / characterHeight + 1);
 			MaxVerialcalScroll = Bytes.Count / bytesPerRow - VisibleLines + 2;
 
-			double rowOffsetWidth = Bytes.Count.ToString("X2").Length * characterWidth;
+			int maxOffset = Bytes.Count.ToString("X2").Length;
+			double rowOffsetWidth = maxOffset * characterWidth;
 
 
 			Pen borderPen = new Pen(SystemColors.ScrollBarBrush, RoundToWholePixels(1));
@@ -77,6 +78,10 @@ namespace HexEdit
 			for (int i = 0; i < VisibleLines; i++)
 			{
 				int rowByteOffset = (i + VerticalOffset) * bytesPerRow;
+
+				if (rowByteOffset >= Bytes.Count)
+					break;
+
 				string previewString = "";
 
 				// Line Y offset
@@ -85,7 +90,7 @@ namespace HexEdit
 					// Draw row ofset
 					drawingContext.PushTransform(new TranslateTransform(textMargin, 0));
 					{
-						drawingContext.DrawGlyphRun(SystemColors.ControlDarkBrush, TextUtils.CreateGlyphRun(rowByteOffset.ToString("X2"), typeface, this.FontSize, dpiScale, out _));
+						drawingContext.DrawGlyphRun(SystemColors.ControlDarkBrush, TextUtils.CreateGlyphRun(rowByteOffset.ToString("X2").PadLeft(maxOffset, '0'), typeface, this.FontSize, dpiScale, out _));
 					}
 					drawingContext.Pop();
 
@@ -125,6 +130,13 @@ namespace HexEdit
 				}
 				drawingContext.Pop(); // Line Y offset
 			}
+
+			// Draw row offset border
+			drawingContext.PushGuidelineSet(borderGuide);
+			{
+				drawingContext.DrawLine(borderPen, new Point(offsetMargin, -1), new Point(offsetMargin, this.ActualHeight));
+			}
+			drawingContext.Pop();
 
 			TextAreaWidth = (int)ActualWidth;
 			MaxHorizontalScroll = (int)(maxTextwidth - TextAreaWidth);
