@@ -161,6 +161,8 @@ namespace HexEdit
 
 				// 2 byte character
 				end = i + 2;
+				if (bytes.Length <= end) return false;
+
 				if (bytes[i] >= 0xC2 && bytes[i] <= 0xDF)
 				{
 					if (bytes[i + 1] >= 0x80 && bytes[i + 1] <= 0xBF)
@@ -173,6 +175,8 @@ namespace HexEdit
 
 				// 3 byte character
 				end = i + 3;
+				if (bytes.Length <= end) return false;
+
 				if (bytes[i] == 0xE0)
 				{
 					if (bytes[i + 1] >= 0xA0 && bytes[i + 1] <= 0xBF)
@@ -227,6 +231,9 @@ namespace HexEdit
 
 				// 4 byte character
 				end = i + 4;
+				if (bytes.Length <= end) return false;
+
+
 				if (bytes[i] == 0xF0)
 				{
 					if (bytes[i + 1] >= 0x90 && bytes[i + 1] <= 0xBF)
