@@ -2,9 +2,12 @@
 using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.Globalization;
+using System.Threading;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
+using System.Windows.Media.Imaging;
+using System.Windows.Threading;
 
 namespace HexEdit
 {
@@ -21,6 +24,8 @@ namespace HexEdit
 
 		private double characterHeight;
 		private double characterWidth;
+
+		private readonly Stopwatch stopwatch = new Stopwatch();
 
 		#endregion
 
@@ -39,11 +44,18 @@ namespace HexEdit
 		{
 			Debug.Print("PreviewControl OnRender");
 
+#if DEBUG
+			MeasureRendeTime();
+#endif
+
 			// Fill background
 			drawingContext.DrawRectangle(AppSettings.TextBackground, null, new Rect(0, 0, this.ActualWidth, this.ActualHeight));
 
 			if (Bytes.Count == 0)
 				return;
+
+			Stopwatch sw = new Stopwatch();
+			sw.Start();
 
 			typeface = new Typeface(this.FontFamily, this.FontStyle, this.FontWeight, this.FontStretch);
 
@@ -56,6 +68,7 @@ namespace HexEdit
 			int lineCount = Bytes.Count / bytesPerRow + 1;
 
 			Pen chunkPen = new Pen(AppSettings.TextForeground, 1);
+			chunkPen.Freeze();
 
 			TextUtils.CreateGlyphRun("W", typeface, this.FontSize, dpiScale, out characterWidth);
 			characterHeight = Math.Ceiling(TextUtils.FontHeight(typeface, this.FontSize, dpiScale) / dpiScale) * dpiScale;
@@ -68,6 +81,7 @@ namespace HexEdit
 
 
 			Pen borderPen = new Pen(SystemColors.ScrollBarBrush, RoundToWholePixels(1));
+			borderPen.Freeze();
 			GuidelineSet borderGuide = CreateGuidelineSet(borderPen);
 
 			textMargin = RoundToWholePixels(4);
@@ -118,7 +132,12 @@ namespace HexEdit
 							// Draw bytes
 							for (int j = 0; j < bytesPerRow && rowByteOffset + j < Bytes.Count; j++)
 							{
-								drawingContext.DrawText(new FormattedText(Bytes[rowByteOffset + j].ToString("X2"), CultureInfo.CurrentCulture, FlowDirection.LeftToRight, typeface, FontSize, AppSettings.TextForeground, new NumberSubstitution(), TextFormattingMode.Display, dpiScale), new Point(j * byteWidth + 5, 0));
+								drawingContext.PushTransform(new TranslateTransform(j * byteWidth + 5, 0));
+								{
+									drawingContext.DrawGlyphRun(AppSettings.TextForeground, TextUtils.CreateGlyphRun(Bytes[rowByteOffset + j].ToString("X2"), typeface, this.FontSize, dpiScale, out _));
+								}
+								drawingContext.Pop();
+								//drawingContext.DrawText(new FormattedText(Bytes[rowByteOffset + j].ToString("X2"), CultureInfo.CurrentCulture, FlowDirection.LeftToRight, typeface, FontSize, AppSettings.TextForeground, new NumberSubstitution(), TextFormattingMode.Display, dpiScale), new Point(j * byteWidth + 5, 0));
 							}
 						}
 						drawingContext.Pop();
@@ -126,7 +145,11 @@ namespace HexEdit
 					drawingContext.Pop(); // Byte area clip
 
 					// Draw preview
-					drawingContext.DrawText(new FormattedText(previewString, CultureInfo.CurrentCulture, FlowDirection.LeftToRight, typeface, FontSize, AppSettings.TextForeground, new NumberSubstitution(), TextFormattingMode.Display, dpiScale), new Point(bytesPerRow * byteWidth + 20 + rowOffsetWidth, 0));
+					drawingContext.PushTransform(new TranslateTransform(bytesPerRow * byteWidth + 20 + rowOffsetWidth, 0));
+					{
+						drawingContext.DrawGlyphRun(AppSettings.TextForeground, TextUtils.CreateGlyphRun(previewString, typeface, this.FontSize, dpiScale, out _));
+					}
+					drawingContext.Pop();
 				}
 				drawingContext.Pop(); // Line Y offset
 			}
@@ -140,6 +163,11 @@ namespace HexEdit
 
 			TextAreaWidth = (int)ActualWidth;
 			MaxHorizontalScroll = (int)(maxTextwidth - TextAreaWidth);
+
+
+#if DEBUG
+			ReportRenderTime();
+#endif
 		}
 
 		#endregion
@@ -230,6 +258,23 @@ namespace HexEdit
 
 		#region Methods
 
+		private void MeasureRendeTime()
+		{
+			stopwatch.Restart();
+		}
+
+		private void ReportRenderTime()
+		{
+			Dispatcher.BeginInvoke(
+				DispatcherPriority.Loaded,
+				new Action(() =>
+				{
+					stopwatch.Stop();
+					Debug.Print($"Took {stopwatch.ElapsedMilliseconds} ms");
+				})
+			);
+		}
+
 		private Size MeasureString(string text)
 		{
 			var formattedText = new FormattedText(text, CultureInfo.CurrentCulture, FlowDirection.LeftToRight, typeface, FontSize, Brushes.Black, new NumberSubstitution(), TextFormattingMode.Display, dpiScale);
@@ -247,6 +292,8 @@ namespace HexEdit
 			GuidelineSet guidelineSet = new GuidelineSet();
 			guidelineSet.GuidelinesX.Add(pen.Thickness / 2);
 			guidelineSet.GuidelinesY.Add(pen.Thickness / 2);
+			guidelineSet.Freeze();
+
 			return guidelineSet;
 		}
 
