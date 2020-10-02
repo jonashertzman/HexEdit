@@ -1,2 +1,3 @@
-# HexEdit
-Hex editor
+# Hex Edit
+Hex editor with rich unicode support.
+Still in early alpha, nothing usefull yet...
