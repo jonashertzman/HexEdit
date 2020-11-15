@@ -64,11 +64,10 @@ namespace HexEdit
 
 			double maxTextwidth = 0;
 			int bytesPerRow = AppSettings.BytesPerRow;
-			int byteWidth = 20;
+			double byteWidth = RoundToWholePixels(20);
 			int lineCount = Bytes.Count / bytesPerRow + 1;
 
-			Pen chunkPen = new Pen(AppSettings.TextForeground, 1);
-			chunkPen.Freeze();
+
 
 			TextUtils.CreateGlyphRun("W", typeface, this.FontSize, dpiScale, out characterWidth);
 			characterHeight = Math.Ceiling(TextUtils.FontHeight(typeface, this.FontSize, dpiScale) / dpiScale) * dpiScale;
@@ -84,8 +83,13 @@ namespace HexEdit
 			borderPen.Freeze();
 			GuidelineSet borderGuide = CreateGuidelineSet(borderPen);
 
+			Pen chunkPen = new Pen(AppSettings.TextForeground, RoundToWholePixels(1));
+			chunkPen.Freeze();
+			GuidelineSet chuncGuide = CreateGuidelineSet(chunkPen);
+
+
 			textMargin = RoundToWholePixels(4);
-			offsetMargin = RoundToWholePixels(rowOffsetWidth) + (2 * textMargin) + borderPen.Thickness;
+			offsetMargin = RoundToWholePixels(rowOffsetWidth) + (2 * textMargin);
 
 			drawingContext.DrawRectangle(SystemColors.ControlBrush, null, new Rect(0, 0, offsetMargin, this.ActualHeight));
 
@@ -104,22 +108,24 @@ namespace HexEdit
 					// Draw row ofset
 					drawingContext.PushTransform(new TranslateTransform(textMargin, 0));
 					{
-						drawingContext.DrawGlyphRun(SystemColors.ControlDarkBrush, TextUtils.CreateGlyphRun(rowByteOffset.ToString("X2").PadLeft(maxOffset, '0'), typeface, this.FontSize, dpiScale, out _));
+						drawingContext.DrawGlyphRun(SystemColors.ControlDarkBrush, TextUtils.CreateGlyphRun(rowByteOffset.ToString("X2").PadLeft(maxOffset, '0'), typeface, FontSize, dpiScale, out _));
 					}
 					drawingContext.Pop();
+
 
 					drawingContext.PushClip(new RectangleGeometry(new Rect(offsetMargin, 0, byteWidth * bytesPerRow + 5, characterHeight + 1)));
 					{
 						drawingContext.PushTransform(new TranslateTransform(offsetMargin, 0));
 						{
 							// Draw chunks
+							drawingContext.PushGuidelineSet(chuncGuide);
 							foreach (Chunk c in Chunks)
 							{
 								if (!(c.End < rowByteOffset || c.Start > rowByteOffset + bytesPerRow - 1))
 								{
 									drawingContext.PushTransform(new TranslateTransform(-.5, .5));
 									{
-										drawingContext.DrawRectangle(new SolidColorBrush(Colors.LightGray), chunkPen, new Rect((c.Start - rowByteOffset) * byteWidth + 4, 0, c.Length * byteWidth - 3, characterHeight));
+										drawingContext.DrawRectangle(SystemColors.ControlBrush, chunkPen, new Rect((c.Start - rowByteOffset) * byteWidth + 4, 0, c.Length * byteWidth - 3, characterHeight));
 									}
 									drawingContext.Pop();
 									if (c.Start >= rowByteOffset)
@@ -128,6 +134,7 @@ namespace HexEdit
 									}
 								}
 							}
+							drawingContext.Pop();
 
 							// Draw bytes
 							for (int j = 0; j < bytesPerRow && rowByteOffset + j < Bytes.Count; j++)

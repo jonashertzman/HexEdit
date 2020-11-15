@@ -125,9 +125,8 @@ namespace HexEdit
 			double characterWidth = Math.Ceiling(glyphTypeface.AdvanceWidths[wIndex] * fontSize / dpiScale) * dpiScale;
 
 			int displayCodePoint = codePoint;
-			ushort glyphIndex;
 
-			glyphTypeface.CharacterToGlyphMap.TryGetValue(displayCodePoint, out glyphIndex);
+			glyphTypeface.CharacterToGlyphMap.TryGetValue(displayCodePoint, out ushort glyphIndex);
 			width = Math.Ceiling(glyphTypeface.AdvanceWidths[glyphIndex] * fontSize / dpiScale) * dpiScale;
 			return glyphIndex;
 		}
@@ -201,7 +200,7 @@ namespace HexEdit
 				foreach (Typeface typeface in typefaces)
 				{
 					typeface.TryGetGlyphTypeface(out GlyphTypeface glyph);
-					if (glyph != null && glyph.CharacterToGlyphMap.TryGetValue(codePoint, out ushort glyphIndex))
+					if (glyph != null && glyph.CharacterToGlyphMap.TryGetValue(codePoint, out _))
 					{
 						if (family.FamilyNames.TryGetValue(XmlLanguage.GetLanguage("en-us"), out string familyName))
 						{
