@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
+using System.Diagnostics;
 using System.IO;
-using System.Reflection;
 using System.Windows.Media;
 
 namespace HexEdit
@@ -31,7 +31,7 @@ namespace HexEdit
 		{
 			get
 			{
-				DateTime buildDate = new FileInfo(Assembly.GetExecutingAssembly().Location).LastWriteTime;
+				DateTime buildDate = new FileInfo(Process.GetCurrentProcess().MainModule.FileName).LastWriteTime;
 				return $"{buildDate:yy}{buildDate.DayOfYear:D3}";
 			}
 		}
