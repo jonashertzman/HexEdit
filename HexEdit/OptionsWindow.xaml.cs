@@ -116,10 +116,10 @@ namespace HexEdit
 		public const int WS_MINIMIZEBOX = 0x20000;
 
 		[DllImport("user32.dll")]
-		extern public static int GetWindowLong(IntPtr hwnd, int index);
+		extern internal static int GetWindowLong(IntPtr hwnd, int index);
 
 		[DllImport("user32.dll")]
-		extern public static int SetWindowLong(IntPtr hwnd, int index, int value);
+		extern internal static int SetWindowLong(IntPtr hwnd, int index, int value);
 
 		#endregion
 
