@@ -1,16 +1,15 @@
 ﻿using System.Windows.Media;
 
-namespace HexEdit
+namespace HexEdit;
+
+public static class DefaultSettings
 {
-	public static class DefaultSettings
-	{
 
-		internal static string Font { get; } = "Courier New";
-		internal static int FontSize { get; } = 11;
+	internal static string Font { get; } = "Courier New";
+	internal static int FontSize { get; } = 11;
 
-		internal static Color TextForeground { get; } = Colors.Black;
-		internal static Color TextBackground { get; } = Colors.White;
-		internal static Color SelectionBackground { get; } = Color.FromArgb(50, 0, 150, 210);
+	internal static Color TextForeground { get; } = Colors.Black;
+	internal static Color TextBackground { get; } = Colors.White;
+	internal static Color SelectionBackground { get; } = Color.FromArgb(50, 0, 150, 210);
 
-	}
 }

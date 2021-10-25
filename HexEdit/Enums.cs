@@ -1,29 +1,26 @@
 ﻿using System.ComponentModel;
 
-namespace HexEdit
+namespace HexEdit;
+
+public enum ChunkType
 {
+	None,
+	Bom,
+	Utf8Character,
+	Utf16leCharacter,
+	Utf16beCharacter,
+	Utf32leCharacter,
+	Utf32beCharacter
+}
 
-	public enum ChunkType
-	{
-		None,
-		Bom,
-		Utf8Character,
-		Utf16leCharacter,
-		Utf16beCharacter,
-		Utf32leCharacter,
-		Utf32beCharacter
-	}
-
-	public enum PreviewMode
-	{
-		Ascii,
-		Ansi,
-		[Description("UTF 8")]
-		Utf8,
-		Utf16be,
-		Utf16le,
-		Utf32be,
-		Utf32le
-	}
-
+public enum PreviewMode
+{
+	Ascii,
+	Ansi,
+	[Description("UTF 8")]
+	Utf8,
+	Utf16be,
+	Utf16le,
+	Utf32be,
+	Utf32le
 }
