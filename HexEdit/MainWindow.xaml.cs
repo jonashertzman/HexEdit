@@ -1,10 +1,8 @@
-﻿global using System;
-global using System.Diagnostics;
+﻿global using System.Diagnostics;
 
 using Microsoft.Win32;
 using System.Collections.ObjectModel;
 using System.IO;
-using System.Linq;
 using System.Windows;
 
 namespace HexEdit;
