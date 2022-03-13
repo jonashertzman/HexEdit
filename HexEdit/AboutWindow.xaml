@@ -14,6 +14,9 @@
 	SizeToContent="WidthAndHeight"
 	mc:Ignorable="d">
 
+	<Window.Resources>
+		<BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" />
+	</Window.Resources>
 	<Grid>
 		<Grid.ColumnDefinitions>
 			<ColumnDefinition Width="Auto" />
@@ -24,24 +27,38 @@
 			<RowDefinition Height="Auto" />
 		</Grid.RowDefinitions>
 		<StackPanel Margin="10">
-			<ContentPresenter Width="100" ContentTemplate="{StaticResource ApplicationIcon}" />
+			<ContentPresenter Width="150" Margin="5" ContentTemplate="{StaticResource ApplicationIcon}" />
 		</StackPanel>
-
 		<StackPanel Grid.Column="1" Margin="10">
-			<Label Content="{Binding FullApplicationName, FallbackValue='Hex Edit X.X  (Build 19123)'}" Style="{StaticResource CommonTextLabel}" />
-			<Label Grid.Row="1" Content="Author: Jonas Hertzman" Style="{StaticResource CommonTextLabel}" />
-			<Label Grid.Row="2" Content="License: GNU General Public License v3" Style="{StaticResource CommonTextLabel}" />
+			<Label Content="{Binding ApplicationName, FallbackValue='Hex Edit X.X'}" Style="{StaticResource CondencedTextLabel}" FontSize="20" FontWeight="Bold" />
 			<StackPanel Orientation="Horizontal">
-				<Label Grid.Row="3" Style="{StaticResource CommonTextLabel}">
-					<Hyperlink RequestNavigate="Hyperlink_RequestNavigate" NavigateUri="https://github.com/jonashertzman/HexEdit">Source Code</Hyperlink>
-				</Label>
-				<Label Grid.Row="1" Style="{StaticResource CommonTextLabel}">
-					<Hyperlink RequestNavigate="Feedback_RequestNavigate" NavigateUri="x">Send Feedback</Hyperlink>
-				</Label>
+				<Label Margin="5,5,0,5" Padding="2,2,0,2" Content="Build Number:  " Style="{StaticResource CondencedTextLabel}" />
+				<Label Margin="0,5,5,5" Padding="0,2,2,2" Content="{Binding BuildNumber, FallbackValue='12345'}" Style="{StaticResource CondencedTextLabel}" />
+				<!--<Label Name="NewVersionLabel" Style="{StaticResource CondencedTextLabel}" Visibility="{Binding NewBuildAvailable, Converter={StaticResource BooleanToVisibilityConverter}}">
+					<Hyperlink RequestNavigate="Hyperlink_RequestNavigate" NavigateUri="https://github.com/jonashertzman/HexEdit/blob/master/README.md">New Version Available</Hyperlink>
+				</Label>-->
 			</StackPanel>
-
+			<Label Content="Author:  Jonas Hertzman" Style="{StaticResource CondencedTextLabel}" />
+			<Label Content="License:  GNU General Public License v3" Style="{StaticResource CommonTextLabel}" />
+			<StackPanel Margin="7,2,7,7">
+				<TextBlock>If you like to support my work on free open-source software,</TextBlock>
+				<StackPanel Orientation="Horizontal">
+					<TextBlock Text="feel free to " />
+					<TextBlock><Hyperlink RequestNavigate="Feedback_RequestNavigate" NavigateUri="x">send feedback</Hyperlink></TextBlock>
+					<TextBlock Text=", have a look at the " />
+					<TextBlock>	<Hyperlink RequestNavigate="Hyperlink_RequestNavigate" NavigateUri="https://github.com/jonashertzman/HexEdit">source code</Hyperlink></TextBlock>
+					<TextBlock Text=", " />
+				</StackPanel>
+				<StackPanel Orientation="Horizontal">
+					<TextBlock Text="support me on " />
+					<TextBlock><Hyperlink RequestNavigate="Hyperlink_RequestNavigate" NavigateUri="https://www.patreon.com/jonashertzman">Patreon</Hyperlink></TextBlock>
+					<TextBlock Text=" or " />
+					<TextBlock>	<Hyperlink RequestNavigate="Hyperlink_RequestNavigate" NavigateUri="https://ko-fi.com/jonashertzman">buy me a coffee</Hyperlink></TextBlock>
+					<TextBlock Text="." />
+				</StackPanel>
+			</StackPanel>
 		</StackPanel>
-		<StackPanel Grid.Row="1" Grid.ColumnSpan="2" Background="{DynamicResource {x:Static SystemColors.ControlBrushKey}}">
+		<StackPanel Grid.Row="1" Grid.ColumnSpan="2" Background="{StaticResource {x:Static SystemColors.ControlBrushKey}}">
 			<StackPanel Margin="10">
 				<Button HorizontalAlignment="Right" Content="Close" Style="{StaticResource CommonButton}" IsDefault="True" IsCancel="True" />
 			</StackPanel>
