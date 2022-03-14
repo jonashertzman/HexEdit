@@ -12,17 +12,12 @@ public class MainWindowViewModel : INotifyPropertyChanged
 
 	public string Title
 	{
-		get { return $"{CurrentFile ?? "New"} - {ApplicationName}"; }
-	}
-
-	public string ApplicationName
-	{
 		get { return "Hex Edit"; }
 	}
 
-	public string ApplicationVersion
+	public string Version
 	{
-		get { return "Alpha 1"; }
+		get { return "0.1"; }
 	}
 
 	public string BuildNumber
@@ -34,9 +29,14 @@ public class MainWindowViewModel : INotifyPropertyChanged
 		}
 	}
 
+	public string ApplicationName
+	{
+		get { return $"{Title} {Version}"; }
+	}
+
 	public string FullApplicationName
 	{
-		get { return $"{ApplicationName} {ApplicationVersion}  (Build {BuildNumber})"; }
+		get { return $"{Title} {Version} (Build {BuildNumber})"; }
 	}
 
 
