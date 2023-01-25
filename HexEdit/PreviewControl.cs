@@ -41,7 +41,7 @@ public class PreviewControl : Control
 		Debug.Print("PreviewControl OnRender");
 
 #if DEBUG
-		MeasureRendeTime();
+		MeasureRenderTime();
 #endif
 
 		// Fill background
@@ -58,7 +58,7 @@ public class PreviewControl : Control
 		Matrix m = PresentationSource.FromVisual(this).CompositionTarget.TransformToDevice;
 		dpiScale = 1 / m.M11;
 
-		double maxTextwidth = 0;
+		double maxTextWidth = 0;
 		int bytesPerRow = AppSettings.BytesPerRow;
 		double byteWidth = RoundToWholePixels(20);
 		int lineCount = Bytes.Count / bytesPerRow + 1;
@@ -69,7 +69,7 @@ public class PreviewControl : Control
 		characterHeight = Math.Ceiling(TextUtils.FontHeight(typeface, this.FontSize, dpiScale) / dpiScale) * dpiScale;
 
 		VisibleLines = (int)(ActualHeight / characterHeight + 1);
-		MaxVerialcalScroll = Bytes.Count / bytesPerRow - VisibleLines + 2;
+		MaxVerticalScroll = Bytes.Count / bytesPerRow - VisibleLines + 2;
 
 		int maxOffset = Bytes.Count.ToString("X2").Length;
 		double rowOffsetWidth = maxOffset * characterWidth;
@@ -81,7 +81,7 @@ public class PreviewControl : Control
 
 		Pen chunkPen = new Pen(AppSettings.TextForeground, RoundToWholePixels(1));
 		chunkPen.Freeze();
-		GuidelineSet chuncGuide = CreateGuidelineSet(chunkPen);
+		GuidelineSet chunkGuide = CreateGuidelineSet(chunkPen);
 
 
 		textMargin = RoundToWholePixels(4);
@@ -101,7 +101,7 @@ public class PreviewControl : Control
 			// Line Y offset
 			drawingContext.PushTransform(new TranslateTransform(0, characterHeight * i));
 			{
-				// Draw row ofset
+				// Draw row offset
 				drawingContext.PushTransform(new TranslateTransform(textMargin, 0));
 				{
 					drawingContext.DrawGlyphRun(SystemColors.ControlDarkBrush, TextUtils.CreateGlyphRun(rowByteOffset.ToString("X2").PadLeft(maxOffset, '0'), typeface, FontSize, dpiScale, out _));
@@ -114,7 +114,7 @@ public class PreviewControl : Control
 					drawingContext.PushTransform(new TranslateTransform(offsetMargin, 0));
 					{
 						// Draw chunks
-						drawingContext.PushGuidelineSet(chuncGuide);
+						drawingContext.PushGuidelineSet(chunkGuide);
 						foreach (Chunk c in Chunks)
 						{
 							if (!(c.End < rowByteOffset || c.Start > rowByteOffset + bytesPerRow - 1))
@@ -165,7 +165,7 @@ public class PreviewControl : Control
 		drawingContext.Pop();
 
 		TextAreaWidth = (int)ActualWidth;
-		MaxHorizontalScroll = (int)(maxTextwidth - TextAreaWidth);
+		MaxHorizontalScroll = (int)(maxTextWidth - TextAreaWidth);
 
 
 #if DEBUG
@@ -204,30 +204,30 @@ public class PreviewControl : Control
 	}
 
 
-	public static readonly DependencyProperty MaxVerialcalScrollProperty = DependencyProperty.Register("MaxVerialcalScroll", typeof(int), typeof(PreviewControl));
+	public static readonly DependencyProperty MaxVerticalScrollProperty = DependencyProperty.Register("MaxVerticalScroll", typeof(int), typeof(PreviewControl));
 
-	public int MaxVerialcalScroll
+	public int MaxVerticalScroll
 	{
-		get { return (int)GetValue(MaxVerialcalScrollProperty); }
-		set { SetValue(MaxVerialcalScrollProperty, value); }
+		get { return (int)GetValue(MaxVerticalScrollProperty); }
+		set { SetValue(MaxVerticalScrollProperty, value); }
 	}
 
 
-	public static readonly DependencyProperty MaxHorizontalScrollPropery = DependencyProperty.Register("MaxHorizontalScroll", typeof(int), typeof(PreviewControl));
+	public static readonly DependencyProperty MaxHorizontalScrollProperty = DependencyProperty.Register("MaxHorizontalScroll", typeof(int), typeof(PreviewControl));
 
 	public int MaxHorizontalScroll
 	{
-		get { return (int)GetValue(MaxHorizontalScrollPropery); }
-		set { SetValue(MaxHorizontalScrollPropery, value); }
+		get { return (int)GetValue(MaxHorizontalScrollProperty); }
+		set { SetValue(MaxHorizontalScrollProperty, value); }
 	}
 
 
-	public static readonly DependencyProperty TextAreaWidthPropery = DependencyProperty.Register("TextAreaWidth", typeof(int), typeof(PreviewControl));
+	public static readonly DependencyProperty TextAreaWidthProperty = DependencyProperty.Register("TextAreaWidth", typeof(int), typeof(PreviewControl));
 
 	public int TextAreaWidth
 	{
-		get { return (int)GetValue(TextAreaWidthPropery); }
-		set { SetValue(TextAreaWidthPropery, value); }
+		get { return (int)GetValue(TextAreaWidthProperty); }
+		set { SetValue(TextAreaWidthProperty, value); }
 	}
 
 
@@ -261,7 +261,7 @@ public class PreviewControl : Control
 
 	#region Methods
 
-	private void MeasureRendeTime()
+	private void MeasureRenderTime()
 	{
 		stopwatch.Restart();
 	}

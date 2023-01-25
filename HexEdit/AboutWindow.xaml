@@ -6,6 +6,7 @@
 	xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
 	xmlns:local="clr-namespace:HexEdit"
 	Title="About"
+	d:DataContext="{d:DesignInstance Type=local:MainWindowViewModel}"
 	ResizeMode="NoResize"
 	TextOptions.TextFormattingMode="Display"
 	Background="{StaticResource {x:Static SystemColors.WindowBrushKey}}"
