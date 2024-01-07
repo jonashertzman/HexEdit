@@ -14,11 +14,11 @@ public partial class MainWindow : Window
 
 	MainWindowViewModel ViewModel { get; } = new MainWindowViewModel();
 
-	readonly byte[] UTF8_BOM = { 0xEF, 0xBB, 0xBF };
-	readonly byte[] UTF16LE_BOM = { 0xFF, 0xFE };
-	readonly byte[] UTF16BE_BOM = { 0xFE, 0xFF };
-	readonly byte[] UTF32LE_BOM = { 0x00, 0x00, 0xFE, 0xFF };
-	readonly byte[] UTF32BE_BOM = { 0xFE, 0xFF, 0x00, 0x00 };
+	readonly byte[] UTF8_BOM = [0xEF, 0xBB, 0xBF];
+	readonly byte[] UTF16LE_BOM = [0xFF, 0xFE];
+	readonly byte[] UTF16BE_BOM = [0xFE, 0xFF];
+	readonly byte[] UTF32LE_BOM = [0x00, 0x00, 0xFE, 0xFF];
+	readonly byte[] UTF32BE_BOM = [0xFE, 0xFF, 0x00, 0x00];
 
 	#endregion
 
@@ -64,7 +64,7 @@ public partial class MainWindow : Window
 		try
 		{
 			byte[] bytes = File.ReadAllBytes(path);
-			ObservableCollection<Chunk> chunks = new ObservableCollection<Chunk>();
+			ObservableCollection<Chunk> chunks = [];
 
 			// First check if the file has a BOM
 			if (bytes.Length > 2 && bytes[0..3].SequenceEqual(UTF8_BOM))
@@ -364,7 +364,7 @@ public partial class MainWindow : Window
 		this.Close();
 	}
 
-	private void CommnadOptions_Executed(object sender, System.Windows.Input.ExecutedRoutedEventArgs e)
+	private void CommandOptions_Executed(object sender, System.Windows.Input.ExecutedRoutedEventArgs e)
 	{
 		// Store existing settings data in case the changes are canceled.
 		var oldFont = ViewModel.Font;

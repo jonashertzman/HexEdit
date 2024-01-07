@@ -24,7 +24,7 @@ public class MainWindowViewModel : INotifyPropertyChanged
 	{
 		get
 		{
-			DateTime buildDate = new FileInfo(Process.GetCurrentProcess().MainModule.FileName).LastWriteTime;
+			DateTime buildDate = new FileInfo(Environment.ProcessPath).LastWriteTime;
 			return $"{buildDate:yy}{buildDate.DayOfYear:D3}";
 		}
 	}
@@ -73,14 +73,14 @@ public class MainWindowViewModel : INotifyPropertyChanged
 		set { FilePreview = (PreviewMode)value; }
 	}
 
-	ObservableCollection<byte> fileContent = new ObservableCollection<byte>();
+	ObservableCollection<byte> fileContent = [];
 	public ObservableCollection<byte> FileContent
 	{
 		get { return fileContent; }
 		set { fileContent = value; OnPropertyChanged(nameof(FileContent)); }
 	}
 
-	ObservableCollection<Chunk> chunks = new ObservableCollection<Chunk>();
+	ObservableCollection<Chunk> chunks = [];
 	public ObservableCollection<Chunk> Chunks
 	{
 		get { return chunks; }

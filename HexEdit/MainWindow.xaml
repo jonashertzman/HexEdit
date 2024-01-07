@@ -23,7 +23,7 @@
 			<CommandBinding Command="local:Commands.Open" Executed="CommandOpen_Executed" />
 			<CommandBinding Command="local:Commands.Save" Executed="CommandSave_Executed" CanExecute="CommandSave_CanExecute" />
 			<CommandBinding Command="local:Commands.Exit" Executed="CommandExit_Executed" />
-			<CommandBinding Command="local:Commands.Options" Executed="CommnadOptions_Executed" />
+			<CommandBinding Command="local:Commands.Options" Executed="CommandOptions_Executed" />
 			<CommandBinding Command="local:Commands.About" Executed="CommandAbout_Executed" />
 
 		</Grid.CommandBindings>
