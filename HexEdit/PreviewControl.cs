@@ -79,7 +79,7 @@ public class PreviewControl : Control
 		borderPen.Freeze();
 		GuidelineSet borderGuide = CreateGuidelineSet(borderPen);
 
-		Pen chunkPen = new Pen(AppSettings.TextForeground, RoundToWholePixels(1));
+		Pen chunkPen = new Pen(AppSettings.TextForeground, RoundToWholePixels(.6));
 		chunkPen.Freeze();
 		GuidelineSet chunkGuide = CreateGuidelineSet(chunkPen);
 
@@ -121,7 +121,7 @@ public class PreviewControl : Control
 							{
 								drawingContext.PushTransform(new TranslateTransform(-.5, .5));
 								{
-									drawingContext.DrawRectangle(SystemColors.ControlBrush, chunkPen, new Rect((c.Start - rowByteOffset) * byteWidth + 4, 0, c.Length * byteWidth - 3, characterHeight));
+									drawingContext.DrawRectangle(SystemColors.ControlBrush, chunkPen, new Rect((c.Start - rowByteOffset) * byteWidth + 2, 0, (c.Length * byteWidth) + 2, characterHeight));
 								}
 								drawingContext.Pop();
 								if (c.Start >= rowByteOffset)

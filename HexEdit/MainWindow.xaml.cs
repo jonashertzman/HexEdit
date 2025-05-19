@@ -15,10 +15,10 @@ public partial class MainWindow : Window
 	MainWindowViewModel ViewModel { get; } = new MainWindowViewModel();
 
 	readonly byte[] UTF8_BOM = [0xEF, 0xBB, 0xBF];
+	readonly byte[] UTF32LE_BOM = [0xFF, 0xFE, 0x00, 0x00];
+	readonly byte[] UTF32BE_BOM = [0x00, 0x00, 0xFF, 0xFE];
 	readonly byte[] UTF16LE_BOM = [0xFF, 0xFE];
 	readonly byte[] UTF16BE_BOM = [0xFE, 0xFF];
-	readonly byte[] UTF32LE_BOM = [0x00, 0x00, 0xFE, 0xFF];
-	readonly byte[] UTF32BE_BOM = [0xFE, 0xFF, 0x00, 0x00];
 
 	#endregion
 
@@ -73,6 +73,14 @@ public partial class MainWindow : Window
 				chunks.Add(new Chunk(ChunkType.Bom, 0, bytes[0..3]));
 				ParseUtf8(bytes, 3, ref chunks);
 			}
+			else if (bytes.Length > 3 && bytes[0..4].SequenceEqual(UTF32LE_BOM)) // Check this before UTF16 since the first 2 bytes are the same as an UTF16 little endian BOM.
+			{
+				ViewModel.FilePreview = PreviewMode.Utf32le;
+			}
+			else if (bytes.Length > 3 && bytes[0..4].SequenceEqual(UTF32BE_BOM))
+			{
+				ViewModel.FilePreview = PreviewMode.Utf32be;
+			}
 			else if (bytes.Length > 1 && bytes[0..2].SequenceEqual(UTF16LE_BOM))
 			{
 				ViewModel.FilePreview = PreviewMode.Utf16le;
@@ -84,14 +92,6 @@ public partial class MainWindow : Window
 				ViewModel.FilePreview = PreviewMode.Utf16be;
 				chunks.Add(new Chunk(ChunkType.Bom, 0, bytes[0..2]));
 				ParseUtf16be(bytes, 2, ref chunks);
-			}
-			else if (bytes.Length > 3 && bytes[0..4].SequenceEqual(UTF32LE_BOM))
-			{
-				ViewModel.FilePreview = PreviewMode.Utf32le;
-			}
-			else if (bytes.Length > 3 && bytes[0..4].SequenceEqual(UTF32BE_BOM))
-			{
-				ViewModel.FilePreview = PreviewMode.Utf32be;
 			}
 
 			// No bom found, check if data passes as a bom-less UTF-8 file
