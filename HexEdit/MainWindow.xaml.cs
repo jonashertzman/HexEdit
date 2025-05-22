@@ -16,7 +16,7 @@ public partial class MainWindow : Window
 
 	readonly byte[] UTF8_BOM = [0xEF, 0xBB, 0xBF];
 	readonly byte[] UTF32LE_BOM = [0xFF, 0xFE, 0x00, 0x00];
-	readonly byte[] UTF32BE_BOM = [0x00, 0x00, 0xFF, 0xFE];
+	readonly byte[] UTF32BE_BOM = [0x00, 0x00, 0xFE, 0xFF];
 	readonly byte[] UTF16LE_BOM = [0xFF, 0xFE];
 	readonly byte[] UTF16BE_BOM = [0xFE, 0xFF];
 
@@ -64,6 +64,9 @@ public partial class MainWindow : Window
 		try
 		{
 			byte[] bytes = File.ReadAllBytes(path);
+
+			Chunk c = DetectBom(bytes);
+
 			ObservableCollection<Chunk> chunks = [];
 
 			// First check if the file has a BOM
@@ -110,6 +113,34 @@ public partial class MainWindow : Window
 		}
 	}
 
+
+	private Chunk DetectBom(byte[] bytes)
+	{
+		if (bytes.Length > 2 && bytes[0..3].SequenceEqual(UTF8_BOM))
+		{
+			return new Chunk(ChunkType.Bom, 0, bytes[0..2]);
+		}
+		//else if (bytes.Length > 3 && bytes[0..4].SequenceEqual(UTF32LE_BOM)) // Must check this before UTF16 since the first 2 bytes are the same as an UTF16 little endian BOM.
+		//{
+		//	Type = new UTF32Encoding(false, true);
+		//}
+		//else if (bytes.Length > 3 && bytes[0..4].SequenceEqual(UTF32BE_BOM))
+		//{
+		//	Type = new UTF32Encoding(true, true);
+		//}
+		//else if (bytes.Length > 1 && bytes[0..2].SequenceEqual(UTF16LE_BOM))
+		//{
+		//	Type = Encoding.Unicode;
+		//}
+		//else if (bytes.Length > 1 && bytes[0..2].SequenceEqual(UTF16BE_BOM))
+		//{
+		//	Type = Encoding.BigEndianUnicode;
+		//}
+
+
+		return null;
+
+	}
 	private void ParseUtf16le(byte[] bytes, int offset, ref ObservableCollection<Chunk> chunks)
 	{
 		for (int i = offset; i < bytes.Length; i += 2)

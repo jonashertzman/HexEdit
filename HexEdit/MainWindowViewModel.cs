@@ -10,6 +10,13 @@ public class MainWindowViewModel : INotifyPropertyChanged
 
 	#region Properties
 
+	private string windowTitle;
+	public string WindowTitle
+	{
+		get { return windowTitle; }
+		set { windowTitle = value; OnPropertyChanged(nameof(WindowTitle)); }
+	}
+
 	public string Title
 	{
 		get { return "Hex Edit"; }
