@@ -60,7 +60,7 @@ public class PreviewControl : Control
 
 		double maxTextWidth = 0;
 		int bytesPerRow = AppSettings.BytesPerRow;
-		double byteWidth = RoundToWholePixels(20);
+		double byteWidth = 30;
 		int lineCount = Bytes.Count / bytesPerRow + 1;
 
 
@@ -87,6 +87,14 @@ public class PreviewControl : Control
 		textMargin = RoundToWholePixels(4);
 		offsetMargin = RoundToWholePixels(rowOffsetWidth) + (2 * textMargin);
 
+		//for (int i = 0; i < 255; i++)
+		//{
+		//	string s = i.ToString("X2");
+		//	TextUtils.CreateGlyphRun(s, typeface, FontSize, dpiScale, out double b);
+		//	byteWidth = Math.Max(byteWidth, b);
+		//	Debug.WriteLine(b);
+		//}
+
 		drawingContext.DrawRectangle(SystemColors.ControlBrush, null, new Rect(0, 0, offsetMargin, this.ActualHeight));
 
 		for (int i = 0; i < VisibleLines; i++)
@@ -104,7 +112,7 @@ public class PreviewControl : Control
 				// Draw row offset
 				drawingContext.PushTransform(new TranslateTransform(textMargin, 0));
 				{
-					drawingContext.DrawGlyphRun(SystemColors.ControlDarkBrush, TextUtils.CreateGlyphRun(rowByteOffset.ToString("X2").PadLeft(maxOffset, '0'), typeface, FontSize, dpiScale, out _));
+					drawingContext.DrawGlyphRun(SystemColors.ControlDarkBrush, TextUtils.CreateGlyphRun(rowByteOffset.ToString("X2").PadLeft(maxOffset, '0'), typeface, FontSize, dpiScale, out double w));
 				}
 				drawingContext.Pop();
 
