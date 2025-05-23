@@ -28,7 +28,7 @@ public partial class MainWindow : Window
 	{
 		InitializeComponent();
 
-		PreviewModeCombobox.ItemsSource = System.Enum.GetValues(typeof(PreviewMode));
+		PreviewModeCombobox.ItemsSource = Enum.GetValues(typeof(Encoding));
 
 		DataContext = ViewModel;
 	}
@@ -65,47 +65,13 @@ public partial class MainWindow : Window
 		{
 			byte[] bytes = File.ReadAllBytes(path);
 
-			Chunk c = DetectBom(bytes);
-
-			ObservableCollection<Chunk> chunks = [];
-
-			// First check if the file has a BOM
-			if (bytes.Length > 2 && bytes[0..3].SequenceEqual(UTF8_BOM))
-			{
-				ViewModel.FilePreview = PreviewMode.Utf8;
-				chunks.Add(new Chunk(ChunkType.Bom, 0, bytes[0..3]));
-				ParseUtf8(bytes, 3, ref chunks);
-			}
-			else if (bytes.Length > 3 && bytes[0..4].SequenceEqual(UTF32LE_BOM)) // Check this before UTF16 since the first 2 bytes are the same as an UTF16 little endian BOM.
-			{
-				ViewModel.FilePreview = PreviewMode.Utf32le;
-			}
-			else if (bytes.Length > 3 && bytes[0..4].SequenceEqual(UTF32BE_BOM))
-			{
-				ViewModel.FilePreview = PreviewMode.Utf32be;
-			}
-			else if (bytes.Length > 1 && bytes[0..2].SequenceEqual(UTF16LE_BOM))
-			{
-				ViewModel.FilePreview = PreviewMode.Utf16le;
-				chunks.Add(new Chunk(ChunkType.Bom, 0, bytes[0..2]));
-				ParseUtf16le(bytes, 2, ref chunks);
-			}
-			else if (bytes.Length > 1 && bytes[0..2].SequenceEqual(UTF16BE_BOM))
-			{
-				ViewModel.FilePreview = PreviewMode.Utf16be;
-				chunks.Add(new Chunk(ChunkType.Bom, 0, bytes[0..2]));
-				ParseUtf16be(bytes, 2, ref chunks);
-			}
-
-			// No bom found, check if data passes as a bom-less UTF-8 file
-			else if (ParseUtf8(bytes, 0, ref chunks))
-			{
-				ViewModel.FilePreview = PreviewMode.Utf8;
-			}
 
 			ViewModel.CurrentFile = path;
 			ViewModel.FileContent = new ObservableCollection<byte>(bytes);
-			ViewModel.Chunks = chunks;
+
+			Encoding c = DetectEncoding(bytes);
+
+			ParseFile(bytes);
 		}
 		catch (Exception exception)
 		{
@@ -113,12 +79,41 @@ public partial class MainWindow : Window
 		}
 	}
 
+	private void ParseFile(byte[] bytes)
+	{
 
-	private Chunk DetectBom(byte[] bytes)
+		// Check if the file has a BOM
+		Encoding foundEncoding = DetectBom(bytes);
+
+		if (foundEncoding == Encoding.Unknown)
+		{
+			// No bom found, check if data passes as a bom-less UTF-8 file.
+			if (CheckValidUtf8(bytes))
+			{
+				foundEncoding = Encoding.Utf8;
+			}
+
+			// Check if data could be a bom-less UTF-16 or UTF-32 file.
+			else if (DetectUtf16Utf32(bytes) != Encoding.Unknown)
+			{
+
+			}
+		}
+		else
+		{
+
+		}
+
+		ObservableCollection<Chunk> chunks = [];
+
+		ViewModel.Chunks = chunks;
+	}
+
+	private Encoding DetectEncoding(byte[] bytes)
 	{
 		if (bytes.Length > 2 && bytes[0..3].SequenceEqual(UTF8_BOM))
 		{
-			return new Chunk(ChunkType.Bom, 0, bytes[0..2]);
+			return Encoding.Utf8;
 		}
 		//else if (bytes.Length > 3 && bytes[0..4].SequenceEqual(UTF32LE_BOM)) // Must check this before UTF16 since the first 2 bytes are the same as an UTF16 little endian BOM.
 		//{
@@ -138,9 +133,196 @@ public partial class MainWindow : Window
 		//}
 
 
-		return null;
+		return Encoding.Unknown;
 
 	}
+
+	private Encoding DetectBom(byte[] bytes)
+	{
+		if (bytes.Length > 2 && bytes[0..3].SequenceEqual(UTF8_BOM))
+		{
+			return Encoding.Utf8;
+		}
+		else if (bytes.Length > 3 && bytes[0..4].SequenceEqual(UTF32LE_BOM)) // Must check this before UTF16 since the first 2 bytes are the same as an UTF16 little endian BOM.
+		{
+			return Encoding.Utf32le;
+		}
+		else if (bytes.Length > 3 && bytes[0..4].SequenceEqual(UTF32BE_BOM))
+		{
+			return Encoding.Utf32be;
+		}
+		else if (bytes.Length > 1 && bytes[0..2].SequenceEqual(UTF16LE_BOM))
+		{
+			return Encoding.Utf16le;
+		}
+		else if (bytes.Length > 1 && bytes[0..2].SequenceEqual(UTF16BE_BOM))
+		{
+			return Encoding.Utf16be;
+		}
+
+		return Encoding.Unknown;
+	}
+
+	private Encoding DetectUtf16Utf32(byte[] bytes)
+	{
+		// Check if the file has null bytes, if so we assume it is a bom-less UTF-16 or UTF-32 file
+		// since they encode white space, punctuation, numbers and English characters as ascii 
+		// padded with 1 or 3 null bytes respectively, either before for big endian or after the
+		// ascii character for little endian.
+		for (int i = 0; i < bytes.Length; i++)
+		{
+			if (bytes[i] == 0)
+			{
+				if (i % 2 == 1) // Little endian since the null byte IS NOT on a multiple of 2 or 4.
+				{
+					if (i < bytes.Length && bytes[i + 1] == 0) // UTF-16 cannot have 2 consecutive null bytes, must be UTF-32.
+					{
+						return Encoding.Utf32le;
+					}
+					else
+					{
+						return Encoding.Utf32le;
+					}
+				}
+				else // Big endian since the null byte IS on a multiple of 2 or 4.
+				{
+					if (i < bytes.Length && bytes[i + 1] == 0) // UTF-16 cannot have 2 consecutive null bytes, must be UTF-32.
+					{
+						return Encoding.Utf32be;
+					}
+					else
+					{
+						return Encoding.Utf32be;
+					}
+				}
+			}
+		}
+
+		return Encoding.Unknown;
+	}
+
+	private static bool CheckValidUtf8(byte[] bytes)
+	{
+		int i = 0;
+		while (i < bytes.Length)
+		{
+			// 1 byte character
+			if (bytes[i] >= 0x00 && bytes[i] <= 0x7F)
+			{
+				i++;
+				continue;
+			}
+
+			// 2 byte character
+			if (bytes[i] >= 0xC2 && bytes[i] <= 0xDF)
+			{
+				if (bytes[i + 1] >= 0x80 && bytes[i + 1] <= 0xBF)
+				{
+					i += 2;
+					continue;
+				}
+			}
+
+			// 3 byte character
+			if (bytes[i] == 0xE0)
+			{
+				if (bytes[i + 1] >= 0xA0 && bytes[i + 1] <= 0xBF)
+				{
+					if (bytes[i + 2] >= 0x80 && bytes[i + 2] <= 0xBF)
+					{
+						i += 3;
+						continue;
+					}
+				}
+			}
+
+			if (bytes[i] >= 0xE1 && bytes[i] <= 0xEC)
+			{
+				if (bytes[i + 1] >= 0x80 && bytes[i + 1] <= 0xBF)
+				{
+					if (bytes[i + 2] >= 0x80 && bytes[i + 2] <= 0xBF)
+					{
+						i += 3;
+						continue;
+					}
+				}
+			}
+
+			if (bytes[i] == 0xED)
+			{
+				if (bytes[i + 1] >= 0x80 && bytes[i + 1] <= 0x9F)
+				{
+					if (bytes[i + 2] >= 0x80 && bytes[i + 2] <= 0xBF)
+					{
+						i += 3;
+						continue;
+					}
+				}
+			}
+
+			if (bytes[i] >= 0xEE && bytes[i] <= 0xEF)
+			{
+				if (bytes[i + 1] >= 0x80 && bytes[i + 1] <= 0xBF)
+				{
+					if (bytes[i + 2] >= 0x80 && bytes[i + 2] <= 0xBF)
+					{
+						i += 3;
+						continue;
+					}
+				}
+			}
+
+			// 4 byte character
+			if (bytes[i] == 0xF0)
+			{
+				if (bytes[i + 1] >= 0x90 && bytes[i + 1] <= 0xBF)
+				{
+					if (bytes[i + 2] >= 0x80 && bytes[i + 2] <= 0xBF)
+					{
+						if (bytes[i + 3] >= 0x80 && bytes[i + 3] <= 0xBF)
+						{
+							i += 4;
+							continue;
+						}
+					}
+				}
+			}
+
+			if (bytes[i] >= 0xF1 && bytes[i] <= 0xF3)
+			{
+				if (bytes[i + 1] >= 0x80 && bytes[i + 1] <= 0xBF)
+				{
+					if (bytes[i + 2] >= 0x80 && bytes[i + 2] <= 0xBF)
+					{
+						if (bytes[i + 3] >= 0x80 && bytes[i + 3] <= 0xBF)
+						{
+							i += 4;
+							continue;
+						}
+					}
+				}
+			}
+
+			if (bytes[i] == 0xF4)
+			{
+				if (bytes[i + 1] >= 0x80 && bytes[i + 1] <= 0x8F)
+				{
+					if (bytes[i + 2] >= 0x80 && bytes[i + 2] <= 0xBF)
+					{
+						if (bytes[i + 3] >= 0x80 && bytes[i + 3] <= 0xBF)
+						{
+							i += 4;
+							continue;
+						}
+					}
+				}
+			}
+
+			return false;
+		}
+		return true;
+	}
+
 	private void ParseUtf16le(byte[] bytes, int offset, ref ObservableCollection<Chunk> chunks)
 	{
 		for (int i = offset; i < bytes.Length; i += 2)

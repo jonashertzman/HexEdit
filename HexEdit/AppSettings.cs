@@ -105,7 +105,7 @@ public static class AppSettings
 
 	internal static void ReadSettingsFromDisk()
 	{
-		string settingsPath = Path.Combine(Path.Combine(System.Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), SETTINGS_DIRECTORY), SETTINGS_FILE_NAME);
+		string settingsPath = Path.Combine(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), SETTINGS_DIRECTORY), SETTINGS_FILE_NAME);
 		DataContractSerializer xmlSerializer = new DataContractSerializer(typeof(SettingsData));
 
 		if (File.Exists(settingsPath))
@@ -133,7 +133,7 @@ public static class AppSettings
 	{
 		try
 		{
-			string settingsPath = Path.Combine(System.Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), SETTINGS_DIRECTORY);
+			string settingsPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), SETTINGS_DIRECTORY);
 
 			DataContractSerializer xmlSerializer = new DataContractSerializer(typeof(SettingsData));
 			var xmlWriterSettings = new XmlWriterSettings { Indent = true, IndentChars = " " };

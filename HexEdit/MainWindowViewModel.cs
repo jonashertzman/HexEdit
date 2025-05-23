@@ -10,11 +10,9 @@ public class MainWindowViewModel : INotifyPropertyChanged
 
 	#region Properties
 
-	private string windowTitle;
 	public string WindowTitle
 	{
-		get { return windowTitle; }
-		set { windowTitle = value; OnPropertyChanged(nameof(WindowTitle)); }
+		get { return string.IsNullOrEmpty(currentFile) ? Title : $"{Title} - {CurrentFile}"; }
 	}
 
 	public string Title
@@ -64,11 +62,11 @@ public class MainWindowViewModel : INotifyPropertyChanged
 	public string CurrentFile
 	{
 		get { return currentFile; }
-		set { currentFile = value; OnPropertyChanged(nameof(CurrentFile)); OnPropertyChanged(nameof(Title)); }
+		set { currentFile = value; OnPropertyChanged(nameof(CurrentFile)); OnPropertyChanged(nameof(WindowTitle)); }
 	}
 
-	PreviewMode filePreview;
-	public PreviewMode FilePreview
+	Encoding filePreview;
+	public Encoding FilePreview
 	{
 		get { return filePreview; }
 		set { filePreview = value; OnPropertyChanged(nameof(FilePreview)); OnPropertyChanged(nameof(SelectedPreview)); }
@@ -77,7 +75,7 @@ public class MainWindowViewModel : INotifyPropertyChanged
 	public int SelectedPreview
 	{
 		get { return (int)FilePreview; }
-		set { FilePreview = (PreviewMode)value; }
+		set { FilePreview = (Encoding)value; }
 	}
 
 	ObservableCollection<byte> fileContent = [];

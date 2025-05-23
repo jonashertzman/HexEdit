@@ -13,7 +13,7 @@ public enum ChunkType
 	Utf32beCharacter
 }
 
-public enum PreviewMode
+public enum Encoding
 {
 	Ascii,
 	Ansi,
@@ -22,5 +22,6 @@ public enum PreviewMode
 	Utf16be,
 	Utf16le,
 	Utf32be,
-	Utf32le
+	Utf32le,
+	Unknown,
 }
