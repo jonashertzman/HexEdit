@@ -69,9 +69,9 @@ public partial class MainWindow : Window
 			ViewModel.CurrentFile = path;
 			ViewModel.FileContent = new ObservableCollection<byte>(bytes);
 
-			Encoding c = DetectEncoding(bytes);
+			Encoding foundEncoding = DetectEncoding(bytes);
 
-			ParseFile(bytes);
+			ParseFileAs(foundEncoding);
 		}
 		catch (Exception exception)
 		{
@@ -79,66 +79,19 @@ public partial class MainWindow : Window
 		}
 	}
 
-	private void ParseFile(byte[] bytes)
+	private void ParseFileAs(Encoding foundEncoding)
 	{
-
-		// Check if the file has a BOM
-		Encoding foundEncoding = DetectBom(bytes);
-
-		if (foundEncoding == Encoding.Unknown)
+		switch (foundEncoding)
 		{
-			// No bom found, check if data passes as a bom-less UTF-8 file.
-			if (CheckValidUtf8(bytes))
-			{
-				foundEncoding = Encoding.Utf8;
-			}
-
-			// Check if data could be a bom-less UTF-16 or UTF-32 file.
-			else if (DetectUtf16Utf32(bytes) != Encoding.Unknown)
-			{
-
-			}
+			case Encoding.Utf8:
+				ParseUtf8(ViewModel.FileContent.ToArray());
+				break;
 		}
-		else
-		{
-
-		}
-
-		ObservableCollection<Chunk> chunks = [];
-
-		ViewModel.Chunks = chunks;
 	}
 
 	private Encoding DetectEncoding(byte[] bytes)
 	{
-		if (bytes.Length > 2 && bytes[0..3].SequenceEqual(UTF8_BOM))
-		{
-			return Encoding.Utf8;
-		}
-		//else if (bytes.Length > 3 && bytes[0..4].SequenceEqual(UTF32LE_BOM)) // Must check this before UTF16 since the first 2 bytes are the same as an UTF16 little endian BOM.
-		//{
-		//	Type = new UTF32Encoding(false, true);
-		//}
-		//else if (bytes.Length > 3 && bytes[0..4].SequenceEqual(UTF32BE_BOM))
-		//{
-		//	Type = new UTF32Encoding(true, true);
-		//}
-		//else if (bytes.Length > 1 && bytes[0..2].SequenceEqual(UTF16LE_BOM))
-		//{
-		//	Type = Encoding.Unicode;
-		//}
-		//else if (bytes.Length > 1 && bytes[0..2].SequenceEqual(UTF16BE_BOM))
-		//{
-		//	Type = Encoding.BigEndianUnicode;
-		//}
-
-
-		return Encoding.Unknown;
-
-	}
-
-	private Encoding DetectBom(byte[] bytes)
-	{
+		// Check if the file has a BOM
 		if (bytes.Length > 2 && bytes[0..3].SequenceEqual(UTF8_BOM))
 		{
 			return Encoding.Utf8;
@@ -160,43 +113,41 @@ public partial class MainWindow : Window
 			return Encoding.Utf16be;
 		}
 
-		return Encoding.Unknown;
-	}
-
-	private Encoding DetectUtf16Utf32(byte[] bytes)
-	{
-		// Check if the file has null bytes, if so we assume it is a bom-less UTF-16 or UTF-32 file
-		// since they encode white space, punctuation, numbers and English characters as ascii 
-		// padded with 1 or 3 null bytes respectively, either before for big endian or after the
-		// ascii character for little endian.
-		for (int i = 0; i < bytes.Length; i++)
+		// No bom found, check if data passes as a bom-less UTF-8 file.
+		if (CheckValidUtf8(bytes))
 		{
-			if (bytes[i] == 0)
-			{
-				if (i % 2 == 1) // Little endian since the null byte IS NOT on a multiple of 2 or 4.
-				{
-					if (i < bytes.Length && bytes[i + 1] == 0) // UTF-16 cannot have 2 consecutive null bytes, must be UTF-32.
-					{
-						return Encoding.Utf32le;
-					}
-					else
-					{
-						return Encoding.Utf32le;
-					}
-				}
-				else // Big endian since the null byte IS on a multiple of 2 or 4.
-				{
-					if (i < bytes.Length && bytes[i + 1] == 0) // UTF-16 cannot have 2 consecutive null bytes, must be UTF-32.
-					{
-						return Encoding.Utf32be;
-					}
-					else
-					{
-						return Encoding.Utf32be;
-					}
-				}
-			}
+			return Encoding.Utf8;
 		}
+
+		// Check if data could be a bom-less UTF-16 or UTF-32 file.
+		//for (int i = 0; i < bytes.Length; i++)
+		//{
+		//	if (bytes[i] == 0)
+		//	{
+		//		if (i % 2 == 1) // Little endian since the null byte IS NOT on a multiple of 2 or 4.
+		//		{
+		//			if (i < bytes.Length && bytes[i + 1] == 0) // UTF-16 cannot have 2 consecutive null bytes, must be UTF-32.
+		//			{
+		//				return Encoding.Utf32le;
+		//			}
+		//			else
+		//			{
+		//				return Encoding.Utf32le;
+		//			}
+		//		}
+		//		else // Big endian since the null byte IS on a multiple of 2 or 4.
+		//		{
+		//			if (i < bytes.Length && bytes[i + 1] == 0) // UTF-16 cannot have 2 consecutive null bytes, must be UTF-32.
+		//			{
+		//				return Encoding.Utf32be;
+		//			}
+		//			else
+		//			{
+		//				return Encoding.Utf32be;
+		//			}
+		//		}
+		//	}
+		//}
 
 		return Encoding.Unknown;
 	}
@@ -355,9 +306,11 @@ public partial class MainWindow : Window
 		}
 	}
 
-	private bool ParseUtf8(byte[] bytes, int offset, ref ObservableCollection<Chunk> chunks)
+	private void ParseUtf8(byte[] bytes)
 	{
-		int i = offset;
+		ObservableCollection<Chunk> chunks = [];
+
+		int i = 0;
 
 		bool valid = true;
 
@@ -374,7 +327,7 @@ public partial class MainWindow : Window
 
 			// 2 byte character
 			end = i + 2;
-			if (bytes.Length <= end) return false;
+			//if (bytes.Length <= end) return false;
 
 			if (bytes[i] >= 0xC2 && bytes[i] <= 0xDF)
 			{
@@ -388,7 +341,7 @@ public partial class MainWindow : Window
 
 			// 3 byte character
 			end = i + 3;
-			if (bytes.Length <= end) return false;
+			//		if (bytes.Length <= end) return false;
 
 			if (bytes[i] == 0xE0)
 			{
@@ -444,7 +397,7 @@ public partial class MainWindow : Window
 
 			// 4 byte character
 			end = i + 4;
-			if (bytes.Length <= end) return false;
+			//		if (bytes.Length <= end) return false;
 
 
 			if (bytes[i] == 0xF0)
@@ -498,7 +451,9 @@ public partial class MainWindow : Window
 			valid = false;
 			i++;
 		}
-		return valid;
+
+		ViewModel.Chunks = chunks;
+
 	}
 
 	#endregion
