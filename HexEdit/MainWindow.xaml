@@ -132,7 +132,7 @@
 
 				<StackPanel Margin="2" Orientation="Horizontal">
 					<TextBlock Margin="2" VerticalAlignment="Center" Text="Preview Mode" />
-					<ComboBox Name="PreviewModeCombobox" Width="90" Margin="2,0,4,0" VerticalAlignment="Center" SelectedIndex="{Binding SelectedPreview}" />
+					<ComboBox Name="PreviewModeCombobox" Width="90" Margin="2,0,4,0" VerticalAlignment="Center" SelectedIndex="{Binding SelectedPreview}" SelectionChanged="PreviewModeCombobox_SelectionChanged" />
 				</StackPanel>
 			</StackPanel>
 

@@ -71,6 +71,7 @@ public partial class MainWindow : Window
 
 			Encoding foundEncoding = DetectEncoding(bytes);
 
+			ViewModel.SelectedPreview = (int)foundEncoding;
 			ParseFileAs(foundEncoding);
 		}
 		catch (Exception exception)
@@ -312,7 +313,6 @@ public partial class MainWindow : Window
 
 		int i = 0;
 
-		bool valid = true;
 
 		while (i < bytes.Length)
 		{
@@ -448,7 +448,6 @@ public partial class MainWindow : Window
 				}
 			}
 
-			valid = false;
 			i++;
 		}
 
@@ -498,6 +497,11 @@ public partial class MainWindow : Window
 	{
 		int lines = SystemParameters.WheelScrollLines * e.Delta / 120;
 		VerticalScrollbar.Value -= lines;
+	}
+
+	private void PreviewModeCombobox_SelectionChanged(object sender, System.Windows.Controls.SelectionChangedEventArgs e)
+	{
+		ParseFileAs((Encoding)PreviewModeCombobox.SelectedItem);
 	}
 
 	#region Commands
