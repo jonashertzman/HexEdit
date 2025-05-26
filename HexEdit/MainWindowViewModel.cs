@@ -82,7 +82,12 @@ public class MainWindowViewModel : INotifyPropertyChanged
 	public ObservableCollection<byte> FileContent
 	{
 		get { return fileContent; }
-		set { fileContent = value; OnPropertyChanged(nameof(FileContent)); }
+		set
+		{
+			fileContent = value;
+			Chunks = [];
+			OnPropertyChanged(nameof(FileContent));
+		}
 	}
 
 	ObservableCollection<Chunk> chunks = [];
