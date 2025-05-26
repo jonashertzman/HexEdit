@@ -96,6 +96,14 @@ public partial class MainWindow : Window
 				ParseUtf16be(ViewModel.FileContent.ToArray());
 				break;
 
+			case Encoding.Utf32le:
+				ParseUtf32le(ViewModel.FileContent.ToArray());
+				break;
+
+			case Encoding.Utf32be:
+				ParseUtf32be(ViewModel.FileContent.ToArray());
+				break;
+
 			default:
 				ParseDefault(ViewModel.FileContent.ToArray());
 				break;
@@ -105,62 +113,6 @@ public partial class MainWindow : Window
 	private void ParseDefault(byte[] bytes)
 	{
 		ViewModel.Chunks = [];
-	}
-
-	private void ParseUtf16le(byte[] bytes)
-	{
-		ObservableCollection<Chunk> chunks = [];
-
-		int i = 0;
-
-		if (bytes.StartsWith(UTF16LE_BOM))
-		{
-			chunks.Add(new Chunk(ChunkType.Bom, i, UTF16LE_BOM));
-			i += UTF16LE_BOM.Length;
-		}
-
-		for (; i < bytes.Length - 1; i += 2)
-		{
-			if (char.IsHighSurrogate((char)(bytes[i + 1] << 8 | bytes[i])))
-			{
-				chunks.Add(new Chunk(ChunkType.Utf16leCharacter, i, bytes[i..(i + 4)]));
-				i += 2;
-			}
-			else
-			{
-				chunks.Add(new Chunk(ChunkType.Utf16leCharacter, i, bytes[i..(i + 2)]));
-			}
-		}
-
-		ViewModel.Chunks = chunks;
-	}
-
-	private void ParseUtf16be(byte[] bytes)
-	{
-		ObservableCollection<Chunk> chunks = [];
-
-		int i = 0;
-
-		if (bytes.StartsWith(UTF16BE_BOM))
-		{
-			chunks.Add(new Chunk(ChunkType.Bom, i, UTF16BE_BOM));
-			i += UTF16BE_BOM.Length;
-		}
-
-		for (; i < bytes.Length; i += 2)
-		{
-			if (char.IsHighSurrogate((char)(bytes[i] << 8 | bytes[i + 1])))
-			{
-				chunks.Add(new Chunk(ChunkType.Utf16beCharacter, i, bytes[i..(i + 4)]));
-				i += 2;
-			}
-			else
-			{
-				chunks.Add(new Chunk(ChunkType.Utf16beCharacter, i, bytes[i..(i + 2)]));
-			}
-		}
-
-		ViewModel.Chunks = chunks;
 	}
 
 	private void ParseUtf8(byte[] bytes)
@@ -314,6 +266,102 @@ public partial class MainWindow : Window
 
 		ViewModel.Chunks = chunks;
 
+	}
+
+	private void ParseUtf16le(byte[] bytes)
+	{
+		ObservableCollection<Chunk> chunks = [];
+
+		int i = 0;
+
+		if (bytes.StartsWith(UTF16LE_BOM))
+		{
+			chunks.Add(new Chunk(ChunkType.Bom, i, UTF16LE_BOM));
+			i += UTF16LE_BOM.Length;
+		}
+
+		for (; i < bytes.Length - 1; i += 2)
+		{
+			if (char.IsHighSurrogate((char)(bytes[i + 1] << 8 | bytes[i])))
+			{
+				chunks.Add(new Chunk(ChunkType.Utf16leCharacter, i, bytes[i..(i + 4)]));
+				i += 2;
+			}
+			else
+			{
+				chunks.Add(new Chunk(ChunkType.Utf16leCharacter, i, bytes[i..(i + 2)]));
+			}
+		}
+
+		ViewModel.Chunks = chunks;
+	}
+
+	private void ParseUtf16be(byte[] bytes)
+	{
+		ObservableCollection<Chunk> chunks = [];
+
+		int i = 0;
+
+		if (bytes.StartsWith(UTF16BE_BOM))
+		{
+			chunks.Add(new Chunk(ChunkType.Bom, i, UTF16BE_BOM));
+			i += UTF16BE_BOM.Length;
+		}
+
+		for (; i < bytes.Length - 1; i += 2)
+		{
+			if (char.IsHighSurrogate((char)(bytes[i] << 8 | bytes[i + 1])))
+			{
+				chunks.Add(new Chunk(ChunkType.Utf16beCharacter, i, bytes[i..(i + 4)]));
+				i += 2;
+			}
+			else
+			{
+				chunks.Add(new Chunk(ChunkType.Utf16beCharacter, i, bytes[i..(i + 2)]));
+			}
+		}
+
+		ViewModel.Chunks = chunks;
+	}
+
+	private void ParseUtf32le(byte[] bytes)
+	{
+		ObservableCollection<Chunk> chunks = [];
+
+		int i = 0;
+
+		if (bytes.StartsWith(UTF32LE_BOM))
+		{
+			chunks.Add(new Chunk(ChunkType.Bom, i, UTF32LE_BOM));
+			i += UTF32LE_BOM.Length;
+		}
+
+		for (; i < bytes.Length - 3; i += 4)
+		{
+			chunks.Add(new Chunk(ChunkType.Utf32leCharacter, i, bytes[i..(i + 4)]));
+		}
+
+		ViewModel.Chunks = chunks;
+	}
+
+	private void ParseUtf32be(byte[] bytes)
+	{
+		ObservableCollection<Chunk> chunks = [];
+
+		int i = 0;
+
+		if (bytes.StartsWith(UTF32BE_BOM))
+		{
+			chunks.Add(new Chunk(ChunkType.Bom, i, UTF32BE_BOM));
+			i += UTF32BE_BOM.Length;
+		}
+
+		for (; i < bytes.Length - 3; i += 4)
+		{
+			chunks.Add(new Chunk(ChunkType.Utf32beCharacter, i, bytes[i..(i + 4)]));
+		}
+
+		ViewModel.Chunks = chunks;
 	}
 
 	private Encoding DetectEncoding(byte[] bytes)

@@ -27,6 +27,14 @@ public class Chunk : INotifyPropertyChanged
 				UnicodeCharacter = DecodeUtf16be(bytes);
 				break;
 
+			case ChunkType.Utf32leCharacter:
+				UnicodeCharacter = DecodeUtf32le(bytes);
+				break;
+
+			case ChunkType.Utf32beCharacter:
+				UnicodeCharacter = DecodeUtf32be(bytes);
+				break;
+
 		}
 	}
 
@@ -71,6 +79,8 @@ public class Chunk : INotifyPropertyChanged
 				case ChunkType.Utf8Character:
 				case ChunkType.Utf16leCharacter:
 				case ChunkType.Utf16beCharacter:
+				case ChunkType.Utf32leCharacter:
+				case ChunkType.Utf32beCharacter:
 					return char.ConvertFromUtf32(UnicodeCharacter);
 
 				default:
@@ -83,6 +93,36 @@ public class Chunk : INotifyPropertyChanged
 	#endregion
 
 	#region Methods
+
+	private int DecodeUtf8(byte[] bytes)
+	{
+		int character = 0;
+		if (bytes.Length == 1)
+		{
+			character = bytes[0] & 0b0111_1111;
+		}
+		else if (bytes.Length == 2)
+		{
+			character = bytes[0] & 0b0001_1111;
+		}
+		else if (bytes.Length == 3)
+		{
+			character = bytes[0] & 0b0000_1111;
+		}
+		else if (bytes.Length == 4)
+		{
+			character = bytes[0] & 0b0000_0111;
+		}
+
+		int i = 0;
+		while (++i < bytes.Length)
+		{
+			character <<= 6;
+			character |= bytes[i] & 0b0011_1111;
+		}
+
+		return character;
+	}
 
 	private int DecodeUtf16le(byte[] bytes)
 	{
@@ -122,34 +162,18 @@ public class Chunk : INotifyPropertyChanged
 		}
 	}
 
-	private int DecodeUtf8(byte[] bytes)
+	private int DecodeUtf32le(byte[] bytes)
 	{
-		int character = 0;
-		if (bytes.Length == 1)
-		{
-			character = bytes[0] & 0b0111_1111;
-		}
-		else if (bytes.Length == 2)
-		{
-			character = bytes[0] & 0b0001_1111;
-		}
-		else if (bytes.Length == 3)
-		{
-			character = bytes[0] & 0b0000_1111;
-		}
-		else if (bytes.Length == 4)
-		{
-			character = bytes[0] & 0b0000_0111;
-		}
+		int i = BitConverter.ToInt32(bytes, 0);
 
-		int i = 0;
-		while (++i < bytes.Length)
-		{
-			character <<= 6;
-			character |= bytes[i] & 0b0011_1111;
-		}
+		return i;
+	}
 
-		return character;
+	private int DecodeUtf32be(byte[] bytes)
+	{
+		int i = bytes[0] << 24 | bytes[1] << 16 | bytes[2] << 8 | bytes[3];
+
+		return i;
 	}
 
 	#endregion
