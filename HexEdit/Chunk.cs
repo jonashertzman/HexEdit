@@ -81,7 +81,10 @@ public class Chunk : INotifyPropertyChanged
 				case ChunkType.Utf16beCharacter:
 				case ChunkType.Utf32leCharacter:
 				case ChunkType.Utf32beCharacter:
-					return char.ConvertFromUtf32(UnicodeCharacter);
+					if (UnicodeCharacter != -1)
+						return char.ConvertFromUtf32(UnicodeCharacter);
+					return "[UNKNOWN]";
+
 
 				default:
 					return "[UNKNOWN]";
@@ -166,14 +169,24 @@ public class Chunk : INotifyPropertyChanged
 	{
 		int i = BitConverter.ToInt32(bytes, 0);
 
-		return i;
+		if (i >= 0x0000_0000 && i <= 0x0010_FFFF)
+		{
+			return i;
+		}
+
+		return -1; // Invalid character
 	}
 
 	private int DecodeUtf32be(byte[] bytes)
 	{
 		int i = bytes[0] << 24 | bytes[1] << 16 | bytes[2] << 8 | bytes[3];
 
-		return i;
+		if (i >= 0x0000_0000 && i <= 0x0010_FFFF)
+		{
+			return i;
+		}
+
+		return -1; // Invalid character
 	}
 
 	#endregion
