@@ -12,7 +12,7 @@ public class MainWindowViewModel : INotifyPropertyChanged
 
 	public string WindowTitle
 	{
-		get { return string.IsNullOrEmpty(currentFile) ? Title : $"{Title} - {CurrentFile}"; }
+		get { return string.IsNullOrEmpty(CurrentFile) ? Title : $"{Title} - {CurrentFile}"; }
 	}
 
 	public string Title
@@ -57,19 +57,16 @@ public class MainWindowViewModel : INotifyPropertyChanged
 		set { AppSettings.FontSize = value; OnPropertyChanged(nameof(FontSize)); }
 	}
 
-
-	string currentFile;
 	public string CurrentFile
 	{
-		get { return currentFile; }
-		set { currentFile = value; OnPropertyChanged(nameof(CurrentFile)); OnPropertyChanged(nameof(WindowTitle)); }
+		get;
+		set { field = value; OnPropertyChanged(nameof(CurrentFile)); OnPropertyChanged(nameof(WindowTitle)); }
 	}
 
-	Encoding filePreview;
 	public Encoding FilePreview
 	{
-		get { return filePreview; }
-		set { filePreview = value; OnPropertyChanged(nameof(FilePreview)); OnPropertyChanged(nameof(SelectedPreview)); }
+		get;
+		set { field = value; OnPropertyChanged(nameof(FilePreview)); OnPropertyChanged(nameof(SelectedPreview)); }
 	}
 
 	public int SelectedPreview
@@ -78,24 +75,17 @@ public class MainWindowViewModel : INotifyPropertyChanged
 		set { FilePreview = (Encoding)value; }
 	}
 
-	ObservableCollection<byte> fileContent = [];
 	public ObservableCollection<byte> FileContent
 	{
-		get { return fileContent; }
-		set
-		{
-			fileContent = value;
-			Chunks = [];
-			OnPropertyChanged(nameof(FileContent));
-		}
-	}
+		get;
+		set { field = value; Chunks = []; OnPropertyChanged(nameof(FileContent)); }
+	} = [];
 
-	ObservableCollection<Chunk> chunks = [];
 	public ObservableCollection<Chunk> Chunks
 	{
-		get { return chunks; }
-		set { chunks = value; OnPropertyChanged(nameof(Chunks)); }
-	}
+		get;
+		set { field = value; OnPropertyChanged(nameof(Chunks)); }
+	} = [];
 
 
 	public int BytesPerRow
@@ -129,12 +119,10 @@ public class MainWindowViewModel : INotifyPropertyChanged
 		set { AppSettings.SelectionBackground = value as SolidColorBrush; OnPropertyChangedRepaint(nameof(SelectionBackground)); }
 	}
 
-
-	int updateTrigger;
 	public int UpdateTrigger
 	{
-		get { return updateTrigger; }
-		set { updateTrigger = value; OnPropertyChanged(nameof(UpdateTrigger)); }
+		get;
+		set { field = value; OnPropertyChanged(nameof(UpdateTrigger)); }
 	}
 
 	#endregion

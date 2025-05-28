@@ -14,7 +14,7 @@ public static class AppSettings
 	private const string SETTINGS_DIRECTORY = "HexEdit";
 	private const string SETTINGS_FILE_NAME = "Settings.xml";
 
-	private static SettingsData Settings = new SettingsData();
+	private static SettingsData Settings = new();
 
 	#endregion
 
@@ -55,13 +55,12 @@ public static class AppSettings
 		set { Settings.WindowState = value; }
 	}
 
-	private static FontFamily font;
 	public static FontFamily Font
 	{
-		get { return font; }
+		get;
 		set
 		{
-			font = value;
+			field = value;
 			Settings.Font = value.ToString();
 		}
 	}
@@ -78,25 +77,22 @@ public static class AppSettings
 		set { Settings.BytesPerRow = value; }
 	}
 
-	private static SolidColorBrush textForeground;
 	public static SolidColorBrush TextForeground
 	{
-		get { return textForeground; }
-		set { textForeground = value; Settings.TextForeground = value.Color; }
+		get;
+		set { field = value; Settings.TextForeground = value.Color; }
 	}
 
-	private static SolidColorBrush textBackground;
 	public static SolidColorBrush TextBackground
 	{
-		get { return textBackground; }
-		set { textBackground = value; Settings.TextBackground = value.Color; }
+		get;
+		set { field = value; Settings.TextBackground = value.Color; }
 	}
 
-	private static SolidColorBrush selectionBackground;
 	public static SolidColorBrush SelectionBackground
 	{
-		get { return selectionBackground; }
-		set { selectionBackground = value; Settings.SelectionBackground = value.Color; }
+		get;
+		set { field = value; Settings.SelectionBackground = value.Color; }
 	}
 
 	#endregion
@@ -106,7 +102,7 @@ public static class AppSettings
 	internal static void ReadSettingsFromDisk()
 	{
 		string settingsPath = Path.Combine(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), SETTINGS_DIRECTORY), SETTINGS_FILE_NAME);
-		DataContractSerializer xmlSerializer = new DataContractSerializer(typeof(SettingsData));
+		DataContractSerializer xmlSerializer = new(typeof(SettingsData));
 
 		if (File.Exists(settingsPath))
 		{
@@ -135,7 +131,7 @@ public static class AppSettings
 		{
 			string settingsPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), SETTINGS_DIRECTORY);
 
-			DataContractSerializer xmlSerializer = new DataContractSerializer(typeof(SettingsData));
+			DataContractSerializer xmlSerializer = new(typeof(SettingsData));
 			var xmlWriterSettings = new XmlWriterSettings { Indent = true, IndentChars = " " };
 
 			if (!Directory.Exists(settingsPath))

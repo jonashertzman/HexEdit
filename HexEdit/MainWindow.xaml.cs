@@ -613,7 +613,7 @@ public partial class MainWindow : Window
 
 	private void CommandOpen_Executed(object sender, System.Windows.Input.ExecutedRoutedEventArgs e)
 	{
-		OpenFileDialog openFileDialog = new OpenFileDialog();
+		OpenFileDialog openFileDialog = new();
 
 		if (!string.IsNullOrEmpty(ViewModel.CurrentFile))
 			openFileDialog.InitialDirectory = Path.GetDirectoryName(Path.GetFullPath(ViewModel.CurrentFile));
@@ -648,7 +648,7 @@ public partial class MainWindow : Window
 		var oldTextForeground = ViewModel.TextForeground;
 		var oldSelectionBackground = ViewModel.SelectionBackground;
 
-		OptionsWindow optionsWindow = new OptionsWindow() { DataContext = ViewModel, Owner = this };
+		OptionsWindow optionsWindow = new() { DataContext = ViewModel, Owner = this };
 		optionsWindow.ShowDialog();
 
 		if (optionsWindow.DialogResult == true)
@@ -669,7 +669,7 @@ public partial class MainWindow : Window
 
 	private void CommandAbout_Executed(object sender, System.Windows.Input.ExecutedRoutedEventArgs e)
 	{
-		AboutWindow aboutWindow = new AboutWindow() { Owner = this, DataContext = ViewModel };
+		AboutWindow aboutWindow = new() { Owner = this, DataContext = ViewModel };
 		aboutWindow.ShowDialog();
 	}
 

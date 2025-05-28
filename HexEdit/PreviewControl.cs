@@ -21,7 +21,7 @@ public class PreviewControl : Control
 	private double characterHeight;
 	private double characterWidth;
 
-	private readonly Stopwatch stopwatch = new Stopwatch();
+	private readonly Stopwatch stopwatch = new();
 
 	#endregion
 
@@ -50,7 +50,7 @@ public class PreviewControl : Control
 		if (Bytes.Count == 0)
 			return;
 
-		Stopwatch sw = new Stopwatch();
+		Stopwatch sw = new();
 		sw.Start();
 
 		typeface = new Typeface(this.FontFamily, this.FontStyle, this.FontWeight, this.FontStretch);
@@ -75,11 +75,11 @@ public class PreviewControl : Control
 		double rowOffsetWidth = maxOffset * characterWidth;
 
 
-		Pen borderPen = new Pen(SystemColors.ScrollBarBrush, RoundToWholePixels(1));
+		Pen borderPen = new(SystemColors.ScrollBarBrush, RoundToWholePixels(1));
 		borderPen.Freeze();
 		GuidelineSet borderGuide = CreateGuidelineSet(borderPen);
 
-		Pen chunkPen = new Pen(AppSettings.TextForeground, RoundToWholePixels(.6));
+		Pen chunkPen = new(AppSettings.TextForeground, RoundToWholePixels(.6));
 		chunkPen.Freeze();
 		GuidelineSet chunkGuide = CreateGuidelineSet(chunkPen);
 
@@ -300,7 +300,7 @@ public class PreviewControl : Control
 
 	private GuidelineSet CreateGuidelineSet(Pen pen)
 	{
-		GuidelineSet guidelineSet = new GuidelineSet();
+		GuidelineSet guidelineSet = new();
 		guidelineSet.GuidelinesX.Add(pen.Thickness / 2);
 		guidelineSet.GuidelinesY.Add(pen.Thickness / 2);
 		guidelineSet.Freeze();
