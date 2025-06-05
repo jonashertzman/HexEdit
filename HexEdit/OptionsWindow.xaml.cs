@@ -1,5 +1,4 @@
-﻿using System.Runtime.InteropServices;
-using System.Windows;
+﻿using System.Windows;
 using System.Windows.Media;
 using System.Windows.Shapes;
 
@@ -19,6 +18,8 @@ public partial class OptionsWindow : Window
 	public OptionsWindow()
 	{
 		InitializeComponent();
+
+		Utils.HideMinimizeAndMaximizeButtons(this);
 
 		foreach (FontFamily family in Fonts.SystemFontFamilies.OrderBy(x => x.Source))
 		{
@@ -93,28 +94,6 @@ public partial class OptionsWindow : Window
 		SliderB.Background = new LinearGradientBrush(Color.FromArgb(alpha, newColor.R, newColor.G, 0), Color.FromArgb(alpha, newColor.R, newColor.G, 255), 0);
 		SliderA.Background = new LinearGradientBrush(Color.FromArgb(0, newColor.R, newColor.G, newColor.B), Color.FromArgb(255, newColor.R, newColor.G, newColor.B), 0);
 	}
-
-	private void Window_SourceInitialized(object sender, EventArgs e)
-	{
-		IntPtr hwnd = new System.Windows.Interop.WindowInteropHelper(this).Handle;
-		int style = GetWindowLong(hwnd, GWL_STYLE);
-
-		SetWindowLong(hwnd, GWL_STYLE, style & ~WS_MAXIMIZEBOX & ~WS_MINIMIZEBOX);
-	}
-
-	#endregion
-
-	#region API Imports
-
-	public const int GWL_STYLE = -16;
-	public const int WS_MAXIMIZEBOX = 0x10000;
-	public const int WS_MINIMIZEBOX = 0x20000;
-
-	[DllImport("user32.dll")]
-	extern internal static int GetWindowLong(IntPtr hwnd, int index);
-
-	[DllImport("user32.dll")]
-	extern internal static int SetWindowLong(IntPtr hwnd, int index, int value);
 
 	#endregion
 

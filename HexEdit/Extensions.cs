@@ -2,6 +2,7 @@
 
 static class Extensions
 {
+
 	public static bool StartsWith<T>(this T[] source, T[] compare)
 	{
 		if (source == null || compare == null)
@@ -19,4 +20,5 @@ static class Extensions
 
 		return false;
 	}
+
 }

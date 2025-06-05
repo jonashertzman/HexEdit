@@ -195,8 +195,7 @@ static class TextUtils
 	{
 		foreach (FontFamily family in Fonts.SystemFontFamilies)
 		{
-			var typefaces = family.GetTypefaces();
-			foreach (Typeface typeface in typefaces)
+			foreach (Typeface typeface in family.GetTypefaces())
 			{
 				typeface.TryGetGlyphTypeface(out GlyphTypeface glyph);
 				if (glyph != null && glyph.CharacterToGlyphMap.TryGetValue(codePoint, out _))

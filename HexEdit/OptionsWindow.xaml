@@ -15,7 +15,6 @@
 	Background="{DynamicResource {x:Static SystemColors.ControlBrushKey}}"
 	WindowStartupLocation="CenterOwner"
 	ShowInTaskbar="False"
-	SourceInitialized="Window_SourceInitialized"
 	mc:Ignorable="d">
 
 	<Grid>
