@@ -85,27 +85,27 @@ public partial class MainWindow : Window
 		switch (foundEncoding)
 		{
 			case Encoding.Utf8:
-				ParseUtf8(ViewModel.FileContent.ToArray());
+				ParseUtf8([.. ViewModel.FileContent]);
 				break;
 
 			case Encoding.Utf16le:
-				ParseUtf16le(ViewModel.FileContent.ToArray());
+				ParseUtf16le([.. ViewModel.FileContent]);
 				break;
 
 			case Encoding.Utf16be:
-				ParseUtf16be(ViewModel.FileContent.ToArray());
+				ParseUtf16be([.. ViewModel.FileContent]);
 				break;
 
 			case Encoding.Utf32le:
-				ParseUtf32le(ViewModel.FileContent.ToArray());
+				ParseUtf32le([.. ViewModel.FileContent]);
 				break;
 
 			case Encoding.Utf32be:
-				ParseUtf32be(ViewModel.FileContent.ToArray());
+				ParseUtf32be([.. ViewModel.FileContent]);
 				break;
 
 			default:
-				ParseDefault(ViewModel.FileContent.ToArray());
+				ParseDefault([.. ViewModel.FileContent]);
 				break;
 		}
 	}
