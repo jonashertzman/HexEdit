@@ -12,7 +12,7 @@ static class Extensions
 
 		if (source.Length >= compare.Length)
 		{
-			if (source[0..compare.Length].SequenceEqual(compare))
+			if (source.AsSpan()[0..compare.Length].SequenceEqual(compare))
 			{
 				return true;
 			}
