@@ -79,7 +79,7 @@ public class PreviewControl : Control
 		borderPen.Freeze();
 		GuidelineSet borderGuide = CreateGuidelineSet(borderPen);
 
-		Pen chunkPen = new(AppSettings.TextForeground, RoundToWholePixels(.6));
+		Pen chunkPen = new(/*AppSettings.TextForeground*/ new SolidColorBrush(Color.FromArgb(128, 255, 0, 0)), RoundToWholePixels(.6));
 		chunkPen.Freeze();
 		GuidelineSet chunkGuide = CreateGuidelineSet(chunkPen);
 
@@ -98,7 +98,7 @@ public class PreviewControl : Control
 			hexWidth = Math.Max(hexWidth, b);
 		}
 
-		double byteWidth = RoundToWholePixels(hexWidth) * 2 + chunkPen.Thickness * 4;
+		double byteWidth = RoundToWholePixels(hexWidth) * 2 + chunkPen.Thickness * 4 + textMargin;
 
 		drawingContext.DrawRectangle(SystemColors.ControlBrush, null, new Rect(0, 0, offsetMargin, this.ActualHeight));
 
@@ -130,9 +130,9 @@ public class PreviewControl : Control
 						// Draw bytes
 						for (int j = 0; j < bytesPerRow && rowByteOffset + j < Bytes.Count; j++)
 						{
-							drawingContext.PushTransform(new TranslateTransform(j * byteWidth + textMargin, 0));
+							drawingContext.PushTransform(new TranslateTransform(j * byteWidth, 0));
 							{
-								if (j % 2 == 0)
+								if ((j + i) % 2 == 0)
 									drawingContext.DrawRectangle(Brushes.LightGray, null, new Rect(0, 0, byteWidth, lineHeight));
 
 								drawingContext.PushTransform(new TranslateTransform(textMargin, 0));
@@ -146,24 +146,24 @@ public class PreviewControl : Control
 							drawingContext.Pop();
 						}
 
-						//// Draw chunks
-						//drawingContext.PushGuidelineSet(chunkGuide);
-						//foreach (Chunk c in Chunks)
-						//{
-						//	if (!(c.End < rowByteOffset || c.Start > rowByteOffset + bytesPerRow - 1))
-						//	{
-						//		drawingContext.PushTransform(new TranslateTransform(-.5, .5));
-						//		{
-						//			drawingContext.DrawRectangle(SystemColors.ControlBrush, chunkPen, new Rect((c.Start - rowByteOffset) * byteWidth + 2, 0, (c.Length * byteWidth) + 2, characterHeight));
-						//		}
-						//		drawingContext.Pop();
-						//		if (c.Start >= rowByteOffset)
-						//		{
-						//			previewString += c.PreviewString;
-						//		}
-						//	}
-						//}
-						//drawingContext.Pop();
+						// Draw chunks
+						drawingContext.PushGuidelineSet(chunkGuide);
+						foreach (Chunk c in Chunks)
+						{
+							//if (Chunks.IndexOf(c) % 3 != 0)
+							//	continue;
+
+							if (!(c.End < rowByteOffset || c.Start > rowByteOffset + bytesPerRow - 1))
+							{
+								drawingContext.DrawRectangle(null, chunkPen, new Rect((c.Start - rowByteOffset) * byteWidth, 0, (c.Length * byteWidth), characterHeight));
+
+								if (c.Start >= rowByteOffset)
+								{
+									previewString += c.PreviewString;
+								}
+							}
+						}
+						drawingContext.Pop();
 					}
 					drawingContext.Pop();
 				}
