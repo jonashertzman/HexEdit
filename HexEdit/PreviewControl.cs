@@ -79,7 +79,7 @@ public class PreviewControl : Control
 		borderPen.Freeze();
 		GuidelineSet borderGuide = CreateGuidelineSet(borderPen);
 
-		Pen chunkPen = new(/*AppSettings.TextForeground*/ new SolidColorBrush(Color.FromArgb(128, 255, 0, 0)), RoundToWholePixels(.6));
+		Pen chunkPen = new(/*AppSettings.TextForeground*/ new SolidColorBrush(Color.FromArgb(255, 255, 0, 0)), RoundToWholePixels(.6));
 		chunkPen.Freeze();
 		GuidelineSet chunkGuide = CreateGuidelineSet(chunkPen);
 
@@ -124,7 +124,7 @@ public class PreviewControl : Control
 
 				drawingContext.PushClip(new RectangleGeometry(new Rect(offsetMargin, 0, byteWidth * bytesPerRow + 5, lineHeight)));
 				{
-					drawingContext.PushTransform(new TranslateTransform(offsetMargin, 0));
+					drawingContext.PushTransform(new TranslateTransform(offsetMargin + borderPen.Thickness, 0));
 					{
 
 						// Draw bytes
@@ -155,7 +155,7 @@ public class PreviewControl : Control
 
 							if (!(c.End < rowByteOffset || c.Start > rowByteOffset + bytesPerRow - 1))
 							{
-								drawingContext.DrawRectangle(null, chunkPen, new Rect((c.Start - rowByteOffset) * byteWidth, 0, (c.Length * byteWidth), characterHeight));
+								drawingContext.DrawRectangle(null, chunkPen, new Rect((c.Start - rowByteOffset) * byteWidth, 0, c.Length * byteWidth - 1, lineHeight - 1));
 
 								if (c.Start >= rowByteOffset)
 								{
