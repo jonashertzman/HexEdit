@@ -155,7 +155,7 @@ public class PreviewControl : Control
 
 							if (!(c.End < rowByteOffset || c.Start > rowByteOffset + bytesPerRow - 1))
 							{
-								drawingContext.DrawRectangle(null, chunkPen, new Rect((c.Start - rowByteOffset) * byteWidth, 0, c.Length * byteWidth - 1, lineHeight - 1));
+								drawingContext.DrawRectangle(null, chunkPen, new Rect((c.Start - rowByteOffset) * byteWidth, 0, RoundToWholePixels(c.Length * byteWidth - 1), RoundToWholePixels(lineHeight - 1)));
 
 								if (c.Start >= rowByteOffset)
 								{
