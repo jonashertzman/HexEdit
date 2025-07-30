@@ -2,6 +2,7 @@
 using System.Globalization;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Threading;
 
@@ -30,6 +31,11 @@ public class PreviewControl : Control
 	static PreviewControl()
 	{
 		DefaultStyleKeyProperty.OverrideMetadata(typeof(PreviewControl), new FrameworkPropertyMetadata(typeof(PreviewControl)));
+	}
+
+	public PreviewControl()
+	{
+		this.ClipToBounds = true;
 	}
 
 	#endregion
@@ -150,8 +156,8 @@ public class PreviewControl : Control
 						drawingContext.PushGuidelineSet(chunkGuide);
 						foreach (Chunk c in Chunks)
 						{
-							//if (Chunks.IndexOf(c) % 3 != 0)
-							//	continue;
+							if (Chunks.IndexOf(c) % 3 != 0)
+								continue;
 
 							if (!(c.End < rowByteOffset || c.Start > rowByteOffset + bytesPerRow - 1))
 							{
@@ -193,6 +199,44 @@ public class PreviewControl : Control
 #if DEBUG
 		ReportRenderTime();
 #endif
+	}
+
+	protected override void OnKeyDown(KeyEventArgs e)
+	{
+		bool controlPressed = (Keyboard.Modifiers & ModifierKeys.Control) == ModifierKeys.Control;
+
+		if (e.Key == Key.Down)
+		{
+			VerticalOffset++;
+		}
+		else if (e.Key == Key.Up)
+		{
+			VerticalOffset--;
+		}
+		else if (e.Key == Key.PageUp)
+		{
+			VerticalOffset = Math.Max(0, VerticalOffset -= VisibleLines - 1);
+		}
+		else if (e.Key == Key.PageDown)
+		{
+			VerticalOffset = VerticalOffset += VisibleLines - 1;
+		}
+		else if (e.Key == Key.Home && controlPressed)
+		{
+			VerticalOffset = 0;
+		}
+		else if (e.Key == Key.End && controlPressed)
+		{
+			VerticalOffset = Bytes.Count / AppSettings.BytesPerRow + 1;
+		}
+		else
+		{
+			base.OnKeyDown(e);
+			return;
+		}
+
+		e.Handled = true;
+		InvalidateVisual();
 	}
 
 	#endregion

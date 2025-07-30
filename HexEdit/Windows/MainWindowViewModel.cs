@@ -54,8 +54,25 @@ public class MainWindowViewModel : INotifyPropertyChanged
 	public int FontSize
 	{
 		get { return AppSettings.FontSize; }
-		set { AppSettings.FontSize = value; OnPropertyChanged(nameof(FontSize)); }
+		set
+		{
+			AppSettings.FontSize = value;
+			Zoom = 0;
+			OnPropertyChangedRepaint(nameof(FontSize)); OnPropertyChanged(nameof(ZoomedFontSize));
+		}
 	}
+
+	public int Zoom
+	{
+		get { return AppSettings.Zoom; }
+		set { AppSettings.Zoom = Math.Max(value, 1 - FontSize); OnPropertyChanged(nameof(Zoom)); OnPropertyChanged(nameof(ZoomedFontSize)); }
+	}
+
+	public int ZoomedFontSize
+	{
+		get { return Math.Max(FontSize + Zoom, 1); }
+	}
+
 
 	public string CurrentFile
 	{

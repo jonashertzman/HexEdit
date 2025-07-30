@@ -71,6 +71,12 @@ public static class AppSettings
 		set { Settings.FontSize = value; }
 	}
 
+	public static int Zoom
+	{
+		get { return Settings.Zoom; }
+		set { Settings.Zoom = value; }
+	}
+
 	public static int BytesPerRow
 	{
 		get { return Settings.BytesPerRow; }

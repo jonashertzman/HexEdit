@@ -2,6 +2,7 @@
 using System.Collections.ObjectModel;
 using System.IO;
 using System.Windows;
+using System.Windows.Input;
 
 namespace HexEdit;
 
@@ -573,6 +574,8 @@ public partial class MainWindow : Window
 		{
 			OpenFile(Environment.GetCommandLineArgs()[1]);
 		}
+
+		Preview.Focus();
 	}
 
 	private void Grid_PreviewDrop(object sender, DragEventArgs e)
@@ -593,8 +596,17 @@ public partial class MainWindow : Window
 
 	private void Preview_MouseWheel(object sender, System.Windows.Input.MouseWheelEventArgs e)
 	{
-		int lines = SystemParameters.WheelScrollLines * e.Delta / 120;
-		VerticalScrollbar.Value -= lines;
+		bool controlPressed = (Keyboard.Modifiers & ModifierKeys.Control) == ModifierKeys.Control;
+
+		if (controlPressed)
+		{
+			ViewModel.Zoom += e.Delta / Math.Abs(e.Delta);
+		}
+		else
+		{
+			int lines = SystemParameters.WheelScrollLines * e.Delta / 120;
+			VerticalScrollbar.Value -= lines;
+		}
 	}
 
 	private void PreviewModeComboBox_SelectionChanged(object sender, System.Windows.Controls.SelectionChangedEventArgs e)
@@ -669,6 +681,21 @@ public partial class MainWindow : Window
 	{
 		AboutWindow aboutWindow = new() { Owner = this, DataContext = ViewModel };
 		aboutWindow.ShowDialog();
+	}
+
+	private void CommandZoomIn_Executed(object sender, ExecutedRoutedEventArgs e)
+	{
+		ViewModel.Zoom += 1;
+	}
+
+	private void CommandZoomOut_Executed(object sender, ExecutedRoutedEventArgs e)
+	{
+		ViewModel.Zoom -= 1;
+	}
+
+	private void CommandResetZoom_Executed(object sender, ExecutedRoutedEventArgs e)
+	{
+		ViewModel.Zoom = 0;
 	}
 
 	#endregion

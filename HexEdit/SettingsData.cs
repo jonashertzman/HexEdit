@@ -10,6 +10,7 @@ public class SettingsData
 
 	public string Font { get; set; } = DefaultSettings.Font;
 	public int FontSize { get; set; } = DefaultSettings.FontSize;
+	public int Zoom { get; set; } = 0;
 
 	public int BytesPerRow { get; set; } = 8;
 
