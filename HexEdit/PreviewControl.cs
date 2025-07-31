@@ -85,7 +85,7 @@ public class PreviewControl : Control
 		borderPen.Freeze();
 		GuidelineSet borderGuide = CreateGuidelineSet(borderPen);
 
-		Pen chunkPen = new(/*AppSettings.TextForeground*/ new SolidColorBrush(Color.FromArgb(255, 255, 0, 0)), RoundToWholePixels(.6));
+		Pen chunkPen = new(/*AppSettings.TextForeground*/ new SolidColorBrush(Color.FromArgb(255, 255, 0, 0)), RoundToWholePixels(4));
 		chunkPen.Freeze();
 		GuidelineSet chunkGuide = CreateGuidelineSet(chunkPen);
 
@@ -100,7 +100,6 @@ public class PreviewControl : Control
 		{
 			string s = i.ToString("X");
 			TextUtils.CreateGlyphRun(s, typeface, FontSize, dpiScale, out double b);
-			Debug.WriteLine(b);
 			hexWidth = Math.Max(hexWidth, b);
 		}
 
@@ -127,8 +126,7 @@ public class PreviewControl : Control
 				}
 				drawingContext.Pop();
 
-
-				drawingContext.PushClip(new RectangleGeometry(new Rect(offsetMargin, 0, byteWidth * bytesPerRow + 5, lineHeight)));
+				drawingContext.PushClip(new RectangleGeometry(new Rect(offsetMargin, 0, byteWidth * bytesPerRow, lineHeight)));
 				{
 					drawingContext.PushTransform(new TranslateTransform(offsetMargin + borderPen.Thickness, 0));
 					{
@@ -146,8 +144,6 @@ public class PreviewControl : Control
 									drawingContext.DrawGlyphRun(AppSettings.TextForeground, TextUtils.CreateGlyphRun(Bytes[rowByteOffset + j].ToString("X2"), typeface, this.FontSize, dpiScale, out _));
 								}
 								drawingContext.Pop();
-
-
 							}
 							drawingContext.Pop();
 						}
@@ -161,7 +157,12 @@ public class PreviewControl : Control
 
 							if (!(c.End < rowByteOffset || c.Start > rowByteOffset + bytesPerRow - 1))
 							{
-								drawingContext.DrawRectangle(null, chunkPen, new Rect((c.Start - rowByteOffset) * byteWidth, 0, RoundToWholePixels(c.Length * byteWidth - 1), RoundToWholePixels(lineHeight - 1)));
+								drawingContext.PushClip(new RectangleGeometry(new Rect((c.Start - rowByteOffset) * byteWidth, 0, byteWidth * c.Length, lineHeight)));
+								{
+									drawingContext.DrawRectangle(null, chunkPen, new Rect((c.Start - rowByteOffset) * byteWidth, 0, c.Length * byteWidth, lineHeight));
+									//		drawingContext.DrawRectangle(null, chunkPen, new Rect((c.Start - rowByteOffset) * byteWidth, 0, RoundToWholePixels(c.Length * byteWidth - 1), RoundToWholePixels(lineHeight - 1)));
+								}
+								drawingContext.Pop();
 
 								if (c.Start >= rowByteOffset)
 								{
