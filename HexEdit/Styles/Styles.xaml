@@ -62,5 +62,8 @@
 		</Style.Triggers>
 	</Style>
 
+	<Style TargetType="Border">
+		<Setter Property="BorderBrush" Value="#FFCCCCCC" />
+	</Style>
 
 </ResourceDictionary>
