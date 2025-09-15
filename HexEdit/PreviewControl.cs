@@ -103,7 +103,7 @@ public class PreviewControl : Control
 			hexWidth = Math.Max(hexWidth, b);
 		}
 
-		double byteWidth = RoundToWholePixels(hexWidth) * 2 + chunkPen.Thickness * 4 + textMargin;
+		double byteWidth = RoundToWholePixels(hexWidth) * 2 + chunkPen.Thickness * 4;
 
 		drawingContext.DrawRectangle(SystemColors.ControlBrush, null, new Rect(0, 0, offsetMargin, this.ActualHeight));
 
@@ -139,7 +139,7 @@ public class PreviewControl : Control
 								if ((j + i) % 2 == 0)
 									drawingContext.DrawRectangle(Brushes.LightGray, null, new Rect(0, 0, byteWidth, lineHeight));
 
-								drawingContext.PushTransform(new TranslateTransform(textMargin, 0));
+								drawingContext.PushTransform(new TranslateTransform(chunkPen.Thickness * 2, chunkPen.Thickness));
 								{
 									drawingContext.DrawGlyphRun(AppSettings.TextForeground, TextUtils.CreateGlyphRun(Bytes[rowByteOffset + j].ToString("X2"), typeface, this.FontSize, dpiScale, out _));
 								}
