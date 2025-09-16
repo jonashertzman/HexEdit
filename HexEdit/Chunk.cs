@@ -13,29 +13,58 @@ public class Chunk : INotifyPropertyChanged
 		Start = start;
 		Length = bytes.Length;
 
+		int codePoint = -1;
+
 		switch (type)
 		{
 			case ChunkType.Utf8Character:
-				UnicodeCharacter = DecodeUtf8(bytes);
+				codePoint = DecodeUtf8(bytes);
 				break;
 
 			case ChunkType.Utf16leCharacter:
-				UnicodeCharacter = DecodeUtf16le(bytes);
+				codePoint = DecodeUtf16le(bytes);
 				break;
 
 			case ChunkType.Utf16beCharacter:
-				UnicodeCharacter = DecodeUtf16be(bytes);
+				codePoint = DecodeUtf16be(bytes);
 				break;
 
 			case ChunkType.Utf32leCharacter:
-				UnicodeCharacter = DecodeUtf32le(bytes);
+				codePoint = DecodeUtf32le(bytes);
 				break;
 
 			case ChunkType.Utf32beCharacter:
-				UnicodeCharacter = DecodeUtf32be(bytes);
+				codePoint = DecodeUtf32be(bytes);
 				break;
-
 		}
+
+		if (CharacterType(type))
+		{
+			if (ValidUnicodeCharacter(codePoint))
+			{
+				UnicodeCharacter = codePoint;
+			}
+			else
+			{
+				Type = ChunkType.None;
+			}
+		}
+	}
+
+	private bool CharacterType(ChunkType type)
+	{
+		return type.In([
+			ChunkType.Utf8Character,
+			ChunkType.Utf16beCharacter,
+			ChunkType.Utf16leCharacter,
+			ChunkType.Utf32beCharacter,
+			ChunkType.Utf32leCharacter,
+		]);
+	}
+
+	private bool ValidUnicodeCharacter(int codePoint)
+	{
+		return codePoint >= 0x0000_0000 && codePoint <= 0x0010_FFFF && !(codePoint >= 0xD800 && codePoint <= 0xDFFF);
 	}
 
 	#endregion
@@ -63,15 +92,9 @@ public class Chunk : INotifyPropertyChanged
 		}
 		internal set
 		{
-			if (value >= 0x0000_0000 && value <= 0x0010_FFFF )
-			{
-				if (value >= 0xD800 && value <= 0xDFFF) // Reserved range for surrogate code points
-				{
-					value = -1;
-				}
+			Debug.Assert(ValidUnicodeCharacter(value));
 
-				field = value;
-			}
+			field = value;
 		}
 	} = -1;
 

@@ -2,7 +2,7 @@
 
 namespace HexEdit;
 
-internal class Utils
+internal static class Utils
 {
 
 	public static void HideMinimizeAndMaximizeButtons(Window window)
@@ -15,5 +15,19 @@ internal class Utils
 			_ = WinApi.SetWindowLong(hwnd, WinApi.GWL_STYLE, style & ~WinApi.WS_MAXIMIZEBOX & ~WinApi.WS_MINIMIZEBOX);
 		};
 	}
+
+	#region Extention Methods
+
+	public static bool In<T>(this T item, params T[] list)
+	{
+		return list.Contains(item);
+	}
+
+	public static bool NotIn<T>(this T item, params T[] list)
+	{
+		return !list.Contains(item);
+	}
+
+	#endregion
 
 }

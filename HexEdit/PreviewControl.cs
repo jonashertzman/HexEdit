@@ -152,8 +152,9 @@ public class PreviewControl : Control
 						// Draw chunks
 						foreach (Chunk c in Chunks)
 						{
-							//if (Chunks.IndexOf(c) % 4 != 0)
-							//	continue;
+							if (c.Type == ChunkType.None)
+								continue;
+
 
 							if (!(c.End < rowByteOffset || c.Start > rowByteOffset + bytesPerRow - 1))
 							{

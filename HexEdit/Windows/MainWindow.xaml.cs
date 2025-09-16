@@ -130,7 +130,7 @@ public partial class MainWindow : Window
 		{
 			// 1 byte character
 			int end = i + 1;
-			if (bytes[i] >= 0x00 && bytes[i] <= 0x7F)
+			if (bytes[i] > 0x00 && bytes[i] <= 0x7F)
 			{
 				chunks.Add(new Chunk(ChunkType.Utf8Character, i, bytes[i..end]));
 				i++;
