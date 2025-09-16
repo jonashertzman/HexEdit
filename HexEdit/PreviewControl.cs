@@ -105,7 +105,8 @@ public class PreviewControl : Control
 
 		double byteWidth = RoundToWholePixels(hexWidth) * 2 + chunkPen.Thickness * 4;
 
-		drawingContext.DrawRectangle(SystemColors.ControlBrush, null, new Rect(0, 0, offsetMargin, this.ActualHeight));
+		// Draw offset background
+		drawingContext.DrawRectangle(SystemColors.ControlBrush, null, new Rect(-0, 0, offsetMargin, this.ActualHeight));
 
 		for (int i = 0; i < VisibleLines; i++)
 		{
@@ -119,7 +120,7 @@ public class PreviewControl : Control
 			// Line Y offset
 			drawingContext.PushTransform(new TranslateTransform(0, lineHeight * i));
 			{
-				// Draw row offset margin
+				// Draw row offset
 				drawingContext.PushTransform(new TranslateTransform(textMargin, chunkPen.Thickness));
 				{
 					drawingContext.DrawGlyphRun(SystemColors.ControlDarkBrush, TextUtils.CreateGlyphRun(rowByteOffset.ToString("X2").PadLeft(maxOffset, '0'), typeface, FontSize, dpiScale, out double w));
@@ -128,7 +129,7 @@ public class PreviewControl : Control
 
 				drawingContext.PushClip(new RectangleGeometry(new Rect(offsetMargin, 0, byteWidth * bytesPerRow, lineHeight)));
 				{
-					drawingContext.PushTransform(new TranslateTransform(offsetMargin + borderPen.Thickness, 0));
+					drawingContext.PushTransform(new TranslateTransform(offsetMargin, 0));
 					{
 
 						// Draw bytes
@@ -152,7 +153,8 @@ public class PreviewControl : Control
 						drawingContext.PushGuidelineSet(chunkGuide);
 						foreach (Chunk c in Chunks)
 						{
-							if (Chunks.IndexOf(c) % 3 != 0)
+							break;
+							if (Chunks.IndexOf(c) % 4 != 0)
 								continue;
 
 							if (!(c.End < rowByteOffset || c.Start > rowByteOffset + bytesPerRow - 1))
@@ -189,7 +191,12 @@ public class PreviewControl : Control
 		// Draw row offset border
 		drawingContext.PushGuidelineSet(borderGuide);
 		{
-			drawingContext.DrawLine(borderPen, new Point(offsetMargin, -1), new Point(offsetMargin, this.ActualHeight));
+			double borderThickness = RoundToWholePixels(borderPen.Thickness / 2);
+
+			if (borderThickness == 0)
+				borderThickness = 1;
+
+			drawingContext.DrawLine(borderPen, new Point(offsetMargin - borderThickness, -1), new Point(offsetMargin - borderThickness, this.ActualHeight - 200));
 		}
 		drawingContext.Pop();
 
