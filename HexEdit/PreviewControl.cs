@@ -85,7 +85,7 @@ public class PreviewControl : Control
 		borderPen.Freeze();
 		GuidelineSet borderGuide = CreateGuidelineSet(borderPen);
 
-		Pen chunkPen = new(/*AppSettings.TextForeground*/ new SolidColorBrush(Color.FromArgb(255, 255, 0, 0)), RoundToWholePixels(4));
+		Pen chunkPen = new(/*AppSettings.TextForeground*/ new SolidColorBrush(Color.FromArgb(128, 255, 0, 0)), RoundToWholePixels(4));
 		chunkPen.Freeze();
 		GuidelineSet chunkGuide = CreateGuidelineSet(chunkPen);
 

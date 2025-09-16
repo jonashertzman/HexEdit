@@ -63,8 +63,13 @@ public class Chunk : INotifyPropertyChanged
 		}
 		internal set
 		{
-			if (value >= 0x0000_0000 && value <= 0x0010_FFFF)
+			if (value >= 0x0000_0000 && value <= 0x0010_FFFF )
 			{
+				if (value >= 0xD800 && value <= 0xDFFF) // Reserved range for surrogate code points
+				{
+					value = -1;
+				}
+
 				field = value;
 			}
 		}
