@@ -150,19 +150,16 @@ public class PreviewControl : Control
 						}
 
 						// Draw chunks
-						drawingContext.PushGuidelineSet(chunkGuide);
 						foreach (Chunk c in Chunks)
 						{
-							break;
-							if (Chunks.IndexOf(c) % 4 != 0)
-								continue;
+							//if (Chunks.IndexOf(c) % 4 != 0)
+							//	continue;
 
 							if (!(c.End < rowByteOffset || c.Start > rowByteOffset + bytesPerRow - 1))
 							{
 								drawingContext.PushClip(new RectangleGeometry(new Rect((c.Start - rowByteOffset) * byteWidth, 0, byteWidth * c.Length, lineHeight)));
 								{
 									drawingContext.DrawRectangle(null, chunkPen, new Rect((c.Start - rowByteOffset) * byteWidth, 0, c.Length * byteWidth, lineHeight));
-									//		drawingContext.DrawRectangle(null, chunkPen, new Rect((c.Start - rowByteOffset) * byteWidth, 0, RoundToWholePixels(c.Length * byteWidth - 1), RoundToWholePixels(lineHeight - 1)));
 								}
 								drawingContext.Pop();
 
@@ -172,7 +169,6 @@ public class PreviewControl : Control
 								}
 							}
 						}
-						drawingContext.Pop();
 					}
 					drawingContext.Pop();
 				}
@@ -196,7 +192,7 @@ public class PreviewControl : Control
 			if (borderThickness == 0)
 				borderThickness = 1;
 
-			drawingContext.DrawLine(borderPen, new Point(offsetMargin - borderThickness, -1), new Point(offsetMargin - borderThickness, this.ActualHeight - 200));
+			drawingContext.DrawLine(borderPen, new Point(offsetMargin - borderThickness, -1), new Point(offsetMargin - borderThickness, this.ActualHeight));
 		}
 		drawingContext.Pop();
 
