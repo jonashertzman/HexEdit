@@ -81,8 +81,10 @@ public class PreviewControl : Control
 		borderPen.Freeze();
 		GuidelineSet borderGuide = CreateGuidelineSet(borderPen);
 
-		Pen chunkPen = new(new SolidColorBrush(Color.FromArgb(128, 255, 0, 0)), RoundToWholePixels(4));
-		Pen chunkPen2 = new(new SolidColorBrush(Color.FromArgb(128, 0, 0, 255)), RoundToWholePixels(4));
+		double chunkBorderThickness = RoundToWholePixels(characterHeight / 5);
+
+		Pen chunkPen = new(new SolidColorBrush(Color.FromArgb(128, 255, 0, 0)), RoundToWholePixels(chunkBorderThickness));
+		Pen chunkPen2 = new(new SolidColorBrush(Color.FromArgb(128, 0, 0, 255)), RoundToWholePixels(chunkBorderThickness));
 		chunkPen.Freeze();
 		GuidelineSet chunkGuide = CreateGuidelineSet(chunkPen);
 
@@ -262,7 +264,7 @@ public class PreviewControl : Control
 		if (Bytes.Count / AppSettings.BytesPerRow < line) // Below the last line
 			return null;
 
-		if (column >= AppSettings.BytesPerRow || line * AppSettings.BytesPerRow + column >= Bytes.Count) // Beyonnd the roghtmost column
+		if (column >= AppSettings.BytesPerRow || line * AppSettings.BytesPerRow + column >= Bytes.Count) // Beyond the rightmost column
 			return null;
 
 
