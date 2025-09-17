@@ -69,19 +69,13 @@ public class PreviewControl : Control
 		double maxTextWidth = 0;
 		int bytesPerRow = AppSettings.BytesPerRow;
 
-
-
 		int lineCount = Bytes.Count / bytesPerRow + 1;
 
 		TextUtils.CreateGlyphRun("W", typeface, this.FontSize, dpiScale, out double characterWidth);
 		double characterHeight = Math.Ceiling(TextUtils.FontHeight(typeface, this.FontSize, dpiScale) / dpiScale) * dpiScale;
 
-		VisibleLines = (int)(ActualHeight / characterHeight + 1);
-		MaxVerticalScroll = Bytes.Count / bytesPerRow - VisibleLines + 2;
-
 		int maxOffset = Bytes.Count.ToString("X2").Length;
 		double rowOffsetWidth = maxOffset * characterWidth;
-
 
 		Pen borderPen = new(SystemColors.ScrollBarBrush, RoundToWholePixels(1));
 		borderPen.Freeze();
@@ -93,6 +87,9 @@ public class PreviewControl : Control
 		GuidelineSet chunkGuide = CreateGuidelineSet(chunkPen);
 
 		lineHeight = characterHeight + 2 * chunkPen.Thickness;
+
+		VisibleLines = (int)(ActualHeight / lineHeight + 1);
+		MaxVerticalScroll = Bytes.Count / bytesPerRow - VisibleLines + 2;
 
 		textMargin = RoundToWholePixels(4);
 		offsetMargin = RoundToWholePixels(rowOffsetWidth) + (2 * textMargin);
@@ -106,7 +103,7 @@ public class PreviewControl : Control
 			hexWidth = Math.Max(hexWidth, b);
 		}
 
-		byteWidth = RoundToWholePixels(hexWidth) * 2 + chunkPen.Thickness * 4;
+		byteWidth = RoundToWholePixels(hexWidth) * 2 + chunkPen.Thickness * 2 + textMargin * 2;
 
 		// Draw offset background
 		drawingContext.DrawRectangle(SystemColors.ControlBrush, null, new Rect(-0, 0, offsetMargin, this.ActualHeight));
@@ -143,7 +140,7 @@ public class PreviewControl : Control
 								if ((j + i) % 2 == 0)
 									drawingContext.DrawRectangle(Brushes.LightGray, null, new Rect(0, 0, byteWidth, lineHeight));
 
-								drawingContext.PushTransform(new TranslateTransform(chunkPen.Thickness * 2, chunkPen.Thickness));
+								drawingContext.PushTransform(new TranslateTransform(chunkPen.Thickness + textMargin, chunkPen.Thickness));
 								{
 									drawingContext.DrawGlyphRun(AppSettings.TextForeground, TextUtils.CreateGlyphRun(Bytes[rowByteOffset + j].ToString("X2"), typeface, this.FontSize, dpiScale, out _));
 								}
