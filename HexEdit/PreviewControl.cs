@@ -19,10 +19,12 @@ public class PreviewControl : Control
 	private double offsetMargin;
 	private double textMargin;
 
-	private double characterHeight;
-	private double characterWidth;
+	double lineHeight = -1;
+	double byteWidth = -1;
 
 	private readonly Stopwatch stopwatch = new();
+
+	Chunk selectedChunk = null;
 
 	#endregion
 
@@ -71,8 +73,8 @@ public class PreviewControl : Control
 
 		int lineCount = Bytes.Count / bytesPerRow + 1;
 
-		TextUtils.CreateGlyphRun("W", typeface, this.FontSize, dpiScale, out characterWidth);
-		characterHeight = Math.Ceiling(TextUtils.FontHeight(typeface, this.FontSize, dpiScale) / dpiScale) * dpiScale;
+		TextUtils.CreateGlyphRun("W", typeface, this.FontSize, dpiScale, out double characterWidth);
+		double characterHeight = Math.Ceiling(TextUtils.FontHeight(typeface, this.FontSize, dpiScale) / dpiScale) * dpiScale;
 
 		VisibleLines = (int)(ActualHeight / characterHeight + 1);
 		MaxVerticalScroll = Bytes.Count / bytesPerRow - VisibleLines + 2;
@@ -85,11 +87,12 @@ public class PreviewControl : Control
 		borderPen.Freeze();
 		GuidelineSet borderGuide = CreateGuidelineSet(borderPen);
 
-		Pen chunkPen = new(/*AppSettings.TextForeground*/ new SolidColorBrush(Color.FromArgb(128, 255, 0, 0)), RoundToWholePixels(4));
+		Pen chunkPen = new(new SolidColorBrush(Color.FromArgb(128, 255, 0, 0)), RoundToWholePixels(4));
+		Pen chunkPen2 = new(new SolidColorBrush(Color.FromArgb(128, 0, 0, 255)), RoundToWholePixels(4));
 		chunkPen.Freeze();
 		GuidelineSet chunkGuide = CreateGuidelineSet(chunkPen);
 
-		double lineHeight = characterHeight + 2 * chunkPen.Thickness;
+		lineHeight = characterHeight + 2 * chunkPen.Thickness;
 
 		textMargin = RoundToWholePixels(4);
 		offsetMargin = RoundToWholePixels(rowOffsetWidth) + (2 * textMargin);
@@ -103,7 +106,7 @@ public class PreviewControl : Control
 			hexWidth = Math.Max(hexWidth, b);
 		}
 
-		double byteWidth = RoundToWholePixels(hexWidth) * 2 + chunkPen.Thickness * 4;
+		byteWidth = RoundToWholePixels(hexWidth) * 2 + chunkPen.Thickness * 4;
 
 		// Draw offset background
 		drawingContext.DrawRectangle(SystemColors.ControlBrush, null, new Rect(-0, 0, offsetMargin, this.ActualHeight));
@@ -155,12 +158,13 @@ public class PreviewControl : Control
 							if (c.Type == ChunkType.None)
 								continue;
 
+							Pen pen = c == selectedChunk ? chunkPen2 : chunkPen;
 
 							if (!(c.End < rowByteOffset || c.Start > rowByteOffset + bytesPerRow - 1))
 							{
 								drawingContext.PushClip(new RectangleGeometry(new Rect((c.Start - rowByteOffset) * byteWidth, 0, byteWidth * c.Length, lineHeight)));
 								{
-									drawingContext.DrawRectangle(null, chunkPen, new Rect((c.Start - rowByteOffset) * byteWidth, 0, c.Length * byteWidth, lineHeight));
+									drawingContext.DrawRectangle(null, pen, new Rect((c.Start - rowByteOffset) * byteWidth, 0, c.Length * byteWidth, lineHeight));
 								}
 								drawingContext.Pop();
 
@@ -244,6 +248,41 @@ public class PreviewControl : Control
 		InvalidateVisual();
 	}
 
+	protected override void OnMouseUp(MouseButtonEventArgs e)
+	{
+		Point currentMousePosition = e.GetPosition(this);
+
+		selectedChunk = PointToChunk(currentMousePosition);
+
+		InvalidateVisual();
+	}
+
+	private Chunk PointToChunk(Point currentMousePosition)
+	{
+		int line = (int)(currentMousePosition.Y / lineHeight) + VerticalOffset;
+		int column = (int)((currentMousePosition.X - offsetMargin + HorizontalOffset) / byteWidth);
+
+		if (Bytes.Count / AppSettings.BytesPerRow < line) // Below the last line
+			return null;
+
+		if (column >= AppSettings.BytesPerRow || line * AppSettings.BytesPerRow + column >= Bytes.Count) // Beyonnd the roghtmost column
+			return null;
+
+
+		int byteIndex = line * AppSettings.BytesPerRow + column;
+
+		Debug.Print($"Line {line} Column {column}  index {byteIndex}");
+
+		foreach (Chunk c in Chunks)
+		{
+			if (byteIndex >= c.Start && byteIndex <= c.End)
+			{
+				return c;
+			}
+		}
+
+		return null;
+	}
 	#endregion
 
 	#region Dependency Properties
