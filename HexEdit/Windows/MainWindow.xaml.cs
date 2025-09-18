@@ -614,6 +614,13 @@ public partial class MainWindow : Window
 		ParseFileAs((Encoding)PreviewModeCombobox.SelectedItem);
 	}
 
+	private void Preview_SelectionChanged(object sender, ChunkEventArgs e)
+	{
+		Chunk c = e.SelectedItem;
+
+		Debug.WriteLine(c.UnicodeCharacter);
+	}
+
 	#region Commands
 
 	private void CommandNew_Executed(object sender, System.Windows.Input.ExecutedRoutedEventArgs e)

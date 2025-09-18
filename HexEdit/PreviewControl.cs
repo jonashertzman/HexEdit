@@ -253,35 +253,17 @@ public class PreviewControl : Control
 
 		selectedChunk = PointToChunk(currentMousePosition);
 
+		SelectionChanged?.Invoke(this, new ChunkEventArgs(selectedChunk));
+
 		InvalidateVisual();
 	}
 
-	private Chunk PointToChunk(Point currentMousePosition)
-	{
-		int line = (int)(currentMousePosition.Y / lineHeight) + VerticalOffset;
-		int column = (int)((currentMousePosition.X - offsetMargin + HorizontalOffset) / byteWidth);
+	#endregion
 
-		if (Bytes.Count / AppSettings.BytesPerRow < line) // Below the last line
-			return null;
+	#region Events
 
-		if (column >= AppSettings.BytesPerRow || line * AppSettings.BytesPerRow + column >= Bytes.Count) // Beyond the rightmost column
-			return null;
+	public event EventHandler<ChunkEventArgs> SelectionChanged;
 
-
-		int byteIndex = line * AppSettings.BytesPerRow + column;
-
-		Debug.Print($"Line {line} Column {column}  index {byteIndex}");
-
-		foreach (Chunk c in Chunks)
-		{
-			if (byteIndex >= c.Start && byteIndex <= c.End)
-			{
-				return c;
-			}
-		}
-
-		return null;
-	}
 	#endregion
 
 	#region Dependency Properties
@@ -385,6 +367,33 @@ public class PreviewControl : Control
 				Debug.Print($"Took {stopwatch.ElapsedMilliseconds} ms");
 			})
 		);
+	}
+
+	private Chunk PointToChunk(Point currentMousePosition)
+	{
+		int line = (int)(currentMousePosition.Y / lineHeight) + VerticalOffset;
+		int column = (int)((currentMousePosition.X - offsetMargin + HorizontalOffset) / byteWidth);
+
+		if (Bytes.Count / AppSettings.BytesPerRow < line) // Below the last line
+			return null;
+
+		if (column >= AppSettings.BytesPerRow || line * AppSettings.BytesPerRow + column >= Bytes.Count) // Beyond the rightmost column
+			return null;
+
+
+		int byteIndex = line * AppSettings.BytesPerRow + column;
+
+		Debug.Print($"Line {line} Column {column}  index {byteIndex}");
+
+		foreach (Chunk c in Chunks)
+		{
+			if (byteIndex >= c.Start && byteIndex <= c.End)
+			{
+				return c;
+			}
+		}
+
+		return null;
 	}
 
 	private Size MeasureString(string text)
