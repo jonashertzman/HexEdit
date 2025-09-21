@@ -1,6 +1,7 @@
 ﻿using Microsoft.Win32;
 using System.Collections.ObjectModel;
 using System.IO;
+using System.Net.Http;
 using System.Windows;
 using System.Windows.Input;
 
@@ -614,12 +615,51 @@ public partial class MainWindow : Window
 		ParseFileAs((Encoding)PreviewModeCombobox.SelectedItem);
 	}
 
-	private void Preview_SelectionChanged(object sender, ChunkEventArgs e)
+	private async void Preview_SelectionChanged(object sender, ChunkEventArgs e)
 	{
 		Chunk c = e.SelectedItem;
 
 		Debug.WriteLine(c.UnicodeCharacter);
+
+		if (c != null)
+		{
+			if (c.Type == ChunkType.Bom)
+			{
+
+			}
+			else if (c.UnicodeCharacter != -1)
+			{
+				UnicodeInfo info = await GetCharacterInfo(c);
+			}
+		}
 	}
+
+	private async Task<UnicodeInfo> GetCharacterInfo(Chunk c)
+	{
+		if (characterInfo.TryGetValue(c.UnicodeCharacter, out UnicodeInfo info))
+		{
+			return info;
+		}
+		else
+		{
+			info = null;
+			HttpResponseMessage response = await client.GetAsync($"https://ucdapi.org/unicode/10.0.0/codepoint/dec/{c.UnicodeCharacter}");
+			if (response.IsSuccessStatusCode)
+			{
+				info = await response.Content.ReadAsAsync<UnicodeInfo>();
+				characterInfo[c.UnicodeCharacter] = info;
+			}
+
+			return info;
+		}
+	}
+
+	readonly Dictionary<int, UnicodeInfo> characterInfo = [];
+
+	static readonly HttpClient client = new();
+
+
+
 
 	#region Commands
 
