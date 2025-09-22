@@ -25,3 +25,9 @@ public enum Encoding
 	Utf32le,
 	Unknown,
 }
+
+public enum Themes
+{
+	Light,
+	Dark,
+}

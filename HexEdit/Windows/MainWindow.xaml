@@ -170,7 +170,12 @@
 
 			<GridSplitter Grid.Column="1" Width="4" HorizontalAlignment="Center" Focusable="False" />
 
-			<Border Grid.Column="2" Background="White" BorderThickness="1,1,0,1" BorderBrush="{StaticResource {x:Static SystemColors.ScrollBarBrushKey}}" />
+			<Border Grid.Column="2" Background="White" BorderThickness="1,1,0,1" BorderBrush="{StaticResource {x:Static SystemColors.ScrollBarBrushKey}}">
+				<StackPanel>
+					<TextBox Name="ChunkTitle" BorderThickness="0,0,0,1" FontSize="14" FontWeight="Bold" />
+					<TextBox Name="ChunkInfo" AcceptsReturn="True" BorderThickness="0" />
+				</StackPanel>
+			</Border>
 		</Grid>
 
 		<!--  Status Bar  -->

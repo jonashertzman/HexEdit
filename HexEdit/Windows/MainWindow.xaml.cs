@@ -2,6 +2,7 @@
 using System.Collections.ObjectModel;
 using System.IO;
 using System.Net.Http;
+using System.Text.Json;
 using System.Windows;
 using System.Windows.Input;
 
@@ -19,6 +20,10 @@ public partial class MainWindow : Window
 	readonly byte[] UTF32BE_BOM = [0x00, 0x00, 0xFE, 0xFF];
 	readonly byte[] UTF16LE_BOM = [0xFF, 0xFE];
 	readonly byte[] UTF16BE_BOM = [0xFE, 0xFF];
+
+	readonly Dictionary<int, UnicodeInfo> characterInfo = [];
+
+	static readonly HttpClient client = new();
 
 	#endregion
 
@@ -39,13 +44,35 @@ public partial class MainWindow : Window
 
 	private void LoadSettings()
 	{
-		AppSettings.ReadSettingsFromDisk();
+		AppSettings.LoadSettings();
 
 		this.Left = AppSettings.PositionLeft;
 		this.Top = AppSettings.PositionTop;
 		this.Width = AppSettings.Width;
 		this.Height = AppSettings.Height;
 		this.WindowState = AppSettings.WindowState;
+
+		Task.Run(() => LoadUnicodeInfoCache());
+	}
+
+	private void LoadUnicodeInfoCache()
+	{
+		Directory.CreateDirectory(AppSettings.CodePointDirectory);
+		foreach (var file in Directory.GetFiles(AppSettings.CodePointDirectory, "*.json"))
+		{
+			try
+			{
+				var info = JsonSerializer.Deserialize<UnicodeInfo>(File.ReadAllText(file));
+				if (info != null)
+				{
+					characterInfo[info.codePoint] = info;
+				}
+			}
+			catch (Exception ex)
+			{
+				Debug.WriteLine("Failed to load code point info from disk: " + ex.Message);
+			}
+		}
 	}
 
 	private void SaveSettings()
@@ -595,7 +622,7 @@ public partial class MainWindow : Window
 		e.Handled = true;
 	}
 
-	private void Preview_MouseWheel(object sender, System.Windows.Input.MouseWheelEventArgs e)
+	private void Preview_MouseWheel(object sender, MouseWheelEventArgs e)
 	{
 		bool controlPressed = (Keyboard.Modifiers & ModifierKeys.Control) == ModifierKeys.Control;
 
@@ -617,19 +644,28 @@ public partial class MainWindow : Window
 
 	private async void Preview_SelectionChanged(object sender, ChunkEventArgs e)
 	{
-		Chunk c = e.SelectedItem;
-
-		Debug.WriteLine(c.UnicodeCharacter);
-
-		if (c != null)
+		if (e.SelectedItem != null)
 		{
-			if (c.Type == ChunkType.Bom)
-			{
+			Chunk c = e.SelectedItem;
 
-			}
-			else if (c.UnicodeCharacter != -1)
+			if (c != null)
 			{
-				UnicodeInfo info = await GetCharacterInfo(c);
+				if (c.Type == ChunkType.Bom)
+				{
+
+				}
+				else if (c.UnicodeCharacter != -1)
+				{
+					UnicodeInfo info = await GetCharacterInfo(c);
+
+					ChunkTitle.Text = info.codePoint.ToString("X4");
+					ChunkInfo.Text = $"""
+						{info.name}
+						{info.block}
+						{info.generalCategory}
+						{info.script}
+						""";
+				}
 			}
 		}
 	}
@@ -642,33 +678,34 @@ public partial class MainWindow : Window
 		}
 		else
 		{
+			Debug.WriteLine($"Fetching unicode info for character {c.UnicodeCharacter}");
+
 			info = null;
 			HttpResponseMessage response = await client.GetAsync($"https://ucdapi.org/unicode/10.0.0/codepoint/dec/{c.UnicodeCharacter}");
 			if (response.IsSuccessStatusCode)
 			{
 				info = await response.Content.ReadAsAsync<UnicodeInfo>();
 				characterInfo[c.UnicodeCharacter] = info;
+
+				_ = Task.Run(() =>
+				{
+					Directory.CreateDirectory(AppSettings.CodePointDirectory);
+					File.WriteAllText(Path.Combine(AppSettings.CodePointDirectory, $"{c.UnicodeCharacter}.json"), JsonSerializer.Serialize(info));
+				});
 			}
 
 			return info;
 		}
 	}
 
-	readonly Dictionary<int, UnicodeInfo> characterInfo = [];
-
-	static readonly HttpClient client = new();
-
-
-
-
 	#region Commands
 
-	private void CommandNew_Executed(object sender, System.Windows.Input.ExecutedRoutedEventArgs e)
+	private void CommandNew_Executed(object sender, ExecutedRoutedEventArgs e)
 	{
 
 	}
 
-	private void CommandOpen_Executed(object sender, System.Windows.Input.ExecutedRoutedEventArgs e)
+	private void CommandOpen_Executed(object sender, ExecutedRoutedEventArgs e)
 	{
 		OpenFileDialog openFileDialog = new();
 
@@ -681,22 +718,22 @@ public partial class MainWindow : Window
 		}
 	}
 
-	private void CommandSave_Executed(object sender, System.Windows.Input.ExecutedRoutedEventArgs e)
+	private void CommandSave_Executed(object sender, ExecutedRoutedEventArgs e)
 	{
 
 	}
 
-	private void CommandSave_CanExecute(object sender, System.Windows.Input.CanExecuteRoutedEventArgs e)
+	private void CommandSave_CanExecute(object sender, CanExecuteRoutedEventArgs e)
 	{
 		e.CanExecute = true;
 	}
 
-	private void CommandExit_Executed(object sender, System.Windows.Input.ExecutedRoutedEventArgs e)
+	private void CommandExit_Executed(object sender, ExecutedRoutedEventArgs e)
 	{
 		this.Close();
 	}
 
-	private void CommandOptions_Executed(object sender, System.Windows.Input.ExecutedRoutedEventArgs e)
+	private void CommandOptions_Executed(object sender, ExecutedRoutedEventArgs e)
 	{
 		// Store existing settings data in case the changes are canceled.
 		var oldFont = ViewModel.Font;
@@ -724,7 +761,7 @@ public partial class MainWindow : Window
 		}
 	}
 
-	private void CommandAbout_Executed(object sender, System.Windows.Input.ExecutedRoutedEventArgs e)
+	private void CommandAbout_Executed(object sender, ExecutedRoutedEventArgs e)
 	{
 		AboutWindow aboutWindow = new() { Owner = this, DataContext = ViewModel };
 		aboutWindow.ShowDialog();

@@ -1,5 +1,4 @@
 ﻿using System.Windows;
-using System.Windows.Media;
 
 namespace HexEdit;
 
@@ -20,9 +19,8 @@ public class SettingsData
 	public double Height { get; set; } = 300;
 	public WindowState WindowState { get; set; }
 
-	public Color TextForeground { get; set; } = DefaultSettings.TextForeground;
-	public Color TextBackground { get; set; } = DefaultSettings.TextBackground;
-
-	public Color SelectionBackground { get; set; } = DefaultSettings.SelectionBackground;
+	public Themes Theme { get; set; } = Themes.Light;
+	public ColorTheme DarkTheme { get; set; } = DefaultSettings.DarkTheme.Clone();
+	public ColorTheme LightTheme { get; set; } = DefaultSettings.LightTheme.Clone();
 
 }

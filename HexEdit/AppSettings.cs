@@ -11,10 +11,12 @@ public static class AppSettings
 
 	#region Members
 
-	private const string SETTINGS_DIRECTORY = "HexEdit";
-	private const string SETTINGS_FILE_NAME = "Settings.xml";
+	private static readonly SettingsData Settings = new();
 
-	private static SettingsData Settings = new();
+	private static readonly string AppDataDirectory = Path.Combine(System.Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "HexEdit");
+	public static readonly string SettingsPath = Path.Combine(AppDataDirectory, "Settings.xml");
+	public static readonly string LogPath = Path.Combine(AppDataDirectory, "HexEdit.log");
+	public static readonly string CodePointDirectory = Path.Combine(AppDataDirectory, "CodePoints");
 
 	#endregion
 
@@ -83,69 +85,148 @@ public static class AppSettings
 		set { Settings.BytesPerRow = value; }
 	}
 
-	public static SolidColorBrush TextForeground
+	public static Themes Theme
 	{
-		get;
-		set { field = value; Settings.TextForeground = value.Color; }
+		get { return Settings.Theme; }
+		set
+		{
+			Settings.Theme = value;
+
+			UpdateCachedSettings();
+			//NotifyStaticPropertyChanged(nameof(WindowForegroundColor));
+			//NotifyStaticPropertyChanged(nameof(WindowBackgroundColor));
+			//NotifyStaticPropertyChanged(nameof(DisabledForegroundColor));
+			//NotifyStaticPropertyChanged(nameof(DialogBackgroundColor));
+			//NotifyStaticPropertyChanged(nameof(ControlLightBackgroundColor));
+			//NotifyStaticPropertyChanged(nameof(BorderForegroundColor));
+		}
 	}
 
+	public static ColorTheme DarkTheme
+	{
+		get { return Settings.DarkTheme; }
+		set { Settings.DarkTheme = value; }
+	}
+
+	public static ColorTheme LightTheme
+	{
+		get { return Settings.LightTheme; }
+		set { Settings.LightTheme = value; }
+	}
+
+	public static ColorTheme CurrentTheme
+	{
+		get
+		{
+			return Theme switch
+			{
+				Themes.Light => Settings.LightTheme,
+				Themes.Dark => Settings.DarkTheme,
+				_ => throw new NotImplementedException(),
+			};
+		}
+	}
+
+
+	// Editor colors
 	public static SolidColorBrush TextBackground
 	{
 		get;
-		set { field = value; Settings.TextBackground = value.Color; }
+		set
+		{
+			field = value;
+			field.Freeze();
+			CurrentTheme.TextBackground = value.Color.ToString();
+		}
+	}
+
+	public static SolidColorBrush TextForeground
+	{
+		get;
+		set
+		{
+			field = value;
+			field.Freeze();
+			CurrentTheme.TextForeground = value.Color.ToString();
+		}
 	}
 
 	public static SolidColorBrush SelectionBackground
 	{
 		get;
-		set { field = value; Settings.SelectionBackground = value.Color; }
+		set
+		{
+			field = value;
+			field.Freeze();
+			CurrentTheme.SelectionBackground = value.Color.ToString();
+		}
 	}
 
 	#endregion
 
 	#region Methods
 
-	internal static void ReadSettingsFromDisk()
+	internal static void LoadSettings()
 	{
-		string settingsPath = Path.Combine(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), SETTINGS_DIRECTORY), SETTINGS_FILE_NAME);
-		DataContractSerializer xmlSerializer = new(typeof(SettingsData));
+		SettingsData storedSettings = ReadSettingsFromDisk();
 
-		if (File.Exists(settingsPath))
+		if (storedSettings != null)
 		{
-			using XmlReader xmlReader = XmlReader.Create(settingsPath);
-			try
-			{
-				Settings = (SettingsData)xmlSerializer.ReadObject(xmlReader);
-			}
-			catch (Exception e)
-			{
-				MessageBox.Show(e.Message, "Error Parsing XML", MessageBoxButton.OK, MessageBoxImage.Error);
-			}
-		}
-
-		if (Settings == null)
-		{
-			Settings = new SettingsData();
+			MergeSettings(Settings, storedSettings);
 		}
 
 		UpdateCachedSettings();
+	}
+
+	private static void MergeSettings(object source, object addition)
+	{
+		foreach (var property in addition.GetType().GetProperties())
+		{
+			if (property.PropertyType.Name == nameof(ColorTheme))
+			{
+				MergeSettings(property.GetValue(source), property.GetValue(addition));
+			}
+			else
+			{
+				if (property.GetValue(addition) != null)
+				{
+					property.SetValue(source, property.GetValue(addition));
+				}
+			}
+		}
+	}
+
+	private static SettingsData ReadSettingsFromDisk()
+	{
+		DataContractSerializer xmlSerializer = new(typeof(SettingsData));
+
+		if (File.Exists(SettingsPath))
+		{
+			using var xmlReader = XmlReader.Create(SettingsPath);
+			try
+			{
+				return (SettingsData)xmlSerializer.ReadObject(xmlReader);
+			}
+			catch (Exception e)
+			{
+				MessageBox.Show(e.Message, "Error Parsing Settings File", MessageBoxButton.OK, MessageBoxImage.Error);
+			}
+		}
+
+		return null;
 	}
 
 	internal static void WriteSettingsToDisk()
 	{
 		try
 		{
-			string settingsPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), SETTINGS_DIRECTORY);
-
 			DataContractSerializer xmlSerializer = new(typeof(SettingsData));
 			var xmlWriterSettings = new XmlWriterSettings { Indent = true, IndentChars = " " };
 
-			if (!Directory.Exists(settingsPath))
-			{
-				Directory.CreateDirectory(settingsPath);
-			}
+			Directory.CreateDirectory(Path.GetDirectoryName(SettingsPath));
 
-			using XmlWriter xmlWriter = XmlWriter.Create(Path.Combine(settingsPath, SETTINGS_FILE_NAME), xmlWriterSettings);
+			using XmlWriter xmlWriter = XmlWriter.Create(SettingsPath, xmlWriterSettings);
+
 			xmlSerializer.WriteObject(xmlWriter, Settings);
 		}
 		catch (Exception e)
@@ -158,10 +239,10 @@ public static class AppSettings
 	{
 		Font = new FontFamily(Settings.Font);
 
-		TextForeground = new SolidColorBrush(Settings.TextForeground);
-		TextBackground = new SolidColorBrush(Settings.TextBackground);
+		TextForeground = new SolidColorBrush((Color)ColorConverter.ConvertFromString(CurrentTheme.TextForeground));
+		TextBackground = new SolidColorBrush((Color)ColorConverter.ConvertFromString(CurrentTheme.TextBackground));
 
-		SelectionBackground = new SolidColorBrush(Settings.SelectionBackground);
+		SelectionBackground = new SolidColorBrush((Color)ColorConverter.ConvertFromString(CurrentTheme.SelectionBackground));
 	}
 
 	#endregion

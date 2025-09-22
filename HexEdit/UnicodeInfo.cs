@@ -2,6 +2,8 @@
 
 internal class UnicodeInfo
 {
+
+#pragma warning disable IDE1006 // Naming Styles
 	public object bidiMirroredGlyph { get; set; }
 	public string quickCheckNFKD { get; set; }
 	public bool idContinue { get; set; }
@@ -81,5 +83,7 @@ internal class UnicodeInfo
 	public string linebreak { get; set; }
 	public int codePoint { get; set; }
 	public bool patternSyntax { get; set; }
+#pragma warning restore IDE1006 // Naming Styles
+
 }
 
