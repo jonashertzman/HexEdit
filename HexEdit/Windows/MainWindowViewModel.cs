@@ -74,6 +74,13 @@ public class MainWindowViewModel : INotifyPropertyChanged
 	}
 
 
+	public Themes Theme
+	{
+		get { return AppSettings.Theme; }
+		set { AppSettings.Theme = value; OnPropertyChangedRepaint(null); } // Refresh all properties when changing theme
+	}
+
+
 	public string CurrentFile
 	{
 		get;

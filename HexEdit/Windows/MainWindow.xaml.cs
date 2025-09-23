@@ -657,14 +657,16 @@ public partial class MainWindow : Window
 				else if (c.UnicodeCharacter != -1)
 				{
 					UnicodeInfo info = await GetCharacterInfo(c);
-
-					ChunkTitle.Text = info.codePoint.ToString("X4");
-					ChunkInfo.Text = $"""
+					if (info != null)
+					{
+						ChunkTitle.Text = info.codePoint.ToString("X4");
+						ChunkInfo.Text = $"""
 						{info.name}
 						{info.block}
 						{info.generalCategory}
 						{info.script}
 						""";
+					}
 				}
 			}
 		}
@@ -738,9 +740,10 @@ public partial class MainWindow : Window
 		// Store existing settings data in case the changes are canceled.
 		var oldFont = ViewModel.Font;
 		var oldFontSize = ViewModel.FontSize;
-		var oldTextBackground = ViewModel.TextBackground;
-		var oldTextForeground = ViewModel.TextForeground;
-		var oldSelectionBackground = ViewModel.SelectionBackground;
+
+		var oldDarkTheme = AppSettings.DarkTheme.Clone();
+		var oldLightTheme = AppSettings.LightTheme.Clone();
+		var oldTheme = ViewModel.Theme;
 
 		OptionsWindow optionsWindow = new() { DataContext = ViewModel, Owner = this };
 		optionsWindow.ShowDialog();
@@ -755,9 +758,9 @@ public partial class MainWindow : Window
 			ViewModel.Font = oldFont;
 			ViewModel.FontSize = oldFontSize;
 
-			ViewModel.TextBackground = oldTextBackground;
-			ViewModel.TextForeground = oldTextForeground;
-			ViewModel.SelectionBackground = oldSelectionBackground;
+			AppSettings.DarkTheme = oldDarkTheme;
+			AppSettings.LightTheme = oldLightTheme;
+			ViewModel.Theme = oldTheme;
 		}
 	}
 
