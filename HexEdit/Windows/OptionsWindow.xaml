@@ -10,10 +10,10 @@
 	Height="318"
 	Padding="5"
 	d:DataContext="{d:DesignInstance Type=local:MainWindowViewModel}"
+	Background="{StaticResource Theme.Dialog}"
 	TextOptions.TextFormattingMode="Display"
 	UseLayoutRounding="True"
 	ResizeMode="CanResizeWithGrip"
-	Background="{DynamicResource {x:Static SystemColors.ControlBrushKey}}"
 	WindowStartupLocation="CenterOwner"
 	ShowInTaskbar="False"
 	mc:Ignorable="d">
@@ -39,8 +39,8 @@
 							<Grid.RowDefinitions>
 								<RowDefinition Height="Auto" />
 							</Grid.RowDefinitions>
-							<Label Grid.Column="0" Content="Font" Style="{StaticResource CommonTextLabel}" />
-							<ComboBox x:Name="ComboBoxFont" Grid.Column="1"  Text="{Binding Font, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" IsEditable="True" Style="{StaticResource CommonComboBox}" />
+							<Label Grid.Column="0" Content="Font" />
+							<ComboBox x:Name="ComboBoxFont" Grid.Column="1" Text="{Binding Font, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" IsEditable="True" Style="{StaticResource CommonComboBox}" />
 							<TextBox x:Name="TextBoxFontSize" Grid.Column="2" Text="{Binding FontSize, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource CommonTextBox}" />
 							<Button x:Name="ButtonResetFont" Grid.Column="3" Content="Default" Style="{StaticResource CommonButton}" Click="ButtonResetFont_Click" />
 						</Grid>
@@ -69,24 +69,24 @@
 							<Border Grid.Row="1" Grid.ColumnSpan="3" Padding="5" BorderThickness="1">
 								<Border.Background>
 									<LinearGradientBrush StartPoint="0,0" EndPoint="0,1">
-										<GradientStop Offset="0" Color="{Binding WindowBackground.Color, FallbackValue=White}" />
-										<GradientStop Offset="1" Color="{Binding DialogBackground.Color, FallbackValue=#FFF0F0F0}" />
+										<GradientStop Offset="0" Color="{Binding Path=(local:AppSettings.WindowBackgroundColor), FallbackValue=#FFFFFFFF}" />
+										<GradientStop Offset="1" Color="{Binding Path=(local:AppSettings.DialogBackgroundColor), FallbackValue=#FFF0F0F0}" />
 									</LinearGradientBrush>
 								</Border.Background>
 							</Border>
 
 
-							<Label Grid.Row="1" Grid.Column="0" Content="Hex Display Colors" Style="{StaticResource CommonTextLabel}" />
-							<Label Grid.Row="1" Grid.Column="1" Content="Foreground" Style="{StaticResource CommonTextLabel}" />
-							<Label Grid.Row="1" Grid.Column="2" Content="Background" Style="{StaticResource CommonTextLabel}" />
+							<Label Grid.Row="1" Grid.Column="0" Content="Hex Display Colors" />
+							<Label Grid.Row="1" Grid.Column="1" Content="Foreground" />
+							<Label Grid.Row="1" Grid.Column="2" Content="Background" />
 							<Button x:Name="ButtonResetColors" Grid.Row="1" Grid.Column="6" Content="Reset All" Style="{StaticResource CommonButton}" Click="ButtonResetColors_Click" />
 
-							<Label Grid.Row="3" Content="Text" Style="{StaticResource CommonTextLabel}" />
-							<Rectangle x:Name="FullMatchForeground" Grid.Row="3" Grid.Column="1" Margin="5" Fill="{Binding TextForeground, Mode=TwoWay}" Stroke="{StaticResource {x:Static SystemColors.ActiveBorderBrushKey}}" MouseLeftButtonUp="Rectangle_MouseUp" />
-							<Rectangle x:Name="FullMatchBackground" Grid.Row="3" Grid.Column="2" Margin="5" Fill="{Binding TextBackground, Mode=TwoWay}" Stroke="{StaticResource {x:Static SystemColors.ActiveBorderBrushKey}}" MouseLeftButtonUp="Rectangle_MouseUp" />
+							<Label Grid.Row="3" Content="Text" />
+							<Rectangle x:Name="FullMatchForeground" Grid.Row="3" Grid.Column="1" Margin="5" Fill="{Binding TextForeground, Mode=TwoWay}" MouseLeftButtonUp="Rectangle_MouseUp" />
+							<Rectangle x:Name="FullMatchBackground" Grid.Row="3" Grid.Column="2" Margin="5" Fill="{Binding TextBackground, Mode=TwoWay}" MouseLeftButtonUp="Rectangle_MouseUp" />
 
-							<Label Grid.Row="4" Content="Selection" Style="{StaticResource CommonTextLabel}" />
-							<Rectangle x:Name="SelectionBackground" Grid.Row="4" Grid.Column="2" Margin="5" Fill="{Binding SelectionBackground, Mode=TwoWay}" Stroke="{StaticResource {x:Static SystemColors.ActiveBorderBrushKey}}" MouseLeftButtonUp="Rectangle_MouseUp" />
+							<Label Grid.Row="4" Content="Selection" />
+							<Rectangle x:Name="SelectionBackground" Grid.Row="4" Grid.Column="2" Margin="5" Fill="{Binding SelectionBackground, Mode=TwoWay}" MouseLeftButtonUp="Rectangle_MouseUp" />
 
 							<Popup Name="ColorChooser" Placement="MousePoint" StaysOpen="False" AllowsTransparency="True">
 								<Grid RenderOptions.ClearTypeHint="Enabled">

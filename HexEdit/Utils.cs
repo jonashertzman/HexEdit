@@ -1,4 +1,5 @@
 ﻿using System.Windows;
+using System.Windows.Media;
 
 namespace HexEdit;
 
@@ -26,6 +27,18 @@ internal static class Utils
 	public static bool NotIn<T>(this T item, params T[] list)
 	{
 		return !list.Contains(item);
+	}
+
+	public static SolidColorBrush ToBrush(this string colorString)
+	{
+		try
+		{
+			return new BrushConverter().ConvertFrom(colorString) as SolidColorBrush;
+		}
+		catch (Exception)
+		{
+			return null;
+		}
 	}
 
 	#endregion

@@ -44,6 +44,12 @@ public class MainWindowViewModel : INotifyPropertyChanged
 		get { return $"{Title} {Version} (Build {BuildNumber})"; }
 	}
 
+	public bool NewBuildAvailable
+	{
+		get;
+		set { field = value; OnPropertyChanged(nameof(NewBuildAvailable)); }
+	} = false;
+
 
 	public FontFamily Font
 	{
@@ -80,6 +86,10 @@ public class MainWindowViewModel : INotifyPropertyChanged
 		set { AppSettings.Theme = value; OnPropertyChangedRepaint(null); } // Refresh all properties when changing theme
 	}
 
+	public bool LightTheme
+	{
+		get { return Theme == Themes.Light; }
+	}
 
 	public string CurrentFile
 	{

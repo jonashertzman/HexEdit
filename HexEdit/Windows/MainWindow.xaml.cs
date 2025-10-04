@@ -582,6 +582,34 @@ public partial class MainWindow : Window
 		return true;
 	}
 
+	private async Task<UnicodeInfo> GetCharacterInfo(Chunk c)
+	{
+		if (characterInfo.TryGetValue(c.UnicodeCharacter, out UnicodeInfo info))
+		{
+			return info;
+		}
+		else
+		{
+			Debug.WriteLine($"Fetching unicode info for character {c.UnicodeCharacter}");
+
+			info = null;
+			HttpResponseMessage response = await client.GetAsync($"https://ucdapi.org/unicode/10.0.0/codepoint/dec/{c.UnicodeCharacter}");
+			if (response.IsSuccessStatusCode)
+			{
+				info = await response.Content.ReadAsAsync<UnicodeInfo>();
+				characterInfo[c.UnicodeCharacter] = info;
+
+				_ = Task.Run(() =>
+				{
+					Directory.CreateDirectory(AppSettings.CodePointDirectory);
+					File.WriteAllText(Path.Combine(AppSettings.CodePointDirectory, $"{c.UnicodeCharacter}.json"), JsonSerializer.Serialize(info));
+				});
+			}
+
+			return info;
+		}
+	}
+
 	#endregion
 
 	#region Events
@@ -672,32 +700,14 @@ public partial class MainWindow : Window
 		}
 	}
 
-	private async Task<UnicodeInfo> GetCharacterInfo(Chunk c)
+	private void LightMode_Click(object sender, RoutedEventArgs e)
 	{
-		if (characterInfo.TryGetValue(c.UnicodeCharacter, out UnicodeInfo info))
-		{
-			return info;
-		}
-		else
-		{
-			Debug.WriteLine($"Fetching unicode info for character {c.UnicodeCharacter}");
+		ViewModel.Theme = Themes.Light;
+	}
 
-			info = null;
-			HttpResponseMessage response = await client.GetAsync($"https://ucdapi.org/unicode/10.0.0/codepoint/dec/{c.UnicodeCharacter}");
-			if (response.IsSuccessStatusCode)
-			{
-				info = await response.Content.ReadAsAsync<UnicodeInfo>();
-				characterInfo[c.UnicodeCharacter] = info;
-
-				_ = Task.Run(() =>
-				{
-					Directory.CreateDirectory(AppSettings.CodePointDirectory);
-					File.WriteAllText(Path.Combine(AppSettings.CodePointDirectory, $"{c.UnicodeCharacter}.json"), JsonSerializer.Serialize(info));
-				});
-			}
-
-			return info;
-		}
+	private void DarkMode_Click(object sender, RoutedEventArgs e)
+	{
+		ViewModel.Theme = Themes.Dark;
 	}
 
 	#region Commands

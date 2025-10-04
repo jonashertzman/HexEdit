@@ -77,7 +77,7 @@ public class PreviewControl : Control
 		int maxOffset = Bytes.Count.ToString("X2").Length;
 		double rowOffsetWidth = maxOffset * characterWidth;
 
-		Pen borderPen = new(SystemColors.ScrollBarBrush, RoundToWholePixels(1));
+		Pen borderPen = new(AppSettings.BorderForeground, RoundToWholePixels(1));
 		borderPen.Freeze();
 		GuidelineSet borderGuide = CreateGuidelineSet(borderPen);
 
@@ -108,7 +108,7 @@ public class PreviewControl : Control
 		byteWidth = RoundToWholePixels(hexWidth) * 2 + chunkPen.Thickness * 2 + textMargin * 2;
 
 		// Draw offset background
-		drawingContext.DrawRectangle(SystemColors.ControlBrush, null, new Rect(-0, 0, offsetMargin, this.ActualHeight));
+		drawingContext.DrawRectangle(AppSettings.DialogBackground, null, new Rect(-0, 0, offsetMargin, this.ActualHeight));
 
 		for (int i = 0; i < VisibleLines; i++)
 		{
@@ -140,7 +140,7 @@ public class PreviewControl : Control
 							drawingContext.PushTransform(new TranslateTransform(j * byteWidth, 0));
 							{
 								if ((j + i) % 2 == 0)
-									drawingContext.DrawRectangle(Brushes.LightGray, null, new Rect(0, 0, byteWidth, lineHeight));
+									drawingContext.DrawRectangle(AppSettings.DisabledBackground, null, new Rect(0, 0, byteWidth, lineHeight));
 
 								drawingContext.PushTransform(new TranslateTransform(chunkPen.Thickness + textMargin, chunkPen.Thickness));
 								{

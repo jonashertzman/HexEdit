@@ -15,7 +15,13 @@
 	Closed="Window_Closed"
 	ContentRendered="Window_ContentRendered"
 	Initialized="Window_Initialized"
+	Background="{StaticResource Theme.Dialog}"
 	mc:Ignorable="d">
+
+	<Window.Resources>
+		<BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" />
+		<local:InverseBooleanToVisibilityConverter x:Key="InverseBooleanToVisibilityConverter" />
+	</Window.Resources>
 
 	<Grid AllowDrop="True" PreviewDragOver="Grid_PreviewDragOver" PreviewDrop="Grid_PreviewDrop">
 		<Grid.CommandBindings>
@@ -39,13 +45,14 @@
 
 
 		<!--  Menu  -->
-		<Border Grid.Row="0" BorderThickness="0,0,0,1" BorderBrush="{StaticResource {x:Static SystemColors.ScrollBarBrushKey}}">
+		<Border Grid.Row="0" BorderThickness="0,0,0,1" Background="{StaticResource Theme.Window}">
 			<Grid x:Name="GridMenu">
 				<Grid.ColumnDefinitions>
 					<ColumnDefinition Width="Auto" />
-					<ColumnDefinition />
+					<ColumnDefinition Width="*" />
+					<ColumnDefinition Width="Auto" />
 				</Grid.ColumnDefinitions>
-				<Menu Grid.Row="0" Margin="2" VerticalAlignment="Center" Background="{StaticResource {x:Static SystemColors.WindowBrushKey}}">
+				<Menu Grid.Row="0" Margin="2" VerticalAlignment="Center">
 					<MenuItem Header="File">
 						<MenuItem Header="New" Command="local:Commands.New" />
 						<MenuItem Header="Open" Command="local:Commands.Open" />
@@ -64,6 +71,44 @@
 						<MenuItem Header="About" Command="local:Commands.About" />
 					</MenuItem>
 				</Menu>
+
+				<!--  Dark Mode / Update Panel  -->
+				<Border Grid.Column="4" BorderThickness="0,0,0,1">
+					<Grid>
+						<Grid.ColumnDefinitions>
+							<ColumnDefinition Width="Auto" />
+							<ColumnDefinition Width="Auto" />
+						</Grid.ColumnDefinitions>
+						<StackPanel x:Name="UpdatePanel" Grid.Column="0" VerticalAlignment="Center" Visibility="{Binding Path=NewBuildAvailable, Converter={StaticResource BooleanToVisibilityConverter}}">
+							<!--<Label Margin="3,3,5,3" Padding="0">
+								<Hyperlink RequestNavigate="Hyperlink_OpenHomepage" NavigateUri="https://github.com/jonashertzman/FileSearch3/blob/master/README.md">New Version Available</Hyperlink>
+							</Label>-->
+						</StackPanel>
+						<StackPanel Grid.Column="1" Orientation="Horizontal">
+							<Button Margin="0" Style="{StaticResource ToolbarButton}" Visibility="{Binding Path=LightTheme, Converter={StaticResource InverseBooleanToVisibilityConverter}}" Click="LightMode_Click">
+								<StackPanel Orientation="Horizontal">
+									<ContentPresenter Margin="0" ContentTemplate="{StaticResource LightModeIcon}" Style="{StaticResource CommonButtonIcon}" />
+								</StackPanel>
+								<Button.ToolTip>
+									<ToolTip DataContext="{Binding Path=PlacementTarget, RelativeSource={x:Static RelativeSource.Self}}">
+										<TextBlock Text="Switch To Light Mode" />
+									</ToolTip>
+								</Button.ToolTip>
+							</Button>
+
+							<Button Margin="0" Style="{StaticResource ToolbarButton}" Visibility="{Binding Path=LightTheme, Converter={StaticResource BooleanToVisibilityConverter}}" Click="DarkMode_Click">
+								<StackPanel Orientation="Horizontal">
+									<ContentPresenter Margin="0" ContentTemplate="{StaticResource DarkModeIcon}" Style="{StaticResource CommonButtonIcon}" />
+								</StackPanel>
+								<Button.ToolTip>
+									<ToolTip DataContext="{Binding Path=PlacementTarget, RelativeSource={x:Static RelativeSource.Self}}">
+										<TextBlock Text="Switch To Dark Mode" />
+									</ToolTip>
+								</Button.ToolTip>
+							</Button>
+						</StackPanel>
+					</Grid>
+				</Border>
 			</Grid>
 		</Border>
 
@@ -71,8 +116,8 @@
 		<WrapPanel x:Name="ToolbarMain" Grid.Row="1" Orientation="Horizontal">
 			<WrapPanel.Background>
 				<LinearGradientBrush StartPoint="0,0" EndPoint="0,1">
-					<GradientStop Offset="0" Color="{StaticResource {x:Static SystemColors.WindowColorKey}}" />
-					<GradientStop Offset="1" Color="{StaticResource {x:Static SystemColors.ControlColorKey}}" />
+					<GradientStop Offset="0" Color="{Binding Path=(local:AppSettings.WindowBackgroundColor), FallbackValue=#FFFFFFFF}" />
+					<GradientStop Offset="1" Color="{Binding Path=(local:AppSettings.DialogBackgroundColor), FallbackValue=#FFF0F0F0}" />
 				</LinearGradientBrush>
 			</WrapPanel.Background>
 
@@ -121,7 +166,7 @@
 				</Button>
 
 				<StackPanel Margin="2" Orientation="Horizontal">
-					<TextBlock Margin="2" VerticalAlignment="Center" Text="Row Width" />
+					<TextBlock Margin="2" VerticalAlignment="Center" Style="{StaticResource StyledTextBlock}" Text="Row Width" />
 					<ComboBox Width="50" Margin="2,0,4,0" VerticalAlignment="Center" Text="{Binding BytesPerRowValue}">
 						<ComboBoxItem Content="4" />
 						<ComboBoxItem Content="8" />
@@ -133,7 +178,7 @@
 
 
 				<StackPanel Margin="2" Orientation="Horizontal">
-					<TextBlock Margin="2" VerticalAlignment="Center" Text="Preview Mode" />
+					<TextBlock Margin="2" VerticalAlignment="Center" Style="{StaticResource StyledTextBlock}" Text="Preview Mode" />
 					<ComboBox Name="PreviewModeCombobox" Width="90" Margin="2,0,4,0" VerticalAlignment="Center" SelectedIndex="{Binding SelectedPreview}" SelectionChanged="PreviewModeComboBox_SelectionChanged" />
 				</StackPanel>
 			</StackPanel>
@@ -141,14 +186,14 @@
 
 		</WrapPanel>
 
-		<Grid Grid.Row="2" Background="{StaticResource {x:Static SystemColors.ControlBrushKey}}">
+		<Grid Grid.Row="2" Background="{StaticResource Theme.Window}">
 			<Grid.ColumnDefinitions>
 				<ColumnDefinition />
 				<ColumnDefinition Width="Auto" />
 				<ColumnDefinition Width="200" />
 			</Grid.ColumnDefinitions>
 
-			<Border Grid.Column="0" Background="White" BorderThickness="0,1,1,1" BorderBrush="{StaticResource {x:Static SystemColors.ScrollBarBrushKey}}">
+			<Border Grid.Column="0" BorderThickness="0,1,1,1">
 				<!--  Preview Control  -->
 				<Grid Grid.Row="1">
 					<Grid.RowDefinitions>
@@ -161,16 +206,16 @@
 						<ColumnDefinition Width="Auto" />
 					</Grid.ColumnDefinitions>
 
-					<local:PreviewControl x:Name="Preview" Grid.Row="0" Bytes="{Binding FileContent}" SelectionChanged="Preview_SelectionChanged" Chunks="{Binding Chunks}" UpdateTrigger="{Binding UpdateTrigger, Mode=TwoWay}" FontFamily="{Binding Font}" FontSize="{Binding ZoomedFontSize}" VerticalOffset="{Binding ElementName=VerticalScrollbar, Path=Value, Mode=TwoWay}" HorizontalOffset="{Binding Value, ElementName=HorizontalScrollbar, Mode=TwoWay}" MouseWheel="Preview_MouseWheel" FocusVisualStyle="{x:Null}" />
+					<local:PreviewControl x:Name="Preview" Grid.Row="0" Background="{StaticResource Theme.Window}" Bytes="{Binding FileContent}" SelectionChanged="Preview_SelectionChanged" Chunks="{Binding Chunks}" UpdateTrigger="{Binding UpdateTrigger, Mode=TwoWay}" FontFamily="{Binding Font}" FontSize="{Binding ZoomedFontSize}" VerticalOffset="{Binding ElementName=VerticalScrollbar, Path=Value, Mode=TwoWay}" HorizontalOffset="{Binding Value, ElementName=HorizontalScrollbar, Mode=TwoWay}" MouseWheel="Preview_MouseWheel" FocusVisualStyle="{x:Null}" />
 					<ScrollBar Name="VerticalScrollbar" Grid.Column="2" SmallChange="1" LargeChange="{Binding Path=VisibleLines, ElementName=Preview}" ViewportSize="{Binding ElementName=Preview, Path=VisibleLines, Mode=TwoWay}" Maximum="{Binding ElementName=Preview, Path=MaxVerticalScroll}" />
 					<ScrollBar x:Name="HorizontalScrollbar" Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2" Orientation="Horizontal" Maximum="{Binding ElementName=Preview, Path=MaxHorizontalScroll}" ViewportSize="{Binding ElementName=Preview, Path=TextAreaWidth}" SmallChange="10" LargeChange="{Binding ElementName=Preview, Path=TextAreaWidth}" />
-					<StackPanel Grid.Row="1" Grid.Column="2" Grid.ColumnSpan="1" Background="{StaticResource {x:Static SystemColors.ControlBrushKey}}" />
+					<StackPanel Grid.Row="1" Grid.Column="2" Grid.ColumnSpan="1" Background="{StaticResource Theme.Dialog}" />
 				</Grid>
 			</Border>
 
-			<GridSplitter Grid.Column="1" Width="4" HorizontalAlignment="Center" Focusable="False" />
+			<GridSplitter Grid.Column="1" Width="4" HorizontalAlignment="Center" Style="{StaticResource CommonGridSpliter}" Focusable="False" />
 
-			<Border Grid.Column="2" Background="White" BorderThickness="1,1,0,1" BorderBrush="{StaticResource {x:Static SystemColors.ScrollBarBrushKey}}">
+			<Border Grid.Column="2" BorderThickness="1,1,0,1">
 				<StackPanel>
 					<TextBox Name="ChunkTitle" BorderThickness="0,0,0,1" FontSize="14" FontWeight="Bold" />
 					<TextBox Name="ChunkInfo" AcceptsReturn="True" BorderThickness="0" />
@@ -179,12 +224,12 @@
 		</Grid>
 
 		<!--  Status Bar  -->
-		<Grid Grid.Row="3" Background="{StaticResource {x:Static SystemColors.ControlBrushKey}}">
+		<Grid Grid.Row="3" Background="{StaticResource Theme.Dialog}">
 			<Grid.ColumnDefinitions>
 				<ColumnDefinition Width="*" />
 				<ColumnDefinition Width="auto" />
 			</Grid.ColumnDefinitions>
-			<TextBlock x:Name="Statusbar" Grid.Column="0" Margin="2" Text="Status" />
+			<TextBlock x:Name="Statusbar" Grid.Column="0" Margin="2" Style="{StaticResource StyledTextBlock}" Text="Status" />
 		</Grid>
 
 	</Grid>

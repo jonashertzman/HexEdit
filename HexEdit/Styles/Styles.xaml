@@ -3,27 +3,35 @@
 	xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
 	xmlns:local="clr-namespace:HexEdit">
 
-	<Style x:Key="CommonTextLabel" TargetType="Label">
+	<local:RoutedCommandToInputGestureTextConverter x:Key="RoutedCommandToInputGestureTextConverter" />
+	<local:StringNullOrEmptyToVisibilityConverter x:Key="StringNullOrEmptyToVisibilityConverter" />
+
+	<ToolTip x:Key="TooltipPanel" DataContext="{Binding Path=PlacementTarget, RelativeSource={x:Static RelativeSource.Self}}">
+		<StackPanel Orientation="Horizontal">
+			<TextBlock Text="{Binding Path=Command.Text}" />
+			<TextBlock Margin="10,0,0,0" Visibility="{Binding Path=Text, RelativeSource={RelativeSource Self}, Converter={local:StringNullOrEmptyToVisibilityConverter}}" Text="{Binding Path=Command, Converter={StaticResource RoutedCommandToInputGestureTextConverter}}" />
+		</StackPanel>
+	</ToolTip>
+
+	<Style TargetType="Label">
 		<Setter Property="VerticalAlignment" Value="Center" />
 		<Setter Property="Padding" Value="2" />
 		<Setter Property="Margin" Value="5" />
+		<Setter Property="Foreground" Value="{StaticResource Theme.NormalText}" />
 	</Style>
 
-	<Style x:Key="CondencedTextLabel" TargetType="Label">
+	<Style x:Key="CondencedTextLabel" TargetType="Label" BasedOn="{StaticResource {x:Type Label}}">
 		<Setter Property="VerticalAlignment" Value="Center" />
 		<Setter Property="Padding" Value="2" />
 		<Setter Property="Margin" Value="5,0" />
 	</Style>
 
-	<Style x:Key="CommonTextBox" TargetType="TextBox">
-		<Setter Property="VerticalAlignment" Value="Center" />
-		<Setter Property="Padding" Value="2" />
-		<Setter Property="Margin" Value="5" />
+	<Style x:Key="StyledTextBlock" TargetType="TextBlock" BasedOn="{StaticResource {x:Type TextBlock}}">
+		<Setter Property="Foreground" Value="{Binding Path=(local:AppSettings.WindowForeground), FallbackValue=Black}" />
 	</Style>
 
-	<Style x:Key="CommonComboBox" TargetType="ComboBox">
-		<Setter Property="VerticalAlignment" Value="Center" />
-		<Setter Property="Margin" Value="5" />
+	<Style TargetType="Rectangle">
+		<Setter Property="Stroke" Value="{Binding Path=(local:AppSettings.BorderForeground), FallbackValue=#FFD6D6D6}" />
 	</Style>
 
 	<Style x:Key="ShortcutTooltip" TargetType="TextBlock">
@@ -31,11 +39,26 @@
 		<Setter Property="Foreground" Value="Gray" />
 	</Style>
 
-	<Style x:Key="CommonButton" TargetType="Button">
+	<Style TargetType="Border">
+		<Setter Property="BorderBrush" Value="{StaticResource Theme.BorderLight}" />
+	</Style>
+
+	<Style x:Key="CommonTextBox" TargetType="TextBox" BasedOn="{StaticResource {x:Type TextBox}}">
+		<Setter Property="VerticalAlignment" Value="Center" />
 		<Setter Property="Padding" Value="3" />
 		<Setter Property="Margin" Value="5" />
+		<Setter Property="FocusVisualStyle" Value="{DynamicResource MyFocusVisual}" />
+	</Style>
+
+	<Style x:Key="CommonComboBox" TargetType="ComboBox" BasedOn="{StaticResource {x:Type ComboBox}}">
+		<Setter Property="VerticalAlignment" Value="Center" />
+		<Setter Property="Margin" Value="5" />
+	</Style>
+
+	<Style x:Key="CommonButton" TargetType="Button" BasedOn="{StaticResource {x:Type Button}}">
+		<Setter Property="Padding" Value="6,3" />
+		<Setter Property="Margin" Value="5" />
 		<Setter Property="MinWidth" Value="80" />
-		<Setter Property="BorderBrush" Value="{StaticResource {x:Static SystemColors.ControlDarkBrushKey}}" />
 	</Style>
 
 	<Style x:Key="CommonButtonIcon" TargetType="ContentPresenter">
@@ -54,7 +77,7 @@
 		<Setter Property="Padding" Value="3" />
 		<Setter Property="Focusable" Value="False" />
 		<Setter Property="BorderThickness" Value="0" />
-
+		<Setter Property="ToolTipService.ToolTip" Value="{StaticResource TooltipPanel}" />
 		<Style.Triggers>
 			<Trigger Property="IsEnabled" Value="False">
 				<Setter Property="Background" Value="Transparent" />
@@ -62,8 +85,9 @@
 		</Style.Triggers>
 	</Style>
 
-	<Style TargetType="Border">
-		<Setter Property="BorderBrush" Value="#FFCCCCCC" />
+	<Style x:Key="CommonGridSpliter" TargetType="GridSplitter">
+		<Setter Property="BorderBrush" Value="{StaticResource Theme.BorderLight}" />
+		<Setter Property="Background" Value="{StaticResource Theme.Dialog}" />
 	</Style>
 
 </ResourceDictionary>
