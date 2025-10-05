@@ -9,7 +9,7 @@ public static class DefaultSettings
 	internal static ColorTheme DarkTheme { get; } = new ColorTheme()
 	{
 		// Editor colors
-		TextBackground = "#FF000000",
+		TextBackground = "#FF1B1B1B",
 		TextForeground = "#FFFFFFFF",
 
 		SelectionBackground = "#320096D2",
