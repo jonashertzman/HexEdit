@@ -134,25 +134,6 @@ public class MainWindowViewModel : INotifyPropertyChanged
 		set { BytesPerRow = int.Parse(value); }
 	}
 
-
-	public Brush TextForeground
-	{
-		get { return AppSettings.TextForeground; }
-		set { AppSettings.TextForeground = value as SolidColorBrush; OnPropertyChangedRepaint(nameof(TextForeground)); }
-	}
-
-	public Brush TextBackground
-	{
-		get { return AppSettings.TextBackground; }
-		set { AppSettings.TextBackground = value as SolidColorBrush; OnPropertyChangedRepaint(nameof(TextBackground)); }
-	}
-
-	public Brush SelectionBackground
-	{
-		get { return AppSettings.SelectionBackground; }
-		set { AppSettings.SelectionBackground = value as SolidColorBrush; OnPropertyChangedRepaint(nameof(SelectionBackground)); }
-	}
-
 	public int UpdateTrigger
 	{
 		get;

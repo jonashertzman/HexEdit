@@ -130,36 +130,39 @@ public static class AppSettings
 
 
 	// Editor colors
-	public static SolidColorBrush TextBackground
+	public static Brush TextBackground
 	{
 		get;
 		set
 		{
 			field = value;
 			field.Freeze();
-			CurrentTheme.TextBackground = value.Color.ToString();
+			CurrentTheme.TextBackground = ((SolidColorBrush)value).Color.ToString();
+			NotifyStaticPropertyChanged(nameof(TextBackground));
 		}
 	}
 
-	public static SolidColorBrush TextForeground
+	public static Brush TextForeground
 	{
 		get;
 		set
 		{
 			field = value;
 			field.Freeze();
-			CurrentTheme.TextForeground = value.Color.ToString();
+			CurrentTheme.TextForeground = ((SolidColorBrush)value).Color.ToString();
+			NotifyStaticPropertyChanged(nameof(TextForeground));
 		}
 	}
 
-	public static SolidColorBrush SelectionBackground
+	public static Brush SelectionBackground
 	{
 		get;
 		set
 		{
 			field = value;
 			field.Freeze();
-			CurrentTheme.SelectionBackground = value.Color.ToString();
+			CurrentTheme.SelectionBackground = ((SolidColorBrush)value).Color.ToString();
+			NotifyStaticPropertyChanged(nameof(SelectionBackground));
 		}
 	}
 

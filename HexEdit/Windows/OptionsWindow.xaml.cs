@@ -29,6 +29,15 @@ public partial class OptionsWindow : Window
 
 	#endregion
 
+	#region Proprerties
+
+	MainWindowViewModel ViewModel
+	{
+		get { return DataContext as MainWindowViewModel; }
+	}
+
+	#endregion
+
 	#region Events
 
 	private void ButtonBrowseFont_Click(object sender, RoutedEventArgs e)
@@ -75,6 +84,8 @@ public partial class OptionsWindow : Window
 		FullMatchBackground.Fill = new SolidColorBrush((Color)ColorConverter.ConvertFromString(themeDefaults.TextBackground));
 
 		SelectionBackground.Fill = new SolidColorBrush((Color)ColorConverter.ConvertFromString(themeDefaults.SelectionBackground));
+
+		ViewModel.UpdateTrigger++;
 	}
 
 	private void ButtonResetFont_Click(object sender, RoutedEventArgs e)
@@ -100,6 +111,8 @@ public partial class OptionsWindow : Window
 		SliderG.Background = new LinearGradientBrush(Color.FromArgb(alpha, newColor.R, 0, newColor.B), Color.FromArgb(alpha, newColor.R, 255, newColor.B), 0);
 		SliderB.Background = new LinearGradientBrush(Color.FromArgb(alpha, newColor.R, newColor.G, 0), Color.FromArgb(alpha, newColor.R, newColor.G, 255), 0);
 		SliderA.Background = new LinearGradientBrush(Color.FromArgb(0, newColor.R, newColor.G, newColor.B), Color.FromArgb(255, newColor.R, newColor.G, newColor.B), 0);
+
+		ViewModel.UpdateTrigger++;
 	}
 
 	#endregion
