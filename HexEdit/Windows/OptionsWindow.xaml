@@ -89,8 +89,8 @@
 									<Border Grid.Row="1" Grid.ColumnSpan="3" Padding="5" BorderThickness="1">
 										<Border.Background>
 											<LinearGradientBrush StartPoint="0,0" EndPoint="0,1">
-												<GradientStop Offset="0" Color="{Binding Path=(local:AppSettings.DialogBackgroundColor), FallbackValue=#FFF0F0F0}" />
-												<GradientStop Offset="1" Color="{Binding Path=(local:AppSettings.WindowBackgroundColor), FallbackValue=#FFFFFFFF}" />
+												<GradientStop Offset="0" Color="{Binding Path=(local:AppSettings.WindowBackgroundColor), FallbackValue=#FFFFFFFF}" />
+												<GradientStop Offset="1" Color="{Binding Path=(local:AppSettings.DialogBackgroundColor), FallbackValue=#FFF0F0F0}" />
 											</LinearGradientBrush>
 										</Border.Background>
 									</Border>
@@ -112,8 +112,8 @@
 									<!--<Border Grid.Row="6" Grid.ColumnSpan="3" Padding="5" BorderThickness="1">
 										<Border.Background>
 											<LinearGradientBrush StartPoint="0,0" EndPoint="0,1">
-												<GradientStop Offset="0" Color="{Binding Path=(local:AppSettings.DialogBackgroundColor), FallbackValue=#FFF0F0F0}" />
-												<GradientStop Offset="1" Color="{Binding Path=(local:AppSettings.WindowBackgroundColor), FallbackValue=#FFFFFFFF}" />
+												<GradientStop Offset="0" Color="{Binding Path=(local:AppSettings.WindowBackgroundColor), FallbackValue=#FFFFFFFF}" />
+												<GradientStop Offset="1" Color="{Binding Path=(local:AppSettings.DialogBackgroundColor), FallbackValue=#FFF0F0F0}" />
 											</LinearGradientBrush>
 										</Border.Background>
 									</Border>
@@ -182,16 +182,16 @@
 													<TextBox Name="ColorHex" Grid.ColumnSpan="2" Text="#FFAA2288" IsReadOnly="True" Style="{StaticResource CommonTextBox}" Foreground="{StaticResource {x:Static SystemColors.ControlDarkDarkBrushKey}}" />
 
 													<Label Grid.Row="1" Content="R" />
-													<Slider Name="SliderR" Grid.Row="1" Grid.Column="1" Margin="5" Maximum="255" SmallChange="1" LargeChange="10" ValueChanged="Slider_ValueChanged" />
+													<Slider Name="SliderR" Grid.Row="1" Grid.Column="1" Margin="5" VerticalAlignment="Center" Maximum="255" SmallChange="1" LargeChange="10" ValueChanged="Slider_ValueChanged" />
 
 													<Label Grid.Row="2" Content="G" />
-													<Slider Name="SliderG" Grid.Row="2" Grid.Column="1" Margin="5" Maximum="255" SmallChange="1" LargeChange="10" ValueChanged="Slider_ValueChanged" />
+													<Slider Name="SliderG" Grid.Row="2" Grid.Column="1" Margin="5" VerticalAlignment="Center" Maximum="255" SmallChange="1" LargeChange="10" ValueChanged="Slider_ValueChanged" />
 
 													<Label Grid.Row="3" Content="B" />
-													<Slider Name="SliderB" Grid.Row="3" Grid.Column="1" Margin="5" Maximum="255" SmallChange="1" LargeChange="10" ValueChanged="Slider_ValueChanged" />
+													<Slider Name="SliderB" Grid.Row="3" Grid.Column="1" Margin="5" VerticalAlignment="Center" Maximum="255" SmallChange="1" LargeChange="10" ValueChanged="Slider_ValueChanged" />
 
 													<Label Name="LabelA" Grid.Row="4" Content="A" />
-													<Slider Name="SliderA" Grid.Row="4" Grid.Column="1" Margin="5" Maximum="255" SmallChange="1" LargeChange="10" ValueChanged="Slider_ValueChanged" />
+													<Slider Name="SliderA" Grid.Row="4" Grid.Column="1" Margin="5" VerticalAlignment="Center" Maximum="255" SmallChange="1" LargeChange="10" ValueChanged="Slider_ValueChanged" />
 
 												</Grid>
 											</Border>
