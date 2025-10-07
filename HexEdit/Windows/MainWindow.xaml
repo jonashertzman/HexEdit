@@ -73,7 +73,7 @@
 				</Menu>
 
 				<!--  Dark Mode / Update Panel  -->
-				<Border Grid.Column="4" BorderThickness="0,0,0,1">
+				<Border Grid.Column="4">
 					<Grid>
 						<Grid.ColumnDefinitions>
 							<ColumnDefinition Width="Auto" />
@@ -176,14 +176,14 @@
 					</ComboBox>
 				</StackPanel>
 
-
 				<StackPanel Margin="2" Orientation="Horizontal">
 					<TextBlock Margin="2" VerticalAlignment="Center" Style="{StaticResource StyledTextBlock}" Text="Preview Mode" />
 					<ComboBox Name="PreviewModeCombobox" Width="90" Margin="2,0,4,0" VerticalAlignment="Center" SelectedIndex="{Binding SelectedPreview}" SelectionChanged="PreviewModeComboBox_SelectionChanged" />
 				</StackPanel>
+
+				<!--<Slider Grid.Column="1" Width="100" Margin="3" VerticalAlignment="Center" Maximum="30" Value="10" />-->
+
 			</StackPanel>
-
-
 		</WrapPanel>
 
 		<Grid Grid.Row="2" Background="{StaticResource Theme.Window}">

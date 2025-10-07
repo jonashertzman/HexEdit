@@ -18,6 +18,7 @@
 				<ResourceDictionary Source="Templates\MenuItemTemplate.xaml" />
 				<ResourceDictionary Source="Templates\MenuTemplate.xaml" />
 				<ResourceDictionary Source="Templates\ScrollbarTemplate.xaml" />
+				<ResourceDictionary Source="Templates\SliderTemplate.xaml" />
 				<ResourceDictionary Source="Templates\TabControlTemplate.xaml" />
 				<ResourceDictionary Source="Templates\ToolbarSeparatorTemplate.xaml" />
 				<ResourceDictionary Source="Templates\TreeViewTemplate.xaml" />
