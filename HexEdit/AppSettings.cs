@@ -168,21 +168,21 @@ public static class AppSettings
 
 
 	// UI colors
-	public static SolidColorBrush WindowForeground
+	public static Brush WindowForeground
 	{
 		get;
 		set
 		{
 			field = value;
 			field.Freeze();
-			CurrentTheme.NormalText = value.Color.ToString();
+			CurrentTheme.NormalText = ((SolidColorBrush)value).Color.ToString();
 			NotifyStaticPropertyChanged(nameof(WindowForeground));
 			NotifyStaticPropertyChanged(nameof(WindowForegroundColor));
 		}
 	} = DefaultSettings.LightTheme.NormalText.ToBrush();
 	public static Color WindowForegroundColor
 	{
-		get { return WindowForeground.Color; }
+		get { return ((SolidColorBrush)WindowForeground).Color; }
 	}
 
 	public static SolidColorBrush DisabledForeground
