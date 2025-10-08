@@ -73,17 +73,7 @@ public partial class OptionsWindow : Window
 
 	private void ButtonResetColors_Click(object sender, RoutedEventArgs e)
 	{
-		ColorTheme themeDefaults = AppSettings.Theme switch
-		{
-			Themes.Light => DefaultSettings.LightTheme,
-			Themes.Dark => DefaultSettings.DarkTheme,
-			_ => throw new NotImplementedException(),
-		};
-
-		FullMatchForeground.Fill = new SolidColorBrush((Color)ColorConverter.ConvertFromString(themeDefaults.TextForeground));
-		FullMatchBackground.Fill = new SolidColorBrush((Color)ColorConverter.ConvertFromString(themeDefaults.TextBackground));
-
-		SelectionBackground.Fill = new SolidColorBrush((Color)ColorConverter.ConvertFromString(themeDefaults.SelectionBackground));
+		AppSettings.ResetCurrentTheme();
 
 		ViewModel.UpdateTrigger++;
 	}
