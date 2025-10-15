@@ -605,6 +605,10 @@ public partial class MainWindow : Window
 					File.WriteAllText(Path.Combine(AppSettings.CodePointDirectory, $"{c.UnicodeCharacter}.json"), JsonSerializer.Serialize(info));
 				});
 			}
+			else
+			{
+				Debug.WriteLine($"Error fetching unicode info for code point {c.UnicodeCharacter}\n{response.StatusCode}");
+			}
 
 			return info;
 		}
