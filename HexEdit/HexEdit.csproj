@@ -9,6 +9,10 @@
 		<ApplicationIcon>Resources\Icon.ico</ApplicationIcon>
 	</PropertyGroup>
 
+	<Target Name="PostPublish" AfterTargets="Publish">
+		<Exec Command="..\UpdateVersion\bin\Release\net10.0\UpdateVersion" />
+	</Target>
+	
 	<ItemGroup>
 	  <Content Include="Resources\Icon.ico" />
 	</ItemGroup>
