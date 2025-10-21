@@ -29,9 +29,9 @@
 				<StackPanel Orientation="Horizontal">
 					<Label Margin="5,5,0,5" Padding="2,2,0,2" Content="Build Number:  " Style="{StaticResource CondencedTextLabel}" />
 					<Label Margin="0,5,5,5" Padding="0,2,2,2" Content="{Binding BuildNumber, FallbackValue='12345'}" Style="{StaticResource CondencedTextLabel}" />
-					<!--<Label Name="NewVersionLabel" Style="{StaticResource CondencedTextLabel}" Visibility="{Binding NewBuildAvailable, Converter={StaticResource BooleanToVisibilityConverter}}">
-					<Hyperlink RequestNavigate="Hyperlink_RequestNavigate" NavigateUri="https://github.com/jonashertzman/HexEdit/blob/master/README.md">New Version Available</Hyperlink>
-				</Label>-->
+					<Label Name="NewVersionLabel" Style="{StaticResource CondencedTextLabel}" Visibility="{Binding NewBuildAvailable, Converter={StaticResource BooleanToVisibilityConverter}}">
+						<Hyperlink RequestNavigate="Hyperlink_RequestNavigate" NavigateUri="https://github.com/jonashertzman/HexEdit/blob/master/README.md">New Version Available</Hyperlink>
+					</Label>
 				</StackPanel>
 				<Label Content="Author:  Jonas Hertzman" Style="{StaticResource CondencedTextLabel}" />
 				<Label Content="License:  GNU General Public License v3" />

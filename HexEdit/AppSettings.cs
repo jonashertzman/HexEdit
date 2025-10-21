@@ -28,6 +28,18 @@ public static class AppSettings
 		get { return Settings.Id; }
 	}
 
+	public static DateTime LastUpdateTime
+	{
+		get { return Settings.LastUpdateTime; }
+		set { Settings.LastUpdateTime = value; }
+	}
+
+	public static bool CheckForUpdates
+	{
+		get { return Settings.CheckForUpdates; }
+		set { Settings.CheckForUpdates = value; }
+	}
+
 	public static double PositionLeft
 	{
 		get { return Settings.PositionLeft; }
@@ -476,7 +488,7 @@ public static class AppSettings
 		AttentionBackground = new SolidColorBrush((Color)ColorConverter.ConvertFromString(CurrentTheme.AttentionBackground));
 	}
 
-	public static  void ResetCurrentTheme()
+	public static void ResetCurrentTheme()
 	{
 		ColorTheme themeDefaults = Theme switch
 		{

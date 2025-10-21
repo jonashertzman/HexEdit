@@ -7,6 +7,10 @@ public class SettingsData
 
 	public string Id { get; set; } = Guid.NewGuid().ToString();
 
+	public DateTime LastUpdateTime { get; set; } = DateTime.MinValue;
+
+	public bool CheckForUpdates { get; set; } = true;
+
 	public string Font { get; set; } = DefaultSettings.Font;
 	public int FontSize { get; set; } = DefaultSettings.FontSize;
 	public int Zoom { get; set; } = 0;

@@ -614,6 +614,29 @@ public partial class MainWindow : Window
 		}
 	}
 
+	private async void CheckForNewVersion(bool forced = false)
+	{
+		if (AppSettings.CheckForUpdates && AppSettings.LastUpdateTime < DateTime.Now.AddDays(-5) || forced)
+		{
+			try
+			{
+				Debug.Print("Checking for new version...");
+
+				HttpClient httpClient = new();
+				string result = await httpClient.GetStringAsync("https://jonashertzman.github.io/HexEdit/download/version.txt");
+
+				Debug.Print($"Latest version found: {result}");
+				ViewModel.NewBuildAvailable = int.Parse(result) > int.Parse(ViewModel.BuildNumber);
+			}
+			catch (Exception exception)
+			{
+				Debug.Print($"Version check failed: {exception.Message}");
+			}
+
+			AppSettings.LastUpdateTime = DateTime.Now;
+		}
+	}
+
 	#endregion
 
 	#region Events
@@ -621,6 +644,8 @@ public partial class MainWindow : Window
 	private void Window_Initialized(object sender, EventArgs e)
 	{
 		LoadSettings();
+
+		CheckForNewVersion();
 	}
 
 	private void Window_Closed(object sender, EventArgs e)
@@ -786,6 +811,8 @@ public partial class MainWindow : Window
 
 	private void CommandAbout_Executed(object sender, ExecutedRoutedEventArgs e)
 	{
+		CheckForNewVersion(true);
+
 		AboutWindow aboutWindow = new() { Owner = this, DataContext = ViewModel };
 		aboutWindow.ShowDialog();
 	}
