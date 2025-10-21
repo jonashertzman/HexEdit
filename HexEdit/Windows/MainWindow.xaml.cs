@@ -33,7 +33,7 @@ public partial class MainWindow : Window
 	{
 		InitializeComponent();
 
-		PreviewModeCombobox.ItemsSource = Enum.GetValues(typeof(Encoding));
+		PreviewModeCombobox.ItemsSource = Enum.GetValues<Encoding>();
 
 		DataContext = ViewModel;
 	}
@@ -835,4 +835,5 @@ public partial class MainWindow : Window
 	#endregion
 
 	#endregion
+
 }
