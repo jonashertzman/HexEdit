@@ -714,6 +714,12 @@ public partial class MainWindow : Window
 		ViewModel.Theme = Themes.Dark;
 	}
 
+	private void Hyperlink_OpenHomepage(object sender, System.Windows.Navigation.RequestNavigateEventArgs e)
+	{
+		Process.Start(new ProcessStartInfo(e.Uri.ToString()) { UseShellExecute = true });
+		e.Handled = true;
+	}
+
 	#region Commands
 
 	private void CommandNew_Executed(object sender, ExecutedRoutedEventArgs e)
@@ -802,5 +808,4 @@ public partial class MainWindow : Window
 	#endregion
 
 	#endregion
-
 }
