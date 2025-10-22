@@ -53,7 +53,14 @@ public partial class ExceptionWindow : Window
 		this.Close();
 	}
 
-	private async void ReportButton_Click(object sender, RoutedEventArgs e)
+	private void ReportButton_Click(object sender, RoutedEventArgs e)
+	{
+		_ = Task.Run(() => PostCrashReport());
+
+		this.Close();
+	}
+
+	private async void PostCrashReport()
 	{
 		try
 		{
@@ -61,7 +68,7 @@ public partial class ExceptionWindow : Window
 
 			CrashReportRequest cr = new()
 			{
-				ApplicationName = "FileDiff",
+				ApplicationName = "HexEdit",
 				BuildNumber = AppSettings.BuildNumber,
 				ClientId = AppSettings.Id,
 				ExceptionType = this.ExceptionType,
@@ -81,8 +88,6 @@ public partial class ExceptionWindow : Window
 
 			Log.LogUnhandledException(ex, ex.Source, true);
 		}
-
-		this.Close();
 	}
 
 	private void OpenLogFileButton_Click(object sender, RoutedEventArgs e)
