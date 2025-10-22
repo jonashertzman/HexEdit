@@ -8,23 +8,26 @@ internal static class Log
 
 	public static Window OwnerWindow { get; set; }
 
-	public static void LogUnhandledException(Exception exception, string source)
+	public static void LogUnhandledException(Exception exception, string source, bool silent = false)
 	{
 		string errorText = $"{DateTime.UtcNow} - {source}\nException:  {exception.GetType().Name}\nMessage:    {exception.Message}\n{exception.StackTrace}\n\n";
 
 		Directory.CreateDirectory(Path.GetDirectoryName(AppSettings.LogPath));
 		File.AppendAllText(AppSettings.LogPath, errorText);
 
-		//ExceptionWindow exceptionWindow = new()
-		//{
-		//	Owner = OwnerWindow,
-		//	ExceptionType = exception.GetType().Name,
-		//	ExceptionMessage = exception.Message,
-		//	Source = source,
-		//	StackTrace = exception.StackTrace
-		//};
+		if (!silent)
+		{
+			ExceptionWindow exceptionWindow = new()
+			{
+				Owner = OwnerWindow,
+				ExceptionType = exception.GetType().Name,
+				ExceptionMessage = exception.Message,
+				Source = source,
+				StackTrace = exception.StackTrace
+			};
 
-		//exceptionWindow.ShowDialog();
+			exceptionWindow.ShowDialog();
+		}
 	}
 
 }
