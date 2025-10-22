@@ -36,6 +36,8 @@ public partial class MainWindow : Window
 		PreviewModeCombobox.ItemsSource = Enum.GetValues<Encoding>();
 
 		DataContext = ViewModel;
+
+		Log.OwnerWindow = this;
 	}
 
 	#endregion
