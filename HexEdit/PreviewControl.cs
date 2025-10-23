@@ -383,8 +383,6 @@ public class PreviewControl : Control
 
 		int byteIndex = line * AppSettings.BytesPerRow + column;
 
-		Debug.Print($"Line {line} Column {column}  index {byteIndex}");
-
 		foreach (Chunk c in Chunks)
 		{
 			if (byteIndex >= c.Start && byteIndex <= c.End)
