@@ -2,6 +2,7 @@
 using System.Collections.ObjectModel;
 using System.IO;
 using System.Net.Http;
+using System.Text;
 using System.Text.Json;
 using System.Windows;
 using System.Windows.Input;
@@ -422,35 +423,39 @@ public partial class MainWindow : Window
 			return Encoding.Utf8;
 		}
 
-		// Check if data could be a bom-less UTF-16 or UTF-32 file.
-		//for (int i = 0; i < bytes.Length; i++)
-		//{
-		//	if (bytes[i] == 0)
-		//	{
-		//		if (i % 2 == 1) // Little endian since the null byte IS NOT on a multiple of 2 or 4.
-		//		{
-		//			if (i < bytes.Length && bytes[i + 1] == 0) // UTF-16 cannot have 2 consecutive null bytes, must be UTF-32.
-		//			{
-		//				return Encoding.Utf32le;
-		//			}
-		//			else
-		//			{
-		//				return Encoding.Utf32le;
-		//			}
-		//		}
-		//		else // Big endian since the null byte IS on a multiple of 2 or 4.
-		//		{
-		//			if (i < bytes.Length && bytes[i + 1] == 0) // UTF-16 cannot have 2 consecutive null bytes, must be UTF-32.
-		//			{
-		//				return Encoding.Utf32be;
-		//			}
-		//			else
-		//			{
-		//				return Encoding.Utf32be;
-		//			}
-		//		}
-		//	}
-		//}
+		
+		// Check if the file has null bytes, if so we assume it is a bom-less UTF-16 or UTF-32 file
+		// since they encode white space, punctuation, numbers and English characters as ascii 
+		// padded with 1 or 3 null bytes respectively, either before for big endian or after the
+		// ascii character for little endian.
+		for (int i = 0; i < bytes.Length; i++)
+		{
+			if (bytes[i] == 0)
+			{
+				if (i % 2 == 1) // Little endian since the null byte IS NOT on a multiple of 2 or 4.
+				{
+					if (i < bytes.Length && bytes[i + 1] == 0) // UTF-16 cannot have 2 consecutive null bytes, must be UTF-32.
+					{
+						return Encoding.Utf32le;
+					}
+					else
+					{
+						return Encoding.Utf16le;
+					}
+				}
+				else // Big endian since the null byte IS on a multiple of 2 or 4.
+				{
+					if (i < bytes.Length && bytes[i + 1] == 0) // UTF-16 cannot have 2 consecutive null bytes, must be UTF-32.
+					{
+						return Encoding.Utf32be;
+					}
+					else
+					{
+						return Encoding.Utf16be;
+					}
+				}
+			}
+		}
 
 		return Encoding.Unknown;
 	}
