@@ -220,6 +220,11 @@ internal static class FileEncoding
 		return true;
 	}
 
+	public static bool ValidUnicodeCharacter(int codePoint)
+	{
+		return codePoint >= 0x0000_0000 && codePoint <= 0x0010_FFFF && !(codePoint >= 0xD800 && codePoint <= 0xDFFF);
+	}
+
 	public static List<Chunk> ParseFileAs(Encoding foundEncoding, byte[] bytes)
 	{
 		switch (foundEncoding)
@@ -402,7 +407,7 @@ internal static class FileEncoding
 
 	private static List<Chunk> ParseUtf16le(byte[] bytes)
 	{
-		List<Chunk>  chunks = [];
+		List<Chunk> chunks = [];
 
 		int i = 0;
 
@@ -425,7 +430,7 @@ internal static class FileEncoding
 			}
 		}
 
-		return  chunks;
+		return chunks;
 	}
 
 	private static List<Chunk> ParseUtf16be(byte[] bytes)
@@ -444,12 +449,20 @@ internal static class FileEncoding
 		{
 			if (char.IsHighSurrogate((char)(bytes[i] << 8 | bytes[i + 1])))
 			{
-				chunks.Add(new Chunk(ChunkType.Utf16beCharacter, i, bytes[i..(i + 4)]));
+				int codePoint = DecodeUtf16be(bytes[i..(i + 4)]);
+				if (ValidUnicodeCharacter(codePoint))
+				{
+					chunks.Add(new Chunk(ChunkType.Utf16beCharacter, i, bytes[i..(i + 4)], codePoint));
+				}
 				i += 2;
 			}
 			else
 			{
-				chunks.Add(new Chunk(ChunkType.Utf16beCharacter, i, bytes[i..(i + 2)]));
+				int codePoint = DecodeUtf16be(bytes[i..(i + 2)]);
+				if (ValidUnicodeCharacter(codePoint))
+				{
+					chunks.Add(new Chunk(ChunkType.Utf16beCharacter, i, bytes[i..(i + 2)], codePoint));
+				}
 			}
 		}
 
@@ -494,6 +507,99 @@ internal static class FileEncoding
 		}
 
 		return chunks;
+	}
+
+	private static int DecodeUtf8(byte[] bytes)
+	{
+		int character = 0;
+		if (bytes.Length == 1)
+		{
+			character = bytes[0] & 0b0111_1111;
+		}
+		else if (bytes.Length == 2)
+		{
+			character = bytes[0] & 0b0001_1111;
+		}
+		else if (bytes.Length == 3)
+		{
+			character = bytes[0] & 0b0000_1111;
+		}
+		else if (bytes.Length == 4)
+		{
+			character = bytes[0] & 0b0000_0111;
+		}
+
+		int i = 0;
+		while (++i < bytes.Length)
+		{
+			character <<= 6;
+			character |= bytes[i] & 0b0011_1111;
+		}
+
+		return character;
+	}
+
+	private static int DecodeUtf16le(byte[] bytes)
+	{
+		if (bytes.Length == 2)
+		{
+			return bytes[1] << 8 | bytes[0];
+		}
+		else // 4 byte surrogate pair character
+		{
+			int highSurrogate = bytes[1] << 8 | bytes[0];
+			int lowSurrogate = bytes[3] << 8 | bytes[2];
+
+			highSurrogate -= 0xD800;
+			highSurrogate *= 0x400;
+			lowSurrogate -= 0xDC00;
+
+			return highSurrogate + lowSurrogate + 0x10000;
+		}
+	}
+
+	private static int DecodeUtf16be(byte[] bytes)
+	{
+		int codePoint = -1;
+
+		if (bytes.Length == 2)
+		{
+			codePoint = bytes[0] << 8 | bytes[1];
+		}
+		else // 4 byte surrogate pair character
+		{
+			int highSurrogate = bytes[0] << 8 | bytes[1];
+			int lowSurrogate = bytes[2] << 8 | bytes[3];
+
+			highSurrogate -= 0xD800;
+			highSurrogate *= 0x400;
+			lowSurrogate -= 0xDC00;
+
+			codePoint = highSurrogate + lowSurrogate + 0x10000;
+		}
+
+		if (ValidUnicodeCharacter(codePoint))
+		{
+			return codePoint;
+		}
+		else
+		{
+			return -1;
+		}
+	}
+
+	private static int DecodeUtf32le(byte[] bytes)
+	{
+		int i = BitConverter.ToInt32(bytes, 0);
+
+		return i;
+	}
+
+	private static int DecodeUtf32be(byte[] bytes)
+	{
+		int i = bytes[0] << 24 | bytes[1] << 16 | bytes[2] << 8 | bytes[3];
+
+		return i;
 	}
 
 	#endregion

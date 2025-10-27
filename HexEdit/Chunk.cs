@@ -7,40 +7,15 @@ public class Chunk : INotifyPropertyChanged
 
 	#region Constructor
 
-	public Chunk(ChunkType type, int start, byte[] bytes)
+	public Chunk(ChunkType type, int start, byte[] bytes, int codePoint = -1)
 	{
 		Type = type;
 		Start = start;
 		Length = bytes.Length;
 
-		int codePoint = -1;
-
-		switch (type)
-		{
-			case ChunkType.Utf8Character:
-				codePoint = DecodeUtf8(bytes);
-				break;
-
-			case ChunkType.Utf16leCharacter:
-				codePoint = DecodeUtf16le(bytes);
-				break;
-
-			case ChunkType.Utf16beCharacter:
-				codePoint = DecodeUtf16be(bytes);
-				break;
-
-			case ChunkType.Utf32leCharacter:
-				codePoint = DecodeUtf32le(bytes);
-				break;
-
-			case ChunkType.Utf32beCharacter:
-				codePoint = DecodeUtf32be(bytes);
-				break;
-		}
-
 		if (CharacterType(type))
 		{
-			if (ValidUnicodeCharacter(codePoint))
+			if (FileEncoding.ValidUnicodeCharacter(codePoint))
 			{
 				UnicodeCharacter = codePoint;
 			}
@@ -49,22 +24,6 @@ public class Chunk : INotifyPropertyChanged
 				Type = ChunkType.None;
 			}
 		}
-	}
-
-	private bool CharacterType(ChunkType type)
-	{
-		return type.In([
-			ChunkType.Utf8Character,
-			ChunkType.Utf16beCharacter,
-			ChunkType.Utf16leCharacter,
-			ChunkType.Utf32beCharacter,
-			ChunkType.Utf32leCharacter,
-		]);
-	}
-
-	private bool ValidUnicodeCharacter(int codePoint)
-	{
-		return codePoint >= 0x0000_0000 && codePoint <= 0x0010_FFFF && !(codePoint >= 0xD800 && codePoint <= 0xDFFF);
 	}
 
 	#endregion
@@ -86,13 +45,10 @@ public class Chunk : INotifyPropertyChanged
 
 	public int UnicodeCharacter
 	{
-		get
-		{
-			return field;
-		}
+		get;
 		internal set
 		{
-			Debug.Assert(ValidUnicodeCharacter(value));
+			Debug.Assert(FileEncoding.ValidUnicodeCharacter(value));
 
 			field = value;
 		}
@@ -138,86 +94,15 @@ public class Chunk : INotifyPropertyChanged
 
 	#region Methods
 
-	private int DecodeUtf8(byte[] bytes)
+	private bool CharacterType(ChunkType type)
 	{
-		int character = 0;
-		if (bytes.Length == 1)
-		{
-			character = bytes[0] & 0b0111_1111;
-		}
-		else if (bytes.Length == 2)
-		{
-			character = bytes[0] & 0b0001_1111;
-		}
-		else if (bytes.Length == 3)
-		{
-			character = bytes[0] & 0b0000_1111;
-		}
-		else if (bytes.Length == 4)
-		{
-			character = bytes[0] & 0b0000_0111;
-		}
-
-		int i = 0;
-		while (++i < bytes.Length)
-		{
-			character <<= 6;
-			character |= bytes[i] & 0b0011_1111;
-		}
-
-		return character;
-	}
-
-	private int DecodeUtf16le(byte[] bytes)
-	{
-		if (bytes.Length == 2)
-		{
-			return bytes[1] << 8 | bytes[0];
-		}
-		else // 4 byte surrogate pair character
-		{
-			int highSurrogate = bytes[1] << 8 | bytes[0];
-			int lowSurrogate = bytes[3] << 8 | bytes[2];
-
-			highSurrogate -= 0xD800;
-			highSurrogate *= 0x400;
-			lowSurrogate -= 0xDC00;
-
-			return highSurrogate + lowSurrogate + 0x10000;
-		}
-	}
-
-	private int DecodeUtf16be(byte[] bytes)
-	{
-		if (bytes.Length == 2)
-		{
-			return bytes[0] << 8 | bytes[1];
-		}
-		else // 4 byte surrogate pair character
-		{
-			int highSurrogate = bytes[0] << 8 | bytes[1];
-			int lowSurrogate = bytes[2] << 8 | bytes[3];
-
-			highSurrogate -= 0xD800;
-			highSurrogate *= 0x400;
-			lowSurrogate -= 0xDC00;
-
-			return highSurrogate + lowSurrogate + 0x10000;
-		}
-	}
-
-	private int DecodeUtf32le(byte[] bytes)
-	{
-		int i = BitConverter.ToInt32(bytes, 0);
-
-		return i;
-	}
-
-	private int DecodeUtf32be(byte[] bytes)
-	{
-		int i = bytes[0] << 24 | bytes[1] << 16 | bytes[2] << 8 | bytes[3];
-
-		return i;
+		return type.In([
+			ChunkType.Utf8Character,
+			ChunkType.Utf16beCharacter,
+			ChunkType.Utf16leCharacter,
+			ChunkType.Utf32beCharacter,
+			ChunkType.Utf32leCharacter,
+		]);
 	}
 
 	#endregion
