@@ -22,6 +22,8 @@ public class PreviewControl : Control
 	double lineHeight = -1;
 	double byteWidth = -1;
 
+	private FormattedText[] hexTexts = new FormattedText[256];
+
 	private readonly Stopwatch stopwatch = new();
 
 	Chunk selectedChunk = null;
@@ -105,6 +107,12 @@ public class PreviewControl : Control
 			hexWidth = Math.Max(hexWidth, b);
 		}
 
+		for (int i = 0; i < hexTexts.Length; i++)
+		{
+			string s = i.ToString("X2");
+			hexTexts[i] = new FormattedText(s, CultureInfo.CurrentCulture, FlowDirection.LeftToRight, typeface, FontSize, AppSettings.TextForeground, new NumberSubstitution(), TextFormattingMode.Display, dpiScale);
+		}
+
 		byteWidth = RoundToWholePixels(hexWidth) * 2 + chunkPen.Thickness * 2 + textMargin * 2;
 
 		// Draw offset background
@@ -144,7 +152,8 @@ public class PreviewControl : Control
 
 								drawingContext.PushTransform(new TranslateTransform(chunkPen.Thickness + textMargin, chunkPen.Thickness));
 								{
-									drawingContext.DrawGlyphRun(AppSettings.TextForeground, TextUtils.CreateGlyphRun(Bytes[rowByteOffset + j].ToString("X2"), typeface, this.FontSize, dpiScale, out _));
+									//drawingContext.DrawGlyphRun(AppSettings.TextForeground, TextUtils.CreateGlyphRun(Bytes[rowByteOffset + j].ToString("X2"), typeface, this.FontSize, dpiScale, out _));
+									drawingContext.DrawText(hexTexts[Bytes[rowByteOffset + j]], new Point(0, 0));
 								}
 								drawingContext.Pop();
 							}
@@ -181,7 +190,10 @@ public class PreviewControl : Control
 				// Draw preview
 				drawingContext.PushTransform(new TranslateTransform(bytesPerRow * byteWidth + 20 + rowOffsetWidth, 0));
 				{
-					drawingContext.DrawGlyphRun(AppSettings.TextForeground, TextUtils.CreateGlyphRun(previewString, typeface, this.FontSize, dpiScale, out _));
+					FormattedText previewText = new(previewString, CultureInfo.CurrentCulture, FlowDirection.LeftToRight, typeface, FontSize, AppSettings.TextForeground, new NumberSubstitution(), TextFormattingMode.Display, dpiScale);
+					drawingContext.DrawText(previewText, new Point(0, chunkPen.Thickness));
+
+					//drawingContext.DrawGlyphRun(AppSettings.TextForeground, TextUtils.CreateGlyphRun(previewString, typeface, this.FontSize, dpiScale, out _));
 				}
 				drawingContext.Pop();
 			}

@@ -122,6 +122,10 @@ public class Chunk : INotifyPropertyChanged
 				case ChunkType.Utf16beCharacter:
 				case ChunkType.Utf32leCharacter:
 				case ChunkType.Utf32beCharacter:
+					if (UnicodeCharacter == 13)
+						return "[CR]";
+					if (UnicodeCharacter == 10)
+						return "[LF]";
 					if (UnicodeCharacter != -1)
 						return char.ConvertFromUtf32(UnicodeCharacter);
 					return "[UNKNOWN]";
@@ -131,6 +135,22 @@ public class Chunk : INotifyPropertyChanged
 					return "[UNKNOWN]";
 
 			}
+		}
+	}
+
+	public bool ValidCharacter
+	{
+		get
+		{
+			if (CharacterType(Type))
+			{
+				if (ValidUnicodeCharacter(UnicodeCharacter))
+				{
+					return true;
+				}
+			}
+
+			return false;
 		}
 	}
 

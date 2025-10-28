@@ -402,7 +402,7 @@ internal static class FileEncoding
 
 	private static List<Chunk> ParseUtf16le(byte[] bytes)
 	{
-		List<Chunk>  chunks = [];
+		List<Chunk> chunks = [];
 
 		int i = 0;
 
@@ -425,7 +425,7 @@ internal static class FileEncoding
 			}
 		}
 
-		return  chunks;
+		return chunks;
 	}
 
 	private static List<Chunk> ParseUtf16be(byte[] bytes)
@@ -444,12 +444,20 @@ internal static class FileEncoding
 		{
 			if (char.IsHighSurrogate((char)(bytes[i] << 8 | bytes[i + 1])))
 			{
-				chunks.Add(new Chunk(ChunkType.Utf16beCharacter, i, bytes[i..(i + 4)]));
+				Chunk c = new Chunk(ChunkType.Utf16beCharacter, i, bytes[i..(i + 4)]);
+				if (c.ValidCharacter)
+				{
+					chunks.Add(c);
+				}
 				i += 2;
 			}
 			else
 			{
-				chunks.Add(new Chunk(ChunkType.Utf16beCharacter, i, bytes[i..(i + 2)]));
+				Chunk c = new Chunk(ChunkType.Utf16beCharacter, i, bytes[i..(i + 2)]);
+				if (c.ValidCharacter)
+				{
+					chunks.Add(c);
+				}
 			}
 		}
 
