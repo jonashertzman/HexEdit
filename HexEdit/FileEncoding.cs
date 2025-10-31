@@ -39,50 +39,33 @@ internal static class FileEncoding
 			return Encoding.Utf16be;
 		}
 
-		// No bom found, check if data passes as a bom-less UTF-8 file.
-		if (CheckValidUtf8(bytes))
+		// No bom found, check if data passes as a bom-less file.
+		else if (ValidUtf8(bytes))
 		{
 			return Encoding.Utf8;
 		}
-
-
-		// Check if the file has null bytes, if so we assume it is a bom-less UTF-16 or UTF-32 file
-		// since they encode white space, punctuation, numbers and English characters as ascii 
-		// padded with 1 or 3 null bytes respectively, either before for big endian or after the
-		// ascii character for little endian.
-		for (int i = 0; i < bytes.Length; i++)
+		else if (ValidUtf16le(bytes))
 		{
-			if (bytes[i] == 0)
-			{
-				if (i % 2 == 1) // Little endian since the null byte IS NOT on a multiple of 2 or 4.
-				{
-					if (i < bytes.Length && bytes[i + 1] == 0) // UTF-16 cannot have 2 consecutive null bytes, must be UTF-32.
-					{
-						return Encoding.Utf32le;
-					}
-					else
-					{
-						return Encoding.Utf16le;
-					}
-				}
-				else // Big endian since the null byte IS on a multiple of 2 or 4.
-				{
-					if (i < bytes.Length && bytes[i + 1] == 0) // UTF-16 cannot have 2 consecutive null bytes, must be UTF-32.
-					{
-						return Encoding.Utf32be;
-					}
-					else
-					{
-						return Encoding.Utf16be;
-					}
-				}
-			}
+			return Encoding.Utf16le;
+		}
+		else if (ValidUtf16be(bytes))
+		{
+			return Encoding.Utf16be;
+		}
+		else if (ValidUtf32le(bytes))
+		{
+			return Encoding.Utf32le;
+		}
+		else if (ValidUtf32be(bytes))
+		{
+			return Encoding.Utf32be;
 		}
 
 		return Encoding.Unknown;
 	}
 
-	private static bool CheckValidUtf8(byte[] bytes)
+
+	private static bool ValidUtf8(byte[] bytes)
 	{
 		int i = 0;
 
@@ -220,28 +203,38 @@ internal static class FileEncoding
 		return true;
 	}
 
-	public static List<Chunk> ParseFileAs(Encoding foundEncoding, byte[] bytes)
+	private static bool ValidUtf16le(byte[] bytes)
 	{
-		switch (foundEncoding)
+		return false;
+	}
+
+	private static bool ValidUtf16be(byte[] bytes)
+	{
+		return false;
+	}
+
+	private static bool ValidUtf32le(byte[] bytes)
+	{
+		return false;
+	}
+
+	private static bool ValidUtf32be(byte[] bytes)
+	{
+		return false;
+	}
+
+
+	public static List<Chunk> ParseDataAs(Encoding foundEncoding, byte[] bytes)
+	{
+		return foundEncoding switch
 		{
-			case Encoding.Utf8:
-				return ParseUtf8(bytes);
-
-			case Encoding.Utf16le:
-				return ParseUtf16le(bytes);
-
-			case Encoding.Utf16be:
-				return ParseUtf16be(bytes);
-
-			case Encoding.Utf32le:
-				return ParseUtf32le(bytes);
-
-			case Encoding.Utf32be:
-				return ParseUtf32be(bytes);
-
-			default:
-				return ParseDefault(bytes);
-		}
+			Encoding.Utf8 => ParseUtf8(bytes),
+			Encoding.Utf16le => ParseUtf16le(bytes),
+			Encoding.Utf16be => ParseUtf16be(bytes),
+			Encoding.Utf32le => ParseUtf32le(bytes),
+			Encoding.Utf32be => ParseUtf32be(bytes),
+			_ => ParseDefault(bytes),
+		};
 	}
 
 	private static List<Chunk> ParseDefault(byte[] bytes)
@@ -444,7 +437,7 @@ internal static class FileEncoding
 		{
 			if (char.IsHighSurrogate((char)(bytes[i] << 8 | bytes[i + 1])))
 			{
-				Chunk c = new Chunk(ChunkType.Utf16beCharacter, i, bytes[i..(i + 4)]);
+				Chunk c = new(ChunkType.Utf16beCharacter, i, bytes[i..(i + 4)]);
 				if (c.ValidCharacter)
 				{
 					chunks.Add(c);
@@ -453,7 +446,7 @@ internal static class FileEncoding
 			}
 			else
 			{
-				Chunk c = new Chunk(ChunkType.Utf16beCharacter, i, bytes[i..(i + 2)]);
+				Chunk c = new(ChunkType.Utf16beCharacter, i, bytes[i..(i + 2)]);
 				if (c.ValidCharacter)
 				{
 					chunks.Add(c);

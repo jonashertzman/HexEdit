@@ -84,10 +84,11 @@ public partial class MainWindow : Window
 
 	private void OpenFile(string path)
 	{
+		Mouse.OverrideCursor = Cursors.Wait;
+
 		try
 		{
 			byte[] bytes = File.ReadAllBytes(path);
-
 
 			ViewModel.CurrentFile = path;
 			ViewModel.FileContent = new ObservableCollection<byte>(bytes);
@@ -95,12 +96,14 @@ public partial class MainWindow : Window
 			Encoding foundEncoding = FileEncoding.DetectEncoding(bytes);
 
 			ViewModel.SelectedPreview = (int)foundEncoding;
-			ViewModel.Chunks = new(FileEncoding.ParseFileAs(foundEncoding, bytes));
+			ViewModel.Chunks = new(FileEncoding.ParseDataAs(foundEncoding, bytes));
 		}
 		catch (Exception exception)
 		{
 			MessageBox.Show(exception.Message, $"Error Opening File {path}", MessageBoxButton.OK, MessageBoxImage.Error);
 		}
+
+		Mouse.OverrideCursor = null;
 	}
 
 	private async Task<UnicodeInfo> GetCharacterInfo(Chunk c)
@@ -217,7 +220,7 @@ public partial class MainWindow : Window
 
 	private void PreviewModeComboBox_SelectionChanged(object sender, System.Windows.Controls.SelectionChangedEventArgs e)
 	{
-		ViewModel.Chunks = new(FileEncoding.ParseFileAs((Encoding)PreviewModeCombobox.SelectedItem, [.. ViewModel.FileContent]));
+		ViewModel.Chunks = new(FileEncoding.ParseDataAs((Encoding)PreviewModeCombobox.SelectedItem, [.. ViewModel.FileContent]));
 	}
 
 	private async void Preview_SelectionChanged(object sender, ChunkEventArgs e)
