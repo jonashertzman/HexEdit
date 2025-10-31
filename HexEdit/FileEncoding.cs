@@ -64,6 +64,10 @@ internal static class FileEncoding
 		return Encoding.Unknown;
 	}
 
+	public static bool ValidUnicodeCharacter(int codePoint)
+	{
+		return codePoint >= 0x0000_0000 && codePoint <= 0x0010_FFFF && !(codePoint >= 0xD800 && codePoint <= 0xDFFF);
+	}
 
 	private static bool ValidUtf8(byte[] bytes)
 	{
@@ -438,7 +442,7 @@ internal static class FileEncoding
 			if (char.IsHighSurrogate((char)(bytes[i] << 8 | bytes[i + 1])))
 			{
 				Chunk c = new(ChunkType.Utf16beCharacter, i, bytes[i..(i + 4)]);
-				if (c.ValidCharacter)
+				if (c.IsValidCharacter)
 				{
 					chunks.Add(c);
 				}
@@ -447,7 +451,7 @@ internal static class FileEncoding
 			else
 			{
 				Chunk c = new(ChunkType.Utf16beCharacter, i, bytes[i..(i + 2)]);
-				if (c.ValidCharacter)
+				if (c.IsValidCharacter)
 				{
 					chunks.Add(c);
 				}

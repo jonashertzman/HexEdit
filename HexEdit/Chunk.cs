@@ -40,7 +40,7 @@ public class Chunk : INotifyPropertyChanged
 
 		if (CharacterType(type))
 		{
-			if (ValidUnicodeCharacter(codePoint))
+			if (FileEncoding.ValidUnicodeCharacter(codePoint))
 			{
 				UnicodeCharacter = codePoint;
 			}
@@ -60,11 +60,6 @@ public class Chunk : INotifyPropertyChanged
 			ChunkType.Utf32beCharacter,
 			ChunkType.Utf32leCharacter,
 		]);
-	}
-
-	private bool ValidUnicodeCharacter(int codePoint)
-	{
-		return codePoint >= 0x0000_0000 && codePoint <= 0x0010_FFFF && !(codePoint >= 0xD800 && codePoint <= 0xDFFF);
 	}
 
 	#endregion
@@ -138,13 +133,13 @@ public class Chunk : INotifyPropertyChanged
 		}
 	}
 
-	public bool ValidCharacter
+	public bool IsValidCharacter
 	{
 		get
 		{
 			if (CharacterType(Type))
 			{
-				if (ValidUnicodeCharacter(UnicodeCharacter))
+				if (FileEncoding.ValidUnicodeCharacter(UnicodeCharacter))
 				{
 					return true;
 				}
