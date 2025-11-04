@@ -87,7 +87,7 @@ public class Chunk : INotifyPropertyChanged
 		}
 		internal set
 		{
-			Debug.Assert(ValidUnicodeCharacter(value));
+			Debug.Assert(FileEncoding.ValidUnicodeCharacter(value));
 
 			field = value;
 		}

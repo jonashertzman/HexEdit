@@ -100,7 +100,10 @@ public partial class MainWindow : Window
 		}
 		catch (Exception exception)
 		{
-			MessageBox.Show(exception.Message, $"Error Opening File {path}", MessageBoxButton.OK, MessageBoxImage.Error);
+			Mouse.OverrideCursor = null;
+
+			//MessageBox.Show(exception.Message, $"Error Opening File {path}", MessageBoxButton.OK, MessageBoxImage.Error);
+			StyledMessageBox.Show(exception.Message, $"Error Opening File {path}");
 		}
 
 		Mouse.OverrideCursor = null;
