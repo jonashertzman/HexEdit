@@ -209,7 +209,49 @@ internal static class FileEncoding
 
 	private static bool ValidUtf16le(byte[] bytes)
 	{
-		return false;
+		int i = 0;
+
+		if (bytes.StartsWith(UTF16LE_BOM))
+		{
+			i += UTF16LE_BOM.Length;
+		}
+
+		for (; i < bytes.Length - 1; i += 2)
+		{
+			int highSurrogate = (bytes[i + 1] << 8 | bytes[i]);
+
+			if (char.IsHighSurrogate((char)highSurrogate))
+			{
+				int lowSurrogate = bytes[3] << 8 | bytes[2];
+
+				highSurrogate -= 0xD800;
+				highSurrogate *= 0x400;
+				lowSurrogate -= 0xDC00;
+
+				if (ValidUnicodeCharacter(highSurrogate + lowSurrogate + 0x10000))
+				{
+					i += 2;
+					continue;
+				}
+				else
+				{
+					return false;
+				}
+			}
+			else
+			{
+				if (ValidUnicodeCharacter(highSurrogate))
+				{
+					continue;
+				}
+				else
+				{
+					return false;
+				}
+			}
+		}
+
+		return true;
 	}
 
 	private static bool ValidUtf16be(byte[] bytes)
