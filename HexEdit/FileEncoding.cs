@@ -45,7 +45,6 @@ internal static class FileEncoding
 			return Encoding.Utf8;
 		}
 
-
 		// Check if the file has null bytes, if so we assume it is a bom-less UTF-16 or UTF-32 file
 		// since they encode white space, punctuation, numbers and English characters as ascii 
 		// padded with 1 or 3 null bytes respectively, either before for big endian or after the
@@ -333,12 +332,51 @@ internal static class FileEncoding
 
 	private static bool ValidUtf32le(byte[] bytes)
 	{
-		return false;
+		int i = 0;
+
+		if (bytes.StartsWith(UTF32LE_BOM))
+		{
+			i += UTF32LE_BOM.Length;
+		}
+
+		for (; i < bytes.Length - 3; i += 4)
+		{
+			if (ValidUnicodeCharacter(BitConverter.ToInt32(bytes, i)))
+			{
+				continue;
+			}
+			else
+			{
+				return false;
+			}
+		}
+
+		return true;
 	}
 
 	private static bool ValidUtf32be(byte[] bytes)
 	{
-		return false;
+		int i = 0;
+
+		if (bytes.StartsWith(UTF32BE_BOM))
+		{
+			i += UTF32BE_BOM.Length;
+		}
+
+		for (; i < bytes.Length - 3; i += 4)
+		{
+
+			if (ValidUnicodeCharacter(bytes[0] << 24 | bytes[1] << 16 | bytes[2] << 8 | bytes[3]))
+			{
+				continue;
+			}
+			else
+			{
+				return false;
+			}
+		}
+
+		return true;
 	}
 
 
@@ -357,7 +395,30 @@ internal static class FileEncoding
 
 	private static List<Chunk> ParseDefault(byte[] bytes)
 	{
-		return [];
+		List<Chunk> chunks = [];
+
+		if (bytes.StartsWith(UTF8_BOM))
+		{
+			chunks.Add(new Chunk(ChunkType.Bom, 0, UTF8_BOM));
+		}
+		else if (bytes.StartsWith(UTF32LE_BOM)) // Must check this before UTF16 since the first 2 bytes are the same as an UTF16 little endian BOM.
+		{
+			chunks.Add(new Chunk(ChunkType.Bom, 0, UTF32LE_BOM));
+		}
+		else if (bytes.StartsWith(UTF32BE_BOM))
+		{
+			chunks.Add(new Chunk(ChunkType.Bom, 0, UTF32BE_BOM));
+		}
+		else if (bytes.StartsWith(UTF16LE_BOM))
+		{
+			chunks.Add(new Chunk(ChunkType.Bom, 0, UTF16LE_BOM));
+		}
+		else if (bytes.StartsWith(UTF16BE_BOM))
+		{
+			chunks.Add(new Chunk(ChunkType.Bom, 0, UTF16BE_BOM));
+		}
+
+		return chunks;
 	}
 
 	private static List<Chunk> ParseUtf8(byte[] bytes)
