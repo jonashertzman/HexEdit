@@ -44,21 +44,51 @@ internal static class FileEncoding
 		{
 			return Encoding.Utf8;
 		}
-		else if (ValidUtf16le(bytes))
+
+
+		// Check if the file has null bytes, if so we assume it is a bom-less UTF-16 or UTF-32 file
+		// since they encode white space, punctuation, numbers and English characters as ascii 
+		// padded with 1 or 3 null bytes respectively, either before for big endian or after the
+		// ascii character for little endian.
+		for (int i = 0; i < bytes.Length; i++)
 		{
-			return Encoding.Utf16le;
-		}
-		else if (ValidUtf16be(bytes))
-		{
-			return Encoding.Utf16be;
-		}
-		else if (ValidUtf32le(bytes))
-		{
-			return Encoding.Utf32le;
-		}
-		else if (ValidUtf32be(bytes))
-		{
-			return Encoding.Utf32be;
+			if (bytes[i] == 0)
+			{
+				if (i % 2 == 1) // Little endian since the null byte IS NOT on a multiple of 2 or 4.
+				{
+					if (i < bytes.Length && bytes[i + 1] == 0) // UTF-16 cannot have 2 consecutive null bytes, must be UTF-32.
+					{
+						if (ValidUtf32le(bytes))
+						{
+							return Encoding.Utf32le;
+						}
+					}
+					else
+					{
+						if (ValidUtf16le(bytes))
+						{
+							return Encoding.Utf16le;
+						}
+					}
+				}
+				else // Big endian since the null byte IS on a multiple of 2 or 4.
+				{
+					if (i < bytes.Length && bytes[i + 1] == 0) // UTF-16 cannot have 2 consecutive null bytes, must be UTF-32.
+					{
+						if (ValidUtf32be(bytes))
+						{
+							return Encoding.Utf32be;
+						}
+					}
+					else
+					{
+						if (ValidUtf16be(bytes))
+						{
+							return Encoding.Utf16be;
+						}
+					}
+				}
+			}
 		}
 
 		return Encoding.Unknown;
@@ -256,7 +286,49 @@ internal static class FileEncoding
 
 	private static bool ValidUtf16be(byte[] bytes)
 	{
-		return false;
+		int i = 0;
+
+		if (bytes.StartsWith(UTF16BE_BOM))
+		{
+			i += UTF16BE_BOM.Length;
+		}
+
+		for (; i < bytes.Length - 1; i += 2)
+		{
+			int highSurrogate = bytes[0] << 8 | bytes[1];
+
+			if (char.IsHighSurrogate((char)highSurrogate))
+			{
+				int lowSurrogate = bytes[2] << 8 | bytes[3];
+
+				highSurrogate -= 0xD800;
+				highSurrogate *= 0x400;
+				lowSurrogate -= 0xDC00;
+
+				if (ValidUnicodeCharacter(highSurrogate + lowSurrogate + 0x10000))
+				{
+					i += 2;
+					continue;
+				}
+				else
+				{
+					return false;
+				}
+			}
+			else
+			{
+				if (ValidUnicodeCharacter(highSurrogate))
+				{
+					continue;
+				}
+				else
+				{
+					return false;
+				}
+			}
+		}
+
+		return true;
 	}
 
 	private static bool ValidUtf32le(byte[] bytes)
