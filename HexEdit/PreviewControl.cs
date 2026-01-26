@@ -86,7 +86,7 @@ public class PreviewControl : Control
 		double chunkBorderThickness = RoundToWholePixels(characterHeight / 5);
 
 		Pen chunkPen = new(new SolidColorBrush(Color.FromArgb(128, 255, 0, 0)), RoundToWholePixels(chunkBorderThickness));
-		Pen chunkPen2 = new(new SolidColorBrush(Color.FromArgb(128, 0, 0, 255)), RoundToWholePixels(chunkBorderThickness));
+		Pen chunkPen2 = new((SolidColorBrush)AppSettings.SelectionBackground, RoundToWholePixels(chunkBorderThickness));
 		chunkPen.Freeze();
 		GuidelineSet chunkGuide = CreateGuidelineSet(chunkPen);
 
@@ -125,7 +125,9 @@ public class PreviewControl : Control
 			if (rowByteOffset >= Bytes.Count)
 				break;
 
-			string previewString = "";
+
+			List<Chunk> previewString = [];
+
 
 			// Line Y offset
 			drawingContext.PushTransform(new TranslateTransform(0, lineHeight * i));
@@ -147,8 +149,8 @@ public class PreviewControl : Control
 						{
 							drawingContext.PushTransform(new TranslateTransform(j * byteWidth, 0));
 							{
-								if ((j + i) % 2 == 0)
-									drawingContext.DrawRectangle(AppSettings.DisabledBackground, null, new Rect(0, 0, byteWidth, lineHeight));
+								//if ((j + i) % 2 == 0)
+								//	drawingContext.DrawRectangle(AppSettings.BorderForeground, null, new Rect(0, 0, byteWidth, lineHeight));
 
 								drawingContext.PushTransform(new TranslateTransform(chunkPen.Thickness + textMargin, chunkPen.Thickness));
 								{
@@ -178,7 +180,7 @@ public class PreviewControl : Control
 
 								if (c.Start >= rowByteOffset)
 								{
-									previewString += c.PreviewString;
+									previewString.Add(c);
 								}
 							}
 						}
@@ -190,9 +192,14 @@ public class PreviewControl : Control
 				// Draw preview
 				drawingContext.PushTransform(new TranslateTransform(bytesPerRow * byteWidth + 20 + rowOffsetWidth, 0));
 				{
-					FormattedText previewText = new(previewString, CultureInfo.CurrentCulture, FlowDirection.LeftToRight, typeface, FontSize, AppSettings.TextForeground, new NumberSubstitution(), TextFormattingMode.Display, dpiScale);
-					drawingContext.DrawText(previewText, new Point(0, chunkPen.Thickness));
+					//FormattedText previewText = new(previewString, CultureInfo.CurrentCulture, FlowDirection.LeftToRight, typeface, FontSize, AppSettings.TextForeground, new NumberSubstitution(), TextFormattingMode.Display, dpiScale);
 
+					//if (previewText.Text.Length > 0)
+					//{
+					//	Geometry x = previewText.BuildHighlightGeometry(new Point(0, chunkPen.Thickness), 0, 1);
+					//	drawingContext.DrawText(previewText, new Point(0, chunkPen.Thickness));
+					//	drawingContext.DrawRectangle(AppSettings.SelectionBackground, null, x.Bounds);
+					//}
 					//drawingContext.DrawGlyphRun(AppSettings.TextForeground, TextUtils.CreateGlyphRun(previewString, typeface, this.FontSize, dpiScale, out _));
 				}
 				drawingContext.Pop();
