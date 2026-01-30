@@ -42,7 +42,7 @@ public partial class MainWindow : Window
 	{
 		AppSettings.LoadSettings();
 
-		if (PointIsOnScreen(AppSettings.PositionLeft, AppSettings.PositionTop) || PointIsOnScreen(AppSettings.PositionLeft + AppSettings.Width, AppSettings.PositionTop))
+		if (Utils.PointIsOnScreen(AppSettings.PositionLeft, AppSettings.PositionTop) || Utils.PointIsOnScreen(AppSettings.PositionLeft + AppSettings.Width, AppSettings.PositionTop))
 		{
 			this.Left = AppSettings.PositionLeft;
 			this.Top = AppSettings.PositionTop;
@@ -51,19 +51,6 @@ public partial class MainWindow : Window
 		}
 
 		Task.Run(() => LoadUnicodeInfoCache());
-	}
-
-	private bool PointIsOnScreen(double x, double y)
-	{
-		if (x >= SystemParameters.VirtualScreenLeft && x <= SystemParameters.VirtualScreenLeft + SystemParameters.VirtualScreenWidth)
-		{
-			if (y >= SystemParameters.VirtualScreenTop && y <= SystemParameters.VirtualScreenTop + SystemParameters.VirtualScreenHeight)
-			{
-				return true;
-			}
-		}
-
-		return false;
 	}
 
 	private void LoadUnicodeInfoCache()

@@ -17,6 +17,19 @@ internal static class Utils
 		};
 	}
 
+	public static bool PointIsOnScreen(double x, double y)
+	{
+		if (x >= SystemParameters.VirtualScreenLeft && x <= SystemParameters.VirtualScreenLeft + SystemParameters.VirtualScreenWidth)
+		{
+			if (y >= SystemParameters.VirtualScreenTop && y <= SystemParameters.VirtualScreenTop + SystemParameters.VirtualScreenHeight)
+			{
+				return true;
+			}
+		}
+
+		return false;
+	}
+
 	#region Extention Methods
 
 	public static bool In<T>(this T item, params T[] list)
