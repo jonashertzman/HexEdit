@@ -215,8 +215,12 @@
 
 			<Border Grid.Column="2" BorderThickness="1,1,0,1">
 				<StackPanel>
-					<TextBox Name="ChunkTitle" BorderThickness="0,0,0,1" FontSize="14" FontWeight="Bold" />
-					<TextBox Name="ChunkInfo" AcceptsReturn="True" BorderThickness="0" />
+					<TextBlock Text="Type"  />
+					<TextBox Name="TextBoxChunkTitle" BorderThickness="0,0,0,1" FontSize="14" FontWeight="Bold" />
+					<TextBlock Text="Value" />
+					<TextBox Name="TextBoxChunkValue" BorderThickness="0,0,0,1" FontSize="14" FontWeight="Bold" />
+					<TextBlock Text="Info" />
+					<TextBox Name="TextBoxChunkInfo" AcceptsReturn="True" BorderThickness="0" />
 				</StackPanel>
 			</Border>
 		</Grid>

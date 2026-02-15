@@ -109,7 +109,11 @@ public class Chunk : INotifyPropertyChanged
 		{
 			switch (Type)
 			{
-				case ChunkType.Bom:
+				case ChunkType.Utf8Bom:
+				case ChunkType.Utf16leBom:
+				case ChunkType.Utf16beBom:
+				case ChunkType.Utf32leBom:
+				case ChunkType.Utf32beBom:
 					return "[BOM]";
 
 				case ChunkType.Utf8Character:
@@ -130,6 +134,48 @@ public class Chunk : INotifyPropertyChanged
 					return "[UNKNOWN]";
 
 			}
+		}
+	}
+
+	public string Description
+	{
+		get
+		{
+			switch (Type)
+			{
+				case ChunkType.Utf8Bom:
+					return Type.ToString();
+
+				case ChunkType.Utf16leBom:
+					return Type.ToString();
+
+				case ChunkType.Utf16beBom:
+					return Type.ToString();
+
+				case ChunkType.Utf32leBom:
+					return Type.ToString();
+
+				case ChunkType.Utf32beBom:
+					return Type.ToString();
+
+				case ChunkType.Utf8Character:
+					return Type.ToString();
+
+				case ChunkType.Utf16leCharacter:
+					return Type.ToString();
+
+				case ChunkType.Utf16beCharacter:
+					return Type.ToString();
+
+				case ChunkType.Utf32leCharacter:
+					return Type.ToString();
+
+				case ChunkType.Utf32beCharacter:
+					return Type.ToString();
+
+			}
+
+			return "";
 		}
 	}
 

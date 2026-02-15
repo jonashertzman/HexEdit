@@ -399,23 +399,23 @@ internal static class FileEncoding
 
 		if (bytes.StartsWith(UTF8_BOM))
 		{
-			chunks.Add(new Chunk(ChunkType.Bom, 0, UTF8_BOM));
+			chunks.Add(new Chunk(ChunkType.Utf8Bom, 0, UTF8_BOM));
 		}
 		else if (bytes.StartsWith(UTF32LE_BOM)) // Must check this before UTF16 since the first 2 bytes are the same as an UTF16 little endian BOM.
 		{
-			chunks.Add(new Chunk(ChunkType.Bom, 0, UTF32LE_BOM));
+			chunks.Add(new Chunk(ChunkType.Utf32leBom, 0, UTF32LE_BOM));
 		}
 		else if (bytes.StartsWith(UTF32BE_BOM))
 		{
-			chunks.Add(new Chunk(ChunkType.Bom, 0, UTF32BE_BOM));
+			chunks.Add(new Chunk(ChunkType.Utf32beBom, 0, UTF32BE_BOM));
 		}
 		else if (bytes.StartsWith(UTF16LE_BOM))
 		{
-			chunks.Add(new Chunk(ChunkType.Bom, 0, UTF16LE_BOM));
+			chunks.Add(new Chunk(ChunkType.Utf16leBom, 0, UTF16LE_BOM));
 		}
 		else if (bytes.StartsWith(UTF16BE_BOM))
 		{
-			chunks.Add(new Chunk(ChunkType.Bom, 0, UTF16BE_BOM));
+			chunks.Add(new Chunk(ChunkType.Utf16beBom, 0, UTF16BE_BOM));
 		}
 
 		return chunks;
@@ -429,7 +429,7 @@ internal static class FileEncoding
 
 		if (bytes.StartsWith(UTF8_BOM))
 		{
-			chunks.Add(new Chunk(ChunkType.Bom, i, UTF8_BOM));
+			chunks.Add(new Chunk(ChunkType.Utf8Bom, i, UTF8_BOM));
 			i += UTF8_BOM.Length;
 		}
 
@@ -580,7 +580,7 @@ internal static class FileEncoding
 
 		if (bytes.StartsWith(UTF16LE_BOM))
 		{
-			chunks.Add(new Chunk(ChunkType.Bom, i, UTF16LE_BOM));
+			chunks.Add(new Chunk(ChunkType.Utf16leBom, i, UTF16LE_BOM));
 			i += UTF16LE_BOM.Length;
 		}
 
@@ -608,7 +608,7 @@ internal static class FileEncoding
 
 		if (bytes.StartsWith(UTF16BE_BOM))
 		{
-			chunks.Add(new Chunk(ChunkType.Bom, i, UTF16BE_BOM));
+			chunks.Add(new Chunk(ChunkType.Utf16beBom, i, UTF16BE_BOM));
 			i += UTF16BE_BOM.Length;
 		}
 
@@ -644,7 +644,7 @@ internal static class FileEncoding
 
 		if (bytes.StartsWith(UTF32LE_BOM))
 		{
-			chunks.Add(new Chunk(ChunkType.Bom, i, UTF32LE_BOM));
+			chunks.Add(new Chunk(ChunkType.Utf32leBom, i, UTF32LE_BOM));
 			i += UTF32LE_BOM.Length;
 		}
 
@@ -664,7 +664,7 @@ internal static class FileEncoding
 
 		if (bytes.StartsWith(UTF32BE_BOM))
 		{
-			chunks.Add(new Chunk(ChunkType.Bom, i, UTF32BE_BOM));
+			chunks.Add(new Chunk(ChunkType.Utf32beBom, i, UTF32BE_BOM));
 			i += UTF32BE_BOM.Length;
 		}
 

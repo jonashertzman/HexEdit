@@ -241,23 +241,26 @@ public partial class MainWindow : Window
 
 			if (c != null)
 			{
-				if (c.Type == ChunkType.Bom)
-				{
+				TextBoxChunkTitle.Text = c.Description;
 
-				}
-				else if (c.UnicodeCharacter != -1)
+				if (c.UnicodeCharacter != -1)
 				{
 					UnicodeInfo info = await GetCharacterInfo(c);
 					if (info != null)
 					{
-						ChunkTitle.Text = info.codePoint.ToString("X4");
-						ChunkInfo.Text = $"""
+						TextBoxChunkValue.Text = info.codePoint.ToString("X4");
+						TextBoxChunkInfo.Text = $"""
 						{info.name}
 						{info.block}
 						{info.generalCategory}
 						{info.script}
 						""";
 					}
+				}
+				else
+				{
+					TextBoxChunkValue.Text = "";
+					TextBoxChunkInfo.Text = "";
 				}
 			}
 		}

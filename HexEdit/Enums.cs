@@ -5,7 +5,13 @@ namespace HexEdit;
 public enum ChunkType
 {
 	None,
-	Bom,
+
+	Utf8Bom,
+	Utf16leBom,
+	Utf16beBom,
+	Utf32leBom,
+	Utf32beBom,
+
 	Utf8Character,
 	Utf16leCharacter,
 	Utf16beCharacter,
