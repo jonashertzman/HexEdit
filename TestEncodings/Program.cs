@@ -7,13 +7,9 @@ internal class Program
 
 	static void Main(string[] args)
 	{
-		string workingDirectory = Path.GetDirectoryName(Environment.ProcessPath) ?? Environment.CurrentDirectory;
-
 		string outDirectory = @"..\..\..\..\HexEdit\ManualTests\FileEncodings";
 
-		string p = Path.Combine(outDirectory, "test");
-
-		string s = "ABC def\nÅÄÖ\nДЖЗ\n日本語𱍊";
+		string s = "ABC def\nÅÄÖ\nДЖЗ\n日本語𱍊\nA\u030A\n";
 
 		// UTF-8
 		File.WriteAllText(Path.Combine(outDirectory, "UTF8.txt"), s, new UTF8Encoding(false));
