@@ -245,10 +245,11 @@ public partial class MainWindow : Window
 
 				if (c.UnicodeCharacter != -1)
 				{
+					TextBoxChunkValue.Text = c.UnicodeCharacter.ToString("X4");
+
 					UnicodeInfo info = await GetCharacterInfo(c);
 					if (info != null)
 					{
-						TextBoxChunkValue.Text = info.codePoint.ToString("X4");
 						TextBoxChunkInfo.Text = $"""
 						{info.name}
 						{info.block}
