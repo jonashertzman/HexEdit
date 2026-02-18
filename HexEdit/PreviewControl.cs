@@ -192,8 +192,6 @@ public class PreviewControl : Control
 				// Draw preview
 				drawingContext.PushTransform(new TranslateTransform(bytesPerRow * byteWidth + 20 + rowOffsetWidth, 0));
 				{
-					Debug.WriteLine($"------------------------------");
-
 					double next = 0;
 					foreach (Chunk c in previewString)
 					{
@@ -203,11 +201,7 @@ public class PreviewControl : Control
 						{
 							Geometry x = previewText.BuildHighlightGeometry(new Point(next, chunkPen.Thickness));
 
-
-							Debug.WriteLine($"{next}  {c.PreviewString}  {x.Bounds.Width}");
-
-
-							drawingContext.DrawText(previewText, new Point(next, chunkPen.Thickness));
+							drawingContext.DrawText(previewText, new Point(x.Bounds.Left, chunkPen.Thickness));
 							if (c == selectedChunk)
 							{
 								drawingContext.DrawRectangle(AppSettings.SelectionBackground, null, x.Bounds);
