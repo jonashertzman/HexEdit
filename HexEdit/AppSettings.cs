@@ -175,15 +175,39 @@ public static class AppSettings
 		}
 	}
 
-	public static Brush SelectionBackground
+	public static Brush TextSelectionBackground
 	{
 		get;
 		set
 		{
 			field = value;
 			field.Freeze();
-			CurrentTheme.SelectionBackground = ((SolidColorBrush)value).Color.ToString();
-			NotifyStaticPropertyChanged(nameof(SelectionBackground));
+			CurrentTheme.TextSelectionBackground = ((SolidColorBrush)value).Color.ToString();
+			NotifyStaticPropertyChanged(nameof(TextSelectionBackground));
+		}
+	}
+
+	public static Brush ChunkForeground
+	{
+		get;
+		set
+		{
+			field = value;
+			field.Freeze();
+			CurrentTheme.ChunkForeground = ((SolidColorBrush)value).Color.ToString();
+			NotifyStaticPropertyChanged(nameof(ChunkForeground));
+		}
+	}
+
+	public static Brush SelectedChunkForeground
+	{
+		get;
+		set
+		{
+			field = value;
+			field.Freeze();
+			CurrentTheme.SelectedChunkForeground = ((SolidColorBrush)value).Color.ToString();
+			NotifyStaticPropertyChanged(nameof(SelectedChunkForeground));
 		}
 	}
 
@@ -474,7 +498,10 @@ public static class AppSettings
 		TextForeground = new SolidColorBrush((Color)ColorConverter.ConvertFromString(CurrentTheme.TextForeground));
 		TextBackground = new SolidColorBrush((Color)ColorConverter.ConvertFromString(CurrentTheme.TextBackground));
 
-		SelectionBackground = new SolidColorBrush((Color)ColorConverter.ConvertFromString(CurrentTheme.SelectionBackground));
+		TextSelectionBackground = new SolidColorBrush((Color)ColorConverter.ConvertFromString(CurrentTheme.TextSelectionBackground));
+
+		ChunkForeground = new SolidColorBrush((Color)ColorConverter.ConvertFromString(CurrentTheme.ChunkForeground));
+		SelectedChunkForeground = new SolidColorBrush((Color)ColorConverter.ConvertFromString(CurrentTheme.SelectedChunkForeground));
 
 		// UI colors
 		WindowForeground = new SolidColorBrush((Color)ColorConverter.ConvertFromString(CurrentTheme.NormalText));

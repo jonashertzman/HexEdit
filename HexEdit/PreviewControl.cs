@@ -22,7 +22,7 @@ public class PreviewControl : Control
 	double lineHeight = -1;
 	double byteWidth = -1;
 
-	private FormattedText[] hexTexts = new FormattedText[256];
+	private readonly FormattedText[] hexTexts = new FormattedText[256];
 
 	private readonly Stopwatch stopwatch = new();
 
@@ -60,9 +60,6 @@ public class PreviewControl : Control
 		if (Bytes.Count == 0)
 			return;
 
-		Stopwatch sw = new();
-		sw.Start();
-
 		typeface = new Typeface(this.FontFamily, this.FontStyle, this.FontWeight, this.FontStretch);
 
 		Matrix m = PresentationSource.FromVisual(this).CompositionTarget.TransformToDevice;
@@ -85,8 +82,8 @@ public class PreviewControl : Control
 
 		double chunkBorderThickness = RoundToWholePixels(characterHeight / 5);
 
-		Pen chunkPen = new(new SolidColorBrush(Color.FromArgb(128, 255, 0, 0)), RoundToWholePixels(chunkBorderThickness));
-		Pen chunkPen2 = new(new SolidColorBrush(Color.FromArgb(255, 0, 0, 255)), RoundToWholePixels(chunkBorderThickness));
+		Pen chunkPen = new(AppSettings.ChunkForeground, RoundToWholePixels(chunkBorderThickness));
+		Pen chunkPen2 = new(AppSettings.SelectedChunkForeground, RoundToWholePixels(chunkBorderThickness));
 		chunkPen.Freeze();
 		GuidelineSet chunkGuide = CreateGuidelineSet(chunkPen);
 
@@ -154,7 +151,6 @@ public class PreviewControl : Control
 
 								drawingContext.PushTransform(new TranslateTransform(chunkPen.Thickness + textMargin, chunkPen.Thickness));
 								{
-									//drawingContext.DrawGlyphRun(AppSettings.TextForeground, TextUtils.CreateGlyphRun(Bytes[rowByteOffset + j].ToString("X2"), typeface, this.FontSize, dpiScale, out _));
 									drawingContext.DrawText(hexTexts[Bytes[rowByteOffset + j]], new Point(0, 0));
 								}
 								drawingContext.Pop();
@@ -202,15 +198,18 @@ public class PreviewControl : Control
 							Geometry x = previewText.BuildHighlightGeometry(new Point(next, chunkPen.Thickness));
 
 							drawingContext.DrawText(previewText, new Point(x.Bounds.Left, chunkPen.Thickness));
+
 							if (c == selectedChunk)
 							{
-								drawingContext.DrawRectangle(AppSettings.SelectionBackground, null, x.Bounds);
+								drawingContext.DrawRectangle(AppSettings.TextSelectionBackground, null, x.Bounds);
+
+								FormattedText highlightText = new(c.PreviewString, CultureInfo.CurrentCulture, FlowDirection.LeftToRight, typeface, FontSize, AppSettings.SelectedChunkForeground, new NumberSubstitution(), TextFormattingMode.Display, dpiScale);
+								drawingContext.DrawText(highlightText, new Point(x.Bounds.Left, chunkPen.Thickness));
 							}
 
 							next += x.Bounds.Width;
 						}
 					}
-					//drawingContext.DrawGlyphRun(AppSettings.TextForeground, TextUtils.CreateGlyphRun(previewString, typeface, this.FontSize, dpiScale, out _));
 				}
 				drawingContext.Pop();
 			}

@@ -12,7 +12,10 @@ public static class DefaultSettings
 		TextBackground = "#FF1B1B1B",
 		TextForeground = "#FFFFFFFF",
 
-		SelectionBackground = "#320096D2",
+		TextSelectionBackground = "#320096D2",
+
+		ChunkForeground = "#880000FF",
+		SelectedChunkForeground = "#88FF0000",
 
 		// UI colors
 		NormalText = "#FFD8D8D8",
@@ -41,7 +44,10 @@ public static class DefaultSettings
 		TextForeground = "#FF000000",
 		TextBackground = "#FFFFFFFF",
 
-		SelectionBackground = "#320096D2",
+		TextSelectionBackground = "#320096D2",
+
+		ChunkForeground = "#880000FF",
+		SelectedChunkForeground = "#88FF0000",
 
 		// UI colors
 		NormalText = "#FF000000",

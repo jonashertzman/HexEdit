@@ -10,7 +10,9 @@ public class ColorTheme
 	// Editor colors
 	public required string TextForeground { get; set; }
 	public required string TextBackground { get; set; }
-	public required string SelectionBackground { get; set; }
+	public required string TextSelectionBackground { get; set; }
+	public required string ChunkForeground { get; set; }
+	public required string SelectedChunkForeground { get; set; }
 
 	// UI colors
 	public required string NormalText { get; set; }
