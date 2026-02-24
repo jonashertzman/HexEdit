@@ -2,6 +2,7 @@
 using System.Collections.ObjectModel;
 using System.IO;
 using System.Net.Http;
+using System.Reflection;
 using System.Text.Json;
 using System.Windows;
 using System.Windows.Input;
@@ -111,36 +112,87 @@ public partial class MainWindow : Window
 		Mouse.OverrideCursor = null;
 	}
 
-	private async Task<UnicodeInfo> GetCharacterInfo(Chunk c)
+	private async Task<UnicodeInfo> GetCharacterInfo(int codePoint)
 	{
-		if (characterInfo.TryGetValue(c.UnicodeCharacter, out UnicodeInfo info))
+		if (characterInfo.TryGetValue(codePoint, out UnicodeInfo info))
 		{
 			return info;
 		}
 		else
 		{
-			Debug.WriteLine($"Fetching unicode info for character {c.UnicodeCharacter}");
+			Debug.WriteLine($"Fetching unicode info for character {codePoint}");
 
 			info = null;
-			HttpResponseMessage response = await client.GetAsync($"https://ucdapi.org/unicode/10.0.0/codepoint/dec/{c.UnicodeCharacter}");
+			HttpResponseMessage response = await client.GetAsync($"https://ucdapi.org/unicode/10.0.0/codepoint/dec/{codePoint}");
 			if (response.IsSuccessStatusCode)
 			{
 				info = await response.Content.ReadAsAsync<UnicodeInfo>();
-				characterInfo[c.UnicodeCharacter] = info;
-
+				characterInfo[codePoint] = info;
 				_ = Task.Run(() =>
 				{
 					Directory.CreateDirectory(AppSettings.CodePointDirectory);
-					File.WriteAllText(Path.Combine(AppSettings.CodePointDirectory, $"{c.UnicodeCharacter}.json"), JsonSerializer.Serialize(info));
+					File.WriteAllText(Path.Combine(AppSettings.CodePointDirectory, $"{codePoint}.json"), JsonSerializer.Serialize(info));
 				});
 			}
 			else
 			{
-				Debug.WriteLine($"Error fetching unicode info for code point {c.UnicodeCharacter}\n{response.StatusCode}");
+				Debug.WriteLine($"Error fetching unicode info for code point {codePoint}, {response.StatusCode}, using fallback...");
+
+				info = ReadFallback(codePoint);
+				if (info != null)
+				{
+					characterInfo[codePoint] = info;
+				}
 			}
 
 			return info;
 		}
+	}
+
+	private UnicodeInfo ReadFallback(int codePoint)
+	{
+
+		using Stream stream = Assembly.GetExecutingAssembly().GetManifestResourceStream("HexEdit.Resources.UnicodeCharacters.txt");
+
+		if (stream != null)
+		{
+			using StreamReader reader = new(stream);
+
+			while (reader.ReadLine() is string line)
+			{
+				if (line.StartsWith('#'))
+				{
+					continue;
+				}
+				else
+				{
+					string[] lineSegments = line.Split(';');
+					if (lineSegments.Length == 2)
+					{
+						if (lineSegments[0].Contains(".."))
+						{
+							string[] codePointRange = lineSegments[0].Split("..");
+							int rangeStart = Convert.ToInt32(codePointRange[0].Trim(), 16);
+							int rangeEnd = Convert.ToInt32(codePointRange[1].Trim(), 16);
+
+							if (codePoint >= rangeStart && codePoint <= rangeEnd)
+							{
+								return new UnicodeInfo() { codePoint = codePoint, name = lineSegments[1].Trim().Replace("*", codePoint.ToString("X4")) };
+							}
+						}
+						else
+						{
+							if (Convert.ToInt32(lineSegments[0].Trim(), 16) == codePoint)
+							{
+								return new UnicodeInfo() { codePoint = codePoint, name = lineSegments[1].Trim() };
+							}
+						}
+					}
+				}
+			}
+		}
+
+		return null;
 	}
 
 	private async void CheckForNewVersion(bool forced = false)
@@ -247,7 +299,7 @@ public partial class MainWindow : Window
 				{
 					TextBoxChunkValue.Text = c.UnicodeCharacter.ToString("X4");
 
-					UnicodeInfo info = await GetCharacterInfo(c);
+					UnicodeInfo info = await GetCharacterInfo(c.UnicodeCharacter);
 					if (info != null)
 					{
 						TextBoxChunkInfo.Text = $"""
@@ -256,6 +308,10 @@ public partial class MainWindow : Window
 						{info.generalCategory}
 						{info.script}
 						""";
+					}
+					else
+					{
+						TextBoxChunkInfo.Text = "N/A";
 					}
 				}
 				else
