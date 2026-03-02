@@ -16,7 +16,7 @@ public partial class MainWindow : Window
 
 	MainWindowViewModel ViewModel { get; } = new MainWindowViewModel();
 
-	readonly Dictionary<int, UnicodeInfo> characterInfo = [];
+	readonly Dictionary<int, UnicodeInfo> codePointCache = [];
 
 	static readonly HttpClient client = new();
 
@@ -49,28 +49,6 @@ public partial class MainWindow : Window
 			this.Top = AppSettings.PositionTop;
 			this.Width = AppSettings.Width;
 			this.Height = AppSettings.Height;
-		}
-
-		Task.Run(() => LoadUnicodeInfoCache());
-	}
-
-	private void LoadUnicodeInfoCache()
-	{
-		Directory.CreateDirectory(AppSettings.CodePointDirectory);
-		foreach (var file in Directory.GetFiles(AppSettings.CodePointDirectory, "*.json"))
-		{
-			try
-			{
-				var info = JsonSerializer.Deserialize<UnicodeInfo>(File.ReadAllText(file));
-				if (info != null)
-				{
-					characterInfo[info.codePoint] = info;
-				}
-			}
-			catch (Exception ex)
-			{
-				Debug.WriteLine("Failed to load code point info from disk: " + ex.Message);
-			}
 		}
 	}
 
@@ -114,44 +92,78 @@ public partial class MainWindow : Window
 
 	private async Task<UnicodeInfo> GetCharacterInfo(int codePoint)
 	{
-		if (characterInfo.TryGetValue(codePoint, out UnicodeInfo info))
+		// Check if we have the character info cached in memory.
+		if (codePointCache.TryGetValue(codePoint, out UnicodeInfo unicodeInfo))
 		{
-			return info;
+			return unicodeInfo;
 		}
-		else
+
+		// If not, check if we have it cached on disk.
+		if (ReadCharacterInfo(codePoint, out unicodeInfo))
 		{
-			Debug.WriteLine($"Fetching unicode info for character {codePoint}");
-
-			info = null;
-			HttpResponseMessage response = await client.GetAsync($"https://ucdapi.org/unicode/10.0.0/codepoint/dec/{codePoint}");
-			if (response.IsSuccessStatusCode)
-			{
-				info = await response.Content.ReadAsAsync<UnicodeInfo>();
-				characterInfo[codePoint] = info;
-				_ = Task.Run(() =>
-				{
-					Directory.CreateDirectory(AppSettings.CodePointDirectory);
-					File.WriteAllText(Path.Combine(AppSettings.CodePointDirectory, $"{codePoint}.json"), JsonSerializer.Serialize(info));
-				});
-			}
-			else
-			{
-				Debug.WriteLine($"Error fetching unicode info for code point {codePoint}, {response.StatusCode}, using fallback...");
-
-				info = ReadFallback(codePoint);
-				if (info != null)
-				{
-					characterInfo[codePoint] = info;
-				}
-			}
-
-			return info;
+			codePointCache[codePoint] = unicodeInfo;
+			return unicodeInfo;
 		}
+
+		// If not, fetch it from the API.
+		if (FetchCharacterInfo(codePoint, out unicodeInfo))
+		{
+			codePointCache[codePoint] = unicodeInfo;
+			return unicodeInfo;
+		}
+
+		// If that fails, read it from the fallback resource file.
+		if (ReadCharacterInfoFallback(codePoint, out unicodeInfo))
+		{
+			codePointCache[codePoint] = unicodeInfo;
+			return unicodeInfo;
+		}
+
+		return null;
 	}
 
-	private UnicodeInfo ReadFallback(int codePoint)
+	private bool ReadCharacterInfo(int codePoint, out UnicodeInfo unicodeInfo)
 	{
+		string path = Path.Combine(AppSettings.CodePointDirectory, $"{codePoint}.json");
 
+		if (File.Exists(path))
+		{
+			try
+			{
+				unicodeInfo = JsonSerializer.Deserialize<UnicodeInfo>(File.ReadAllText(path));
+				if (unicodeInfo != null)
+				{
+					return true;
+				}
+			}
+			catch (Exception ex)
+			{
+			}
+		}
+
+		unicodeInfo = null;
+		return false;
+	}
+
+	private bool FetchCharacterInfo(int codePoint, out UnicodeInfo unicodeInfo)
+	{
+		unicodeInfo = null;
+		HttpResponseMessage response = client.GetAsync($"https://ucdapi.org/unicode/10.0.0/codepoint/dec/{codePoint}").Result;
+		if (response.IsSuccessStatusCode)
+		{
+			unicodeInfo = response.Content.ReadAsAsync<UnicodeInfo>().Result;
+
+			Directory.CreateDirectory(AppSettings.CodePointDirectory);
+			File.WriteAllText(Path.Combine(AppSettings.CodePointDirectory, $"{codePoint}.json"), JsonSerializer.Serialize(unicodeInfo));
+
+			return true;
+		}
+
+		return false;
+	}
+
+	private bool ReadCharacterInfoFallback(int codePoint, out UnicodeInfo unicodeInfo)
+	{
 		using Stream stream = Assembly.GetExecutingAssembly().GetManifestResourceStream("HexEdit.Resources.UnicodeCharacters.txt");
 
 		if (stream != null)
@@ -177,14 +189,16 @@ public partial class MainWindow : Window
 
 							if (codePoint >= rangeStart && codePoint <= rangeEnd)
 							{
-								return new UnicodeInfo() { codePoint = codePoint, name = lineSegments[1].Trim().Replace("*", codePoint.ToString("X4")) };
+								unicodeInfo = new UnicodeInfo() { codePoint = codePoint, name = lineSegments[1].Trim().Replace("*", codePoint.ToString("X4")) };
+								return true;
 							}
 						}
 						else
 						{
 							if (Convert.ToInt32(lineSegments[0].Trim(), 16) == codePoint)
 							{
-								return new UnicodeInfo() { codePoint = codePoint, name = lineSegments[1].Trim() };
+								unicodeInfo = new UnicodeInfo() { codePoint = codePoint, name = lineSegments[1].Trim() };
+								return true;
 							}
 						}
 					}
@@ -192,7 +206,8 @@ public partial class MainWindow : Window
 			}
 		}
 
-		return null;
+		unicodeInfo = null;
+		return false;
 	}
 
 	private async void CheckForNewVersion(bool forced = false)
