@@ -148,16 +148,20 @@ public partial class MainWindow : Window
 	private bool FetchCharacterInfo(int codePoint, out UnicodeInfo unicodeInfo)
 	{
 		unicodeInfo = null;
-		HttpResponseMessage response = client.GetAsync($"https://ucdapi.org/unicode/10.0.0/codepoint/dec/{codePoint}").Result;
-		if (response.IsSuccessStatusCode)
+		try
 		{
-			unicodeInfo = response.Content.ReadAsAsync<UnicodeInfo>().Result;
+			HttpResponseMessage response = client.GetAsync($"https://ucdapi.org/unicode/10.0.0/codepoint/dec/{codePoint}").Result;
+			if (response.IsSuccessStatusCode)
+			{
+				unicodeInfo = response.Content.ReadAsAsync<UnicodeInfo>().Result;
 
-			Directory.CreateDirectory(AppSettings.CodePointDirectory);
-			File.WriteAllText(Path.Combine(AppSettings.CodePointDirectory, $"{codePoint}.json"), JsonSerializer.Serialize(unicodeInfo));
+				Directory.CreateDirectory(AppSettings.CodePointDirectory);
+				File.WriteAllText(Path.Combine(AppSettings.CodePointDirectory, $"{codePoint}.json"), JsonSerializer.Serialize(unicodeInfo));
 
-			return true;
+				return true;
+			}
 		}
+		catch (Exception) { }
 
 		return false;
 	}
@@ -313,6 +317,8 @@ public partial class MainWindow : Window
 				if (c.UnicodeCharacter != -1)
 				{
 					TextBoxChunkValue.Text = c.UnicodeCharacter.ToString("X4");
+					TextBoxChunkValue.Text = "";
+					TextBoxChunkInfo.Text = "";
 
 					UnicodeInfo info = await GetCharacterInfo(c.UnicodeCharacter);
 					if (info != null)
@@ -328,11 +334,6 @@ public partial class MainWindow : Window
 					{
 						TextBoxChunkInfo.Text = "N/A";
 					}
-				}
-				else
-				{
-					TextBoxChunkValue.Text = "";
-					TextBoxChunkInfo.Text = "";
 				}
 			}
 		}
