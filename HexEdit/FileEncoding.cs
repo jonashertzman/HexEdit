@@ -22,7 +22,7 @@ internal static class FileEncoding
 		{
 			return Encoding.Utf8;
 		}
-		else if (bytes.StartsWith(UTF32LE_BOM)) // Must check this before UTF16 since the first 2 bytes are the same as an UTF16 little endian BOM.
+		else if (bytes.StartsWith(UTF32LE_BOM)) // Must check this before UTF-16 since the first 2 bytes are the same as an UTF-16 little endian BOM.
 		{
 			return Encoding.Utf32le;
 		}
@@ -401,7 +401,7 @@ internal static class FileEncoding
 		{
 			chunks.Add(new Chunk(ChunkType.Utf8Bom, 0, UTF8_BOM));
 		}
-		else if (bytes.StartsWith(UTF32LE_BOM)) // Must check this before UTF16 since the first 2 bytes are the same as an UTF16 little endian BOM.
+		else if (bytes.StartsWith(UTF32LE_BOM)) // Must check this before UTF-16 since the first 2 bytes are the same as an UTF-16 little endian BOM.
 		{
 			chunks.Add(new Chunk(ChunkType.Utf32leBom, 0, UTF32LE_BOM));
 		}
