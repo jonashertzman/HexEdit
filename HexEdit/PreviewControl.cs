@@ -23,8 +23,11 @@ public class PreviewControl : Control
 	double byteWidth = -1;
 
 	private readonly FormattedText[] hexTexts = new FormattedText[256];
+	private readonly GlyphRun[] hexTexts2 = new GlyphRun[256];
 
 	private readonly Stopwatch stopwatch = new();
+
+	private readonly Dictionary<int, List<Chunk>> rowChunks = [];
 
 	Chunk selectedChunk = null;
 
@@ -97,6 +100,7 @@ public class PreviewControl : Control
 
 		double hexWidth = 0;
 
+		// Calculate max width of a hex digit
 		for (int i = 0; i < 16; i++)
 		{
 			string s = i.ToString("X");
@@ -104,10 +108,28 @@ public class PreviewControl : Control
 			hexWidth = Math.Max(hexWidth, b);
 		}
 
+		// Pre-create hex value glyph runs
 		for (int i = 0; i < hexTexts.Length; i++)
 		{
 			string s = i.ToString("X2");
-			hexTexts[i] = new FormattedText(s, CultureInfo.CurrentCulture, FlowDirection.LeftToRight, typeface, FontSize, AppSettings.TextForeground, new NumberSubstitution(), TextFormattingMode.Display, dpiScale);
+			//	hexTexts[i] = new FormattedText(s, CultureInfo.CurrentCulture, FlowDirection.LeftToRight, typeface, FontSize, AppSettings.TextForeground, new NumberSubstitution(), TextFormattingMode.Display, dpiScale);
+			hexTexts2[i] = TextUtils.CreateGlyphRun(i.ToString("X2"), typeface, FontSize, dpiScale, out double w);
+		}
+
+		if (rowChunks.Count == 0)
+		{
+			foreach (Chunk c in Chunks)
+			{
+				int startRow = c.Start / bytesPerRow;
+				int endRow = c.End / bytesPerRow;
+
+				for (int row = startRow; row <= endRow; row++)
+				{
+					if (!rowChunks.ContainsKey(row))
+						rowChunks[row] = [];
+					rowChunks[row].Add(c);
+				}
+			}
 		}
 
 		byteWidth = RoundToWholePixels(hexWidth) * 2 + chunkPen.Thickness * 2 + textMargin * 2;
@@ -151,7 +173,9 @@ public class PreviewControl : Control
 
 								drawingContext.PushTransform(new TranslateTransform(chunkPen.Thickness + textMargin, chunkPen.Thickness));
 								{
-									drawingContext.DrawText(hexTexts[Bytes[rowByteOffset + j]], new Point(0, 0));
+									//	drawingContext.DrawText(hexTexts[Bytes[rowByteOffset + j]], new Point(0, 0));
+									drawingContext.DrawGlyphRun(SystemColors.ControlDarkBrush, hexTexts2[Bytes[rowByteOffset + j]]);
+
 								}
 								drawingContext.Pop();
 							}
@@ -305,7 +329,7 @@ public class PreviewControl : Control
 	}
 
 
-	public static readonly DependencyProperty ChunksProperty = DependencyProperty.Register("Chunks", typeof(ObservableCollection<Chunk>), typeof(PreviewControl), new FrameworkPropertyMetadata(new ObservableCollection<Chunk>(), FrameworkPropertyMetadataOptions.AffectsRender));
+	public static readonly DependencyProperty ChunksProperty = DependencyProperty.Register("Chunks", typeof(ObservableCollection<Chunk>), typeof(PreviewControl), new FrameworkPropertyMetadata(new ObservableCollection<Chunk>(), FrameworkPropertyMetadataOptions.AffectsRender, new PropertyChangedCallback(OnSetTextChanged)));
 
 	public ObservableCollection<Chunk> Chunks
 	{
@@ -313,6 +337,15 @@ public class PreviewControl : Control
 		set { SetValue(ChunksProperty, value); }
 	}
 
+	private static void OnSetTextChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+	{
+		PreviewControl UserControl1Control = d as PreviewControl;
+		UserControl1Control.OnSetTextChanged(e);
+	}
+
+	private void OnSetTextChanged(DependencyPropertyChangedEventArgs e)
+	{
+	}
 
 	public static readonly DependencyProperty VisibleLinesProperty = DependencyProperty.Register("VisibleLines", typeof(int), typeof(PreviewControl));
 

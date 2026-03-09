@@ -317,7 +317,6 @@ public partial class MainWindow : Window
 				if (c.UnicodeCharacter != -1)
 				{
 					TextBoxChunkValue.Text = c.UnicodeCharacter.ToString("X4");
-					TextBoxChunkValue.Text = "";
 					TextBoxChunkInfo.Text = "";
 
 					UnicodeInfo info = await GetCharacterInfo(c.UnicodeCharacter);
