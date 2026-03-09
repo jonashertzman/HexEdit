@@ -69,9 +69,9 @@ public class PreviewControl : Control
 		dpiScale = 1 / m.M11;
 
 		double maxTextWidth = 0;
-		int bytesPerRow = AppSettings.BytesPerRow;
+		//	int bytesPerRow = AppSettings.BytesPerRow;
 
-		int lineCount = Bytes.Count / bytesPerRow + 1;
+		int lineCount = Bytes.Count / BytesPerRow + 1;
 
 		TextUtils.CreateGlyphRun("W", typeface, this.FontSize, dpiScale, out double characterWidth);
 		double characterHeight = Math.Ceiling(TextUtils.FontHeight(typeface, this.FontSize, dpiScale) / dpiScale) * dpiScale;
@@ -93,7 +93,7 @@ public class PreviewControl : Control
 		lineHeight = characterHeight + 2 * chunkPen.Thickness;
 
 		VisibleLines = (int)(ActualHeight / lineHeight + 1);
-		MaxVerticalScroll = Bytes.Count / bytesPerRow - VisibleLines + 2;
+		MaxVerticalScroll = Bytes.Count / BytesPerRow - VisibleLines + 2;
 
 		textMargin = RoundToWholePixels(4);
 		offsetMargin = RoundToWholePixels(rowOffsetWidth) + (2 * textMargin);
@@ -120,8 +120,8 @@ public class PreviewControl : Control
 		{
 			foreach (Chunk c in Chunks)
 			{
-				int startRow = c.Start / bytesPerRow;
-				int endRow = c.End / bytesPerRow;
+				int startRow = c.Start / BytesPerRow;
+				int endRow = c.End / BytesPerRow;
 
 				for (int row = startRow; row <= endRow; row++)
 				{
@@ -139,7 +139,7 @@ public class PreviewControl : Control
 
 		for (int i = 0; i < VisibleLines; i++)
 		{
-			int rowByteOffset = (i + VerticalOffset) * bytesPerRow;
+			int rowByteOffset = (i + VerticalOffset) * BytesPerRow;
 
 			if (rowByteOffset >= Bytes.Count)
 				break;
@@ -158,13 +158,13 @@ public class PreviewControl : Control
 				}
 				drawingContext.Pop();
 
-				drawingContext.PushClip(new RectangleGeometry(new Rect(offsetMargin, 0, byteWidth * bytesPerRow, lineHeight)));
+				drawingContext.PushClip(new RectangleGeometry(new Rect(offsetMargin, 0, byteWidth * BytesPerRow, lineHeight)));
 				{
 					drawingContext.PushTransform(new TranslateTransform(offsetMargin, 0));
 					{
 
 						// Draw bytes
-						for (int j = 0; j < bytesPerRow && rowByteOffset + j < Bytes.Count; j++)
+						for (int j = 0; j < BytesPerRow && rowByteOffset + j < Bytes.Count; j++)
 						{
 							drawingContext.PushTransform(new TranslateTransform(j * byteWidth, 0));
 							{
@@ -190,7 +190,7 @@ public class PreviewControl : Control
 
 							Pen pen = c == selectedChunk ? chunkPen2 : chunkPen;
 
-							if (!(c.End < rowByteOffset || c.Start > rowByteOffset + bytesPerRow - 1))
+							if (!(c.End < rowByteOffset || c.Start > rowByteOffset + BytesPerRow - 1))
 							{
 								drawingContext.PushClip(new RectangleGeometry(new Rect((c.Start - rowByteOffset) * byteWidth, 0, byteWidth * c.Length, lineHeight)));
 								{
@@ -210,7 +210,7 @@ public class PreviewControl : Control
 				drawingContext.Pop(); // Byte area clip
 
 				// Draw preview
-				drawingContext.PushTransform(new TranslateTransform(bytesPerRow * byteWidth + 20 + rowOffsetWidth, 0));
+				drawingContext.PushTransform(new TranslateTransform(BytesPerRow * byteWidth + 20 + rowOffsetWidth, 0));
 				{
 					double next = 0;
 					foreach (Chunk c in previewString)
@@ -316,6 +316,18 @@ public class PreviewControl : Control
 
 	public event EventHandler<ChunkEventArgs> SelectionChanged;
 
+	private static void OnDependencyPropertyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+	{
+		PreviewControl previewControl = d as PreviewControl;
+		previewControl.OnDependencyPropertyChanged(e);
+	}
+
+	private void OnDependencyPropertyChanged(DependencyPropertyChangedEventArgs e)
+	{
+		Debug.Print($"Dependency property changed: {e.Property.Name}");
+		rowChunks.Clear();
+	}
+
 	#endregion
 
 	#region Dependency Properties
@@ -329,7 +341,7 @@ public class PreviewControl : Control
 	}
 
 
-	public static readonly DependencyProperty ChunksProperty = DependencyProperty.Register("Chunks", typeof(ObservableCollection<Chunk>), typeof(PreviewControl), new FrameworkPropertyMetadata(new ObservableCollection<Chunk>(), FrameworkPropertyMetadataOptions.AffectsRender, new PropertyChangedCallback(OnSetTextChanged)));
+	public static readonly DependencyProperty ChunksProperty = DependencyProperty.Register("Chunks", typeof(ObservableCollection<Chunk>), typeof(PreviewControl), new FrameworkPropertyMetadata(new ObservableCollection<Chunk>(), FrameworkPropertyMetadataOptions.AffectsRender, new PropertyChangedCallback(OnDependencyPropertyChanged)));
 
 	public ObservableCollection<Chunk> Chunks
 	{
@@ -337,15 +349,6 @@ public class PreviewControl : Control
 		set { SetValue(ChunksProperty, value); }
 	}
 
-	private static void OnSetTextChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
-	{
-		PreviewControl UserControl1Control = d as PreviewControl;
-		UserControl1Control.OnSetTextChanged(e);
-	}
-
-	private void OnSetTextChanged(DependencyPropertyChangedEventArgs e)
-	{
-	}
 
 	public static readonly DependencyProperty VisibleLinesProperty = DependencyProperty.Register("VisibleLines", typeof(int), typeof(PreviewControl));
 
@@ -380,6 +383,15 @@ public class PreviewControl : Control
 	{
 		get { return (int)GetValue(TextAreaWidthProperty); }
 		set { SetValue(TextAreaWidthProperty, value); }
+	}
+
+
+	public static readonly DependencyProperty BytesPerRowProperty = DependencyProperty.Register("BytesPerRow", typeof(int), typeof(PreviewControl), new FrameworkPropertyMetadata(new PropertyChangedCallback(OnDependencyPropertyChanged)));
+
+	public int BytesPerRow
+	{
+		get { return (int)GetValue(BytesPerRowProperty); }
+		set { SetValue(BytesPerRowProperty, value); }
 	}
 
 
