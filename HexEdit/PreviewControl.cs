@@ -139,7 +139,8 @@ public class PreviewControl : Control
 
 		for (int i = 0; i < VisibleLines; i++)
 		{
-			int rowByteOffset = (i + VerticalOffset) * BytesPerRow;
+			int currentLine = i + VerticalOffset;
+			int rowByteOffset = currentLine * BytesPerRow;
 
 			if (rowByteOffset >= Bytes.Count)
 				break;
@@ -183,24 +184,29 @@ public class PreviewControl : Control
 						}
 
 						// Draw chunks
-						foreach (Chunk c in Chunks)
+						rowChunks.TryGetValue(currentLine, out List<Chunk> a);
+
+						if (a != null)
 						{
-							if (c.Type == ChunkType.None)
-								continue;
-
-							Pen pen = c == selectedChunk ? chunkPen2 : chunkPen;
-
-							if (!(c.End < rowByteOffset || c.Start > rowByteOffset + BytesPerRow - 1))
+							foreach (Chunk c in a)
 							{
-								drawingContext.PushClip(new RectangleGeometry(new Rect((c.Start - rowByteOffset) * byteWidth, 0, byteWidth * c.Length, lineHeight)));
-								{
-									drawingContext.DrawRectangle(null, pen, new Rect((c.Start - rowByteOffset) * byteWidth, 0, c.Length * byteWidth, lineHeight));
-								}
-								drawingContext.Pop();
+								if (c.Type == ChunkType.None)
+									continue;
 
-								if (c.Start >= rowByteOffset)
+								Pen pen = c == selectedChunk ? chunkPen2 : chunkPen;
+
+								if (!(c.End < rowByteOffset || c.Start > rowByteOffset + BytesPerRow - 1))
 								{
-									previewString.Add(c);
+									drawingContext.PushClip(new RectangleGeometry(new Rect((c.Start - rowByteOffset) * byteWidth, 0, byteWidth * c.Length, lineHeight)));
+									{
+										drawingContext.DrawRectangle(null, pen, new Rect((c.Start - rowByteOffset) * byteWidth, 0, c.Length * byteWidth, lineHeight));
+									}
+									drawingContext.Pop();
+
+									if (c.Start >= rowByteOffset)
+									{
+										previewString.Add(c);
+									}
 								}
 							}
 						}
