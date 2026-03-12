@@ -181,8 +181,8 @@
 				</StackPanel>
 
 				<StackPanel Margin="2" Orientation="Horizontal" IsEnabled="False">
-					<TextBlock Margin="2" VerticalAlignment="Center" Style="{StaticResource StyledTextBlock}" Text="Code Page"  IsEnabled="False"/>
-					<ComboBox Name="CodePageCombobox" Width="90" Margin="2,0,4,0" VerticalAlignment="Center"  />
+					<TextBlock Margin="2" VerticalAlignment="Center" Style="{StaticResource StyledTextBlock}" Text="Code Page" IsEnabled="False" />
+					<ComboBox Name="CodePageCombobox" Width="90" Margin="2,0,4,0" VerticalAlignment="Center" />
 				</StackPanel>
 
 				<!--<Slider Grid.Column="1" Width="100" Margin="3" VerticalAlignment="Center" Maximum="30" Value="10" />-->
@@ -221,7 +221,7 @@
 
 			<Border Grid.Column="2" BorderThickness="1,1,0,1">
 				<StackPanel>
-					<controls:ChunkInfo/>
+					<controls:ChunkInfo />
 					<TextBlock Text="Type" />
 					<TextBox Name="TextBoxChunkTitle" BorderThickness="0,0,0,1" FontSize="14" FontWeight="Bold" />
 					<TextBlock Text="Value" />
