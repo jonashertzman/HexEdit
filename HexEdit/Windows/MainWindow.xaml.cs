@@ -106,11 +106,11 @@ public partial class MainWindow : Window
 		}
 
 		// If not, fetch it from the API.
-		if (FetchCharacterInfo(codePoint, out unicodeInfo))
-		{
-			codePointCache[codePoint] = unicodeInfo;
-			return unicodeInfo;
-		}
+		//if (FetchCharacterInfo(codePoint, out unicodeInfo))
+		//{
+		//	codePointCache[codePoint] = unicodeInfo;
+		//	return unicodeInfo;
+		//}
 
 		// If that fails, read it from the fallback resource file.
 		if (ReadCharacterInfoFallback(codePoint, out unicodeInfo))
@@ -138,6 +138,7 @@ public partial class MainWindow : Window
 			}
 			catch (Exception ex)
 			{
+				Log.LogUnhandledException(ex, $"Failed to read cached character info for code point {codePoint} from disk.", true);
 			}
 		}
 
