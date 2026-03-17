@@ -121,6 +121,12 @@ public class MainWindowViewModel : INotifyPropertyChanged
 		set { field = value; OnPropertyChanged(nameof(Chunks)); }
 	} = [];
 
+	public Chunk SelectedChunk
+	{
+		get;
+		set { field = value; OnPropertyChanged(nameof(SelectedChunk)); }
+	}
+
 
 	public int BytesPerRow
 	{

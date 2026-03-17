@@ -221,7 +221,7 @@
 
 			<Border Grid.Column="2" BorderThickness="1,1,0,1">
 				<StackPanel>
-					<controls:ChunkInfo />
+					<controls:ChunkInfo SelectedChunk="{Binding SelectedChunk}" />
 					<TextBlock Text="Type" />
 					<TextBox Name="TextBoxChunkTitle" BorderThickness="0,0,0,1" FontSize="14" FontWeight="Bold" />
 					<TextBlock Text="Value" />

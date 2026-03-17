@@ -9,9 +9,12 @@
 	d:DesignHeight="200"
 	d:DesignWidth="200"
 	mc:Ignorable="d">
-	<Border Background="Beige">
-		<Grid>
-			<TextBlock Margin="10" Text="Chunk Info" FontWeight="Bold" />
-		</Grid>
+	<Border >
+		<StackPanel Margin="5">
+			<TextBlock   Text="Chunk Info" FontWeight="Bold" />
+			<TextBlock   Text="{Binding SelectedChunk.Type}"  />
+			<TextBlock   Text="{Binding SelectedChunk.Description}"  />
+			<TextBlock   Text="{Binding SelectedChunk.UnicodeCharacter}"  />
+		</StackPanel>
 	</Border>
 </UserControl>

@@ -313,6 +313,8 @@ public partial class MainWindow : Window
 
 			if (c != null)
 			{
+				ViewModel.SelectedChunk = c;
+
 				TextBoxChunkTitle.Text = c.Description;
 
 				if (c.UnicodeCharacter != -1)
