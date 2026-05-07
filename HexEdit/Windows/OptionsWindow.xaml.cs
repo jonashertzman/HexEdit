@@ -1,4 +1,5 @@
 ﻿using System.Windows;
+using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Shapes;
 
@@ -100,6 +101,13 @@ public partial class OptionsWindow : Window
 	private void Slider_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
 	{
 		byte alpha = (byte)(ShowAlpha ? (byte)SliderA.Value : 255);
+
+		if ((Keyboard.Modifiers & ModifierKeys.Shift) == ModifierKeys.Shift)
+		{
+			SliderR.Value = e.NewValue;
+			SliderG.Value = e.NewValue;
+			SliderB.Value = e.NewValue;
+		}
 
 		Color newColor = Color.FromArgb(alpha, (byte)SliderR.Value, (byte)SliderG.Value, (byte)SliderB.Value);
 		ColorHex.Text = newColor.ToString();

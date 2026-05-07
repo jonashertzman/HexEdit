@@ -155,7 +155,7 @@ public class PreviewControl : Control
 				// Draw row offset
 				drawingContext.PushTransform(new TranslateTransform(textMargin, chunkPen.Thickness));
 				{
-					drawingContext.DrawGlyphRun(SystemColors.ControlDarkBrush, TextUtils.CreateGlyphRun(rowByteOffset.ToString("X2").PadLeft(maxOffset, '0'), typeface, FontSize, dpiScale, out double w));
+					drawingContext.DrawGlyphRun(AppSettings.DisabledForeground, TextUtils.CreateGlyphRun(rowByteOffset.ToString("X2").PadLeft(maxOffset, '0'), typeface, FontSize, dpiScale, out double w));
 				}
 				drawingContext.Pop();
 
@@ -170,12 +170,12 @@ public class PreviewControl : Control
 							drawingContext.PushTransform(new TranslateTransform(j * byteWidth, 0));
 							{
 								if ((j + i) % 2 == 0)
-									drawingContext.DrawRectangle(new SolidColorBrush(Color.FromRgb(230, 230, 230)), null, new Rect(0, 0, byteWidth, lineHeight));
+									drawingContext.DrawRectangle(AppSettings.DialogBackground, null, new Rect(0, 0, byteWidth, lineHeight));
 
 								drawingContext.PushTransform(new TranslateTransform(chunkPen.Thickness + textMargin, chunkPen.Thickness));
 								{
 									//	drawingContext.DrawText(hexTexts[Bytes[rowByteOffset + j]], new Point(0, 0));
-									drawingContext.DrawGlyphRun(SystemColors.ControlDarkBrush, hexTexts2[Bytes[rowByteOffset + j]]);
+									drawingContext.DrawGlyphRun(AppSettings.DisabledForeground, hexTexts2[Bytes[rowByteOffset + j]]);
 
 								}
 								drawingContext.Pop();

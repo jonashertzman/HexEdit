@@ -9,12 +9,13 @@
 	d:DesignHeight="200"
 	d:DesignWidth="200"
 	mc:Ignorable="d">
-	<Border >
+
+	<Border>
 		<StackPanel Margin="5">
-			<TextBlock   Text="Chunk Info" FontWeight="Bold" />
-			<TextBlock   Text="{Binding SelectedChunk.Type}"  />
-			<TextBlock   Text="{Binding SelectedChunk.Description}"  />
-			<TextBlock   Text="{Binding SelectedChunk.UnicodeCharacter}"  />
+			<TextBlock Text="Chunk Info" FontWeight="Bold" Style="{StaticResource StyledTextBlock}" />
+			<TextBlock Text="{Binding SelectedChunk.Type}" Style="{StaticResource StyledTextBlock}" />
+			<TextBlock Text="{Binding SelectedChunk.Description}" Style="{StaticResource StyledTextBlock}" />
+			<TextBlock Text="{Binding SelectedChunk.UnicodeCharacter}" Style="{StaticResource StyledTextBlock}" />
 		</StackPanel>
 	</Border>
 </UserControl>
