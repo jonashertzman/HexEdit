@@ -146,7 +146,7 @@ public class PreviewControl : Control
 				break;
 
 
-			List<Chunk> previewString = [];
+			List<Chunk> previewChunks = [];
 
 
 			// Line Y offset
@@ -205,7 +205,7 @@ public class PreviewControl : Control
 
 									if (c.Start >= rowByteOffset)
 									{
-										previewString.Add(c);
+										previewChunks.Add(c);
 									}
 								}
 							}
@@ -219,22 +219,25 @@ public class PreviewControl : Control
 				drawingContext.PushTransform(new TranslateTransform(BytesPerRow * byteWidth + 20 + rowOffsetWidth, 0));
 				{
 					double next = 0;
-					foreach (Chunk c in previewString)
+					foreach (Chunk c in previewChunks)
 					{
 						FormattedText previewText = new(c.PreviewString, CultureInfo.CurrentCulture, FlowDirection.LeftToRight, typeface, FontSize, AppSettings.TextForeground, new NumberSubstitution(), TextFormattingMode.Display, dpiScale);
 
-						if (previewText.Text.Length > 0)
+						if (c.PreviewString.Length > 0)
 						{
 							Geometry x = previewText.BuildHighlightGeometry(new Point(next, chunkPen.Thickness));
 
-							drawingContext.DrawText(previewText, new Point(x.Bounds.Left, chunkPen.Thickness));
-
-							if (c == selectedChunk)
+							if (c != selectedChunk)
 							{
-								drawingContext.DrawRectangle(AppSettings.TextSelectionBackground, null, x.Bounds);
+								drawingContext.DrawText(previewText, x.Bounds.Location);
+							}
+							else
+							{
+								//drawingContext.DrawRectangle(Brushes.Yellow, null, x.Bounds);
 
 								FormattedText highlightText = new(c.PreviewString, CultureInfo.CurrentCulture, FlowDirection.LeftToRight, typeface, FontSize, AppSettings.SelectedChunkForeground, new NumberSubstitution(), TextFormattingMode.Display, dpiScale);
-								drawingContext.DrawText(highlightText, new Point(x.Bounds.Left, chunkPen.Thickness));
+
+								drawingContext.DrawText(highlightText, x.Bounds.Location);
 							}
 
 							next += x.Bounds.Width;
