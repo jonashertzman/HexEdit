@@ -139,7 +139,7 @@
 						</PathGeometry>
 					</Path.Data>
 				</Path>
-				<Rectangle Canvas.Left="50" Canvas.Top="0" Width="70" Height="50">
+				<Rectangle Canvas.Left="50" Canvas.Top="0" Width="70" Height="50" StrokeThickness="0">
 					<Rectangle.Fill>
 						<LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
 							<GradientStop Offset="0" Color="#FFE2E0FF" />
@@ -147,7 +147,7 @@
 						</LinearGradientBrush>
 					</Rectangle.Fill>
 				</Rectangle>
-				<Rectangle Canvas.Left="20" Canvas.Top="70" Width="120" Height="80">
+				<Rectangle Canvas.Left="20" Canvas.Top="70" Width="120" Height="80" StrokeThickness="0">
 					<Rectangle.Fill>
 						<LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
 							<GradientStop Offset="0" Color="White" />
