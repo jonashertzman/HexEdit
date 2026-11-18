@@ -9,7 +9,7 @@ using System.Windows.Input;
 
 namespace HexEdit;
 
-public partial class MainWindow : Window
+public partial class MainWindow : StyledWindow
 {
 
 	#region Members

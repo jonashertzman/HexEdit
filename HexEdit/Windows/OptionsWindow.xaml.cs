@@ -5,7 +5,7 @@ using System.Windows.Shapes;
 
 namespace HexEdit;
 
-public partial class OptionsWindow : Window
+public partial class OptionsWindow : StyledWindow
 {
 
 	#region Members

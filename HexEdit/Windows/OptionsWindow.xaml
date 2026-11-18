@@ -1,4 +1,4 @@
-﻿<Window
+﻿<local:StyledWindow
 	x:Class="HexEdit.OptionsWindow"
 	xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
 	xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
@@ -12,11 +12,6 @@
 	d:Width="500"
 	d:Height="700"
 	d:DataContext="{d:DesignInstance Type=local:MainWindowViewModel}"
-	Background="{StaticResource Theme.Dialog}"
-	TextOptions.TextFormattingMode="Display"
-	UseLayoutRounding="True"
-	ResizeMode="CanResizeWithGrip"
-	WindowStartupLocation="CenterOwner"
 	ShowInTaskbar="False"
 	mc:Ignorable="d">
 
@@ -222,4 +217,4 @@
 		</StackPanel>
 
 	</Grid>
-</Window>
+</local:StyledWindow>

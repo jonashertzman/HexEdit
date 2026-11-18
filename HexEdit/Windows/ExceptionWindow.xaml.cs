@@ -5,7 +5,7 @@ using System.Windows;
 
 namespace HexEdit;
 
-public partial class ExceptionWindow : Window
+public partial class ExceptionWindow : StyledWindow
 {
 
 	#region Constructor

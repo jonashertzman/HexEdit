@@ -2,7 +2,7 @@
 
 namespace HexEdit;
 
-public partial class StyledMessageBox : Window
+public partial class StyledMessageBox : StyledWindow
 {
 	public StyledMessageBox()
 	{

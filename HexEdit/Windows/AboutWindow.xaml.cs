@@ -1,8 +1,6 @@
-﻿using System.Windows;
+﻿namespace HexEdit;
 
-namespace HexEdit;
-
-public partial class AboutWindow : Window
+public partial class AboutWindow : StyledWindow
 {
 
 	public AboutWindow()
