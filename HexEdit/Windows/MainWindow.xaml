@@ -10,8 +10,6 @@
 	Width="600"
 	Height="300"
 	d:DataContext="{d:DesignInstance Type=local:MainWindowViewModel}"
-	d:TextOptions.TextFormattingMode="Display"
-	d:ResizeMode="CanResizeWithGrip"
 	Closed="Window_Closed"
 	ContentRendered="Window_ContentRendered"
 	Initialized="Window_Initialized"
@@ -75,7 +73,7 @@
 				</Menu>
 
 				<!--  Update Panel  -->
-				<StackPanel x:Name="UpdatePanel" Grid.Column="2" VerticalAlignment="Center" d:Visibility="Visible" Visibility="{Binding Path=NewBuildAvailable, Converter={StaticResource BooleanToVisibilityConverter}}">
+				<StackPanel x:Name="UpdatePanel" Grid.Column="2" VerticalAlignment="Center" Visibility="{Binding Path=NewBuildAvailable, Converter={StaticResource BooleanToVisibilityConverter}, FallbackValue=Visible}">
 					<Label Margin="3,3,5,3" Padding="0">
 						<Hyperlink RequestNavigate="Hyperlink_OpenHomepage" NavigateUri="https://github.com/jonashertzman/HexEdit/blob/master/README.md">New Version Available</Hyperlink>
 					</Label>
