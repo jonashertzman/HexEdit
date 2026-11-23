@@ -72,19 +72,6 @@
 		</Style.Triggers>
 	</Style>
 
-	<Style x:Key="ToolbarButton" TargetType="Button" BasedOn="{StaticResource {x:Static ToolBar.ButtonStyleKey}}">
-		<Setter Property="Margin" Value="2" />
-		<Setter Property="Padding" Value="3" />
-		<Setter Property="Focusable" Value="False" />
-		<Setter Property="BorderThickness" Value="0" />
-		<Setter Property="ToolTipService.ToolTip" Value="{StaticResource TooltipPanel}" />
-		<Style.Triggers>
-			<Trigger Property="IsEnabled" Value="False">
-				<Setter Property="Background" Value="Transparent" />
-			</Trigger>
-		</Style.Triggers>
-	</Style>
-
 	<Style x:Key="CommonGridSpliter" TargetType="GridSplitter">
 		<Setter Property="BorderBrush" Value="{StaticResource Theme.BorderLight}" />
 		<Setter Property="Background" Value="{StaticResource Theme.Dialog}" />
